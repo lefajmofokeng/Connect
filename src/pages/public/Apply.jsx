@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import { useAuth } from "../../context/AuthContext";
 import { doc, getDoc, addDoc, collection, serverTimestamp } from "firebase/firestore";
 import { ref, uploadBytes, getDownloadURL } from "firebase/storage";
 import { useParams, useNavigate, Link } from "react-router-dom";
@@ -18,6 +19,8 @@ const OPTIONAL_DOCS = [
 export default function Apply() {
   const { id } = useParams();
   const navigate = useNavigate();
+  const { user, jobSeekerProfile } = useAuth();
+
   const [job, setJob] = useState(null);
   const [loading, setLoading] = useState(true);
   const [submitting, setSubmitting] = useState(false);
@@ -30,18 +33,30 @@ export default function Apply() {
     city: "", notice: "", experience: "", salaryExpectation: "", coverNote: "",
   });
 
-  // Required files
   const [cvFile, setCvFile] = useState(null);
   const [idFile, setIdFile] = useState(null);
-
-  // Optional files — object keyed by doc type
   const [optionalFiles, setOptionalFiles] = useState({});
-
   const [declarations, setDeclarations] = useState({
     accurate: false, rightToWork: false, consent: false,
   });
 
   useEffect(() => { fetchJob(); }, [id]);
+
+  // Pre-fill from job seeker profile
+  useEffect(() => {
+    if (jobSeekerProfile) {
+      setForm(prev => ({
+        ...prev,
+        firstName: prev.firstName || jobSeekerProfile.firstName || "",
+        lastName: prev.lastName || jobSeekerProfile.lastName || "",
+        email: prev.email || user?.email || "",
+        phone: prev.phone || jobSeekerProfile.phone || "",
+        city: prev.city || jobSeekerProfile.city || "",
+      }));
+    } else if (user?.email) {
+      setForm(prev => ({ ...prev, email: prev.email || user.email }));
+    }
+  }, [jobSeekerProfile, user]);
 
   const fetchJob = async () => {
     try {
@@ -52,7 +67,10 @@ export default function Apply() {
   };
 
   const set = (field) => (e) => setForm(prev => ({ ...prev, [field]: e.target.value }));
-  const setDecl = (field) => (e) => setDeclarations(prev => ({ ...prev, [field]: e.target.checked }));
+
+  const toggleDecl = (field) => {
+    setDeclarations(prev => ({ ...prev, [field]: !prev[field] }));
+  };
 
   const setOptionalFile = (key) => (e) => {
     const file = e.target.files[0] || null;
@@ -102,13 +120,11 @@ export default function Apply() {
       const appId = `${id}_${Date.now()}`;
       const base = `applications/${appId}`;
 
-      // Upload required files
       const [cvPath, idPath] = await Promise.all([
         uploadFile(cvFile, `${base}/cv_${cvFile.name}`),
         uploadFile(idFile, `${base}/id_${idFile.name}`),
       ]);
 
-      // Upload optional files
       const optionalPaths = {};
       await Promise.all(
         Object.entries(optionalFiles).map(async ([key, file]) => {
@@ -127,14 +143,13 @@ export default function Apply() {
         employerName: job.employerName,
         applyEmail: job.applyEmail || "",
         ...form,
-        // Required docs
         cvPath,
         cvMime: cvFile.type,
         cvFilename: cvFile.name,
         idPath,
         idFilename: idFile.name,
-        // Optional docs
         optionalDocs: optionalPaths,
+        jobSeekerId: user?.uid || null,
         status: "new",
         notes: "",
         createdAt: serverTimestamp(),
@@ -162,12 +177,20 @@ export default function Apply() {
       <Navbar />
       <div style={s.body}>
         <div style={s.successCard}>
-          <div style={s.successIcon}>✓</div>
+          <div style={s.successIcon}>
+            <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+          </div>
           <h1 style={s.successTitle}>Application Submitted!</h1>
           <p style={s.successSub}>
-            Your application for <strong style={{ color: "#e8edf8" }}>{job.title}</strong> at{" "}
-            <strong style={{ color: "#e8edf8" }}>{job.employerName}</strong> has been received. Good luck!
+            Your application for <strong style={{ color: "#202124" }}>{job.title}</strong> at{" "}
+            <strong style={{ color: "#202124" }}>{job.employerName}</strong> has been received. Good luck!
           </p>
+          {user && jobSeekerProfile && (
+            <p style={{ ...s.successSub, fontSize: "13px", marginBottom: "24px" }}>
+              You can track your application status in your{" "}
+              <Link to="/jobseeker/dashboard" style={{ color: "#1a73e8" }}>dashboard</Link>.
+            </p>
+          )}
           <div style={s.successActions}>
             <button onClick={() => navigate("/jobs")} style={s.btnPrimary}>Browse More Jobs</button>
             <button onClick={() => navigate("/")} style={s.btnOutline}>Back to Home</button>
@@ -182,60 +205,80 @@ export default function Apply() {
       <Navbar />
       <div style={s.body}>
         <div style={s.inner}>
-          <button onClick={() => navigate(`/jobs/${id}`)} style={s.backBtn}>← Back to Job</button>
+          <button onClick={() => navigate(`/jobs/${id}`)} style={s.backBtn}>
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" style={{ marginRight: 6 }}><line x1="19" y1="12" x2="5" y2="12"/><polyline points="12 19 5 12 12 5"/></svg>
+            Back to Job
+          </button>
 
           <div style={s.layout}>
+            {/* Form */}
             <div style={s.formCol}>
               <div style={s.card}>
+
                 {/* Stepper */}
                 <div style={s.stepper}>
                   {STEPS.map((label, i) => (
                     <div key={label} style={s.stepItem}>
                       <div style={{ ...s.stepDot, ...(i === step ? s.stepActive : i < step ? s.stepDone : {}) }}>
-                        {i < step ? "✓" : i + 1}
+                        {i < step
+                          ? <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3"><polyline points="20 6 9 17 4 12"/></svg>
+                          : i + 1
+                        }
                       </div>
-                      <div style={{ ...s.stepLabel, ...(i === step ? { color: "#e8edf8" } : {}) }}>{label}</div>
+                      <div style={{ ...s.stepLabel, ...(i === step ? s.stepLabelActive : i < step ? s.stepLabelDone : {}) }}>{label}</div>
+                      {i < STEPS.length - 1 && <div style={{ ...s.stepLine, ...(i < step ? s.stepLineDone : {}) }} />}
                     </div>
                   ))}
                 </div>
 
-                {error && <div style={s.error}>{error}</div>}
+                {error && (
+                  <div style={s.error}>
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" style={{ marginRight: 8, flexShrink: 0 }}><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+                    {error}
+                  </div>
+                )}
 
-                {/* Step 0 — Personal Info */}
+                {/* ── Step 0 — Personal Info ── */}
                 {step === 0 && (
                   <div style={s.form}>
-                    <Row>
+                    {jobSeekerProfile && (
+                      <div style={s.prefillNote}>
+                        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" style={{ marginRight: 6, flexShrink: 0 }}><circle cx="12" cy="12" r="10"/><polyline points="20 6 9 17 4 12"/></svg>
+                        Some fields have been pre-filled from your profile. Review and update as needed.
+                      </div>
+                    )}
+                    <div style={s.row}>
                       <Field label="First Name *">
                         <input style={s.input} value={form.firstName} onChange={set("firstName")} placeholder="Jane" />
                       </Field>
                       <Field label="Last Name *">
                         <input style={s.input} value={form.lastName} onChange={set("lastName")} placeholder="Smith" />
                       </Field>
-                    </Row>
-                    <Row>
+                    </div>
+                    <div style={s.row}>
                       <Field label="Email Address *">
                         <input style={s.input} type="email" value={form.email} onChange={set("email")} placeholder="jane@email.com" />
                       </Field>
                       <Field label="Phone Number *">
                         <input style={s.input} type="tel" value={form.phone} onChange={set("phone")} placeholder="071 000 0000" />
                       </Field>
-                    </Row>
-                    <Row>
+                    </div>
+                    <div style={s.row}>
                       <Field label="City *">
                         <input style={s.input} value={form.city} onChange={set("city")} placeholder="Cape Town" />
                       </Field>
                       <Field label="Notice Period">
                         <input style={s.input} value={form.notice} onChange={set("notice")} placeholder="e.g. 1 month" />
                       </Field>
-                    </Row>
-                    <Row>
+                    </div>
+                    <div style={s.row}>
                       <Field label="Years of Experience">
                         <input style={s.input} value={form.experience} onChange={set("experience")} placeholder="e.g. 3 years" />
                       </Field>
                       <Field label="Salary Expectation">
                         <input style={s.input} value={form.salaryExpectation} onChange={set("salaryExpectation")} placeholder="e.g. R25 000 pm" />
                       </Field>
-                    </Row>
+                    </div>
                     <Field label="Cover Note">
                       <textarea
                         style={{ ...s.input, minHeight: "120px", resize: "vertical" }}
@@ -247,26 +290,35 @@ export default function Apply() {
                   </div>
                 )}
 
-                {/* Step 1 — Documents */}
+                {/* ── Step 1 — Documents ── */}
                 {step === 1 && (
                   <div style={s.form}>
                     <div style={s.uploadNote}>
-                      Accepted formats: PDF, DOC, DOCX, JPG, PNG. Max 5MB per file.
+                      <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" style={{ marginRight: 6, flexShrink: 0 }}><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+                      Accepted: PDF, DOC, DOCX, JPG, PNG · Max 5MB per file
                     </div>
 
                     {/* Required */}
                     <div style={s.docGroup}>
-                      <div style={s.docGroupTitle}>Required Documents</div>
+                      <div style={s.docGroupTitle}>
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" style={{ marginRight: 6 }}><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+                        Required Documents
+                      </div>
 
                       <Field label="CV / Resume *">
                         {cvFile ? (
                           <div style={s.fileAttached}>
-                            <span style={s.fileAttachedName}>📄 {cvFile.name}</span>
-                            <button style={s.removeFileBtn} onClick={() => setCvFile(null)}>✕ Remove</button>
+                            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#1e8e3e" strokeWidth="2" style={{ marginRight: 6, flexShrink: 0 }}><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+                            <span style={s.fileAttachedName}>{cvFile.name}</span>
+                            <button style={s.removeFileBtn} onClick={() => setCvFile(null)}>
+                              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+                              Remove
+                            </button>
                           </div>
                         ) : (
                           <label style={s.fileLabel}>
-                            <span>+ Attach CV / Resume</span>
+                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" style={{ marginRight: 6 }}><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+                            Attach CV / Resume
                             <input type="file" accept=".pdf,.doc,.docx" onChange={e => setCvFile(e.target.files[0] || null)} style={{ display: "none" }} />
                           </label>
                         )}
@@ -275,12 +327,17 @@ export default function Apply() {
                       <Field label="ID Document *">
                         {idFile ? (
                           <div style={s.fileAttached}>
-                            <span style={s.fileAttachedName}>📄 {idFile.name}</span>
-                            <button style={s.removeFileBtn} onClick={() => setIdFile(null)}>✕ Remove</button>
+                            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#1e8e3e" strokeWidth="2" style={{ marginRight: 6, flexShrink: 0 }}><rect x="2" y="5" width="20" height="14" rx="2"/><line x1="2" y1="10" x2="22" y2="10"/></svg>
+                            <span style={s.fileAttachedName}>{idFile.name}</span>
+                            <button style={s.removeFileBtn} onClick={() => setIdFile(null)}>
+                              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+                              Remove
+                            </button>
                           </div>
                         ) : (
                           <label style={s.fileLabel}>
-                            <span>+ Attach ID Document</span>
+                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" style={{ marginRight: 6 }}><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+                            Attach ID Document
                             <input type="file" accept=".pdf,.jpg,.jpeg,.png" onChange={e => setIdFile(e.target.files[0] || null)} style={{ display: "none" }} />
                           </label>
                         )}
@@ -289,19 +346,28 @@ export default function Apply() {
 
                     {/* Optional */}
                     <div style={s.docGroup}>
-                      <div style={s.docGroupTitle}>Additional Documents <span style={s.optionalTag}>(optional)</span></div>
-                      <p style={s.docGroupNote}>Attach any supporting documents that strengthen your application.</p>
+                      <div style={s.docGroupTitle}>
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" style={{ marginRight: 6 }}><path d="M13 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V9z"/><polyline points="13 2 13 9 20 9"/></svg>
+                        Additional Documents
+                        <span style={s.optionalBadge}>Optional</span>
+                      </div>
+                      <p style={s.docGroupNote}>Supporting documents that strengthen your application.</p>
 
                       {OPTIONAL_DOCS.map(({ key, label }) => (
                         <Field key={key} label={label}>
                           {optionalFiles[key] ? (
                             <div style={s.fileAttached}>
-                              <span style={s.fileAttachedName}>📄 {optionalFiles[key].name}</span>
-                              <button style={s.removeFileBtn} onClick={() => removeOptionalFile(key)}>✕ Remove</button>
+                              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#1e8e3e" strokeWidth="2" style={{ marginRight: 6, flexShrink: 0 }}><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+                              <span style={s.fileAttachedName}>{optionalFiles[key].name}</span>
+                              <button style={s.removeFileBtn} onClick={() => removeOptionalFile(key)}>
+                                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+                                Remove
+                              </button>
                             </div>
                           ) : (
                             <label style={s.fileLabel}>
-                              <span>+ Attach {label}</span>
+                              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" style={{ marginRight: 6 }}><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+                              Attach {label}
                               <input type="file" accept=".pdf,.doc,.docx,.jpg,.jpeg,.png" onChange={setOptionalFile(key)} style={{ display: "none" }} />
                             </label>
                           )}
@@ -309,102 +375,162 @@ export default function Apply() {
                       ))}
                     </div>
 
-                    {/* Declarations */}
+                    {/* Declarations — FIXED */}
                     <div style={s.declCard}>
                       <div style={s.declTitle}>Declarations</div>
-                      <label style={s.checkRow}>
-                        <input type="checkbox" checked={declarations.accurate} onChange={setDecl("accurate")} />
-                        <span style={s.checkLabel}>All information I have provided is accurate and truthful.</span>
-                      </label>
-                      <label style={s.checkRow}>
-                        <input type="checkbox" checked={declarations.rightToWork} onChange={setDecl("rightToWork")} />
-                        <span style={s.checkLabel}>I have the legal right to work in South Africa.</span>
-                      </label>
-                      <label style={s.checkRow}>
-                        <input type="checkbox" checked={declarations.consent} onChange={setDecl("consent")} />
-                        <span style={s.checkLabel}>I consent to my information being shared with {job.employerName} for recruitment purposes.</span>
-                      </label>
+                      <p style={s.declNote}>Please read and confirm each declaration before proceeding.</p>
+
+                      {[
+                        { key: "accurate", text: "All information I have provided is accurate and truthful." },
+                        { key: "rightToWork", text: "I have the legal right to work in South Africa." },
+                        { key: "consent", text: `I consent to my information being shared with ${job.employerName} for recruitment purposes.` },
+                      ].map(({ key, text }) => (
+                        <div
+                          key={key}
+                          style={{ ...s.checkRow, ...(declarations[key] ? s.checkRowChecked : {}) }}
+                          onClick={() => toggleDecl(key)}
+                        >
+                          <div style={{ ...s.checkbox, ...(declarations[key] ? s.checkboxChecked : {}) }}>
+                            {declarations[key] && (
+                              <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="3"><polyline points="20 6 9 17 4 12"/></svg>
+                            )}
+                          </div>
+                          <span style={s.checkLabel}>{text}</span>
+                        </div>
+                      ))}
                     </div>
                   </div>
                 )}
 
-                {/* Step 2 — Review */}
+                {/* ── Step 2 — Review ── */}
                 {step === 2 && (
                   <div style={s.form}>
-                    <ReviewSection title="Personal Info">
+                    <ReviewSection title="Personal Information">
                       <ReviewRow label="Name" value={`${form.firstName} ${form.lastName}`} />
                       <ReviewRow label="Email" value={form.email} />
                       <ReviewRow label="Phone" value={form.phone} />
                       <ReviewRow label="City" value={form.city} />
-                      <ReviewRow label="Notice" value={form.notice} />
+                      <ReviewRow label="Notice Period" value={form.notice} />
                       <ReviewRow label="Experience" value={form.experience} />
-                      <ReviewRow label="Salary" value={form.salaryExpectation} />
+                      <ReviewRow label="Salary Expectation" value={form.salaryExpectation} />
                     </ReviewSection>
 
                     {form.coverNote && (
                       <ReviewSection title="Cover Note">
-                        <p style={{ color: "#6b7fa3", fontSize: "13px", lineHeight: "1.6", margin: 0 }}>{form.coverNote}</p>
+                        <p style={{ color: "#5f6368", fontSize: "13px", lineHeight: "1.6", margin: 0 }}>{form.coverNote}</p>
                       </ReviewSection>
                     )}
 
                     <ReviewSection title="Documents">
-                      <ReviewRow label="CV" value={cvFile?.name} />
+                      <ReviewRow label="CV / Resume" value={cvFile?.name} />
                       <ReviewRow label="ID Document" value={idFile?.name} />
                       {Object.entries(optionalFiles).map(([key, file]) => {
                         const docLabel = OPTIONAL_DOCS.find(d => d.key === key)?.label || key;
                         return file ? <ReviewRow key={key} label={docLabel} value={file.name} /> : null;
                       })}
                     </ReviewSection>
+
+                    <div style={s.reviewNote}>
+                      By submitting this application you confirm all declarations made in the previous step.
+                    </div>
                   </div>
                 )}
 
                 {/* Navigation */}
                 <div style={s.navRow}>
                   {step > 0 && (
-                    <button onClick={() => { setError(""); setStep(s => s - 1); }} style={s.btnBack2}>← Back</button>
+                    <button onClick={() => { setError(""); setStep(s => s - 1); }} style={s.btnBack2}>
+                      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" style={{ marginRight: 6 }}><line x1="19" y1="12" x2="5" y2="12"/><polyline points="12 19 5 12 12 5"/></svg>
+                      Back
+                    </button>
                   )}
                   <div style={{ flex: 1 }} />
                   {step < 2 && (
-                    <button onClick={handleNext} style={s.btnNext}>Next →</button>
+                    <button onClick={handleNext} style={s.btnNext}>
+                      Next
+                      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" style={{ marginLeft: 6 }}><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
+                    </button>
                   )}
                   {step === 2 && (
                     <button onClick={handleSubmit} disabled={submitting} style={s.btnSubmit}>
-                      {submitting ? "Uploading & Submitting…" : "Submit Application"}
+                      {submitting ? (
+                        <>Uploading &amp; Submitting…</>
+                      ) : (
+                        <>
+                          Submit Application
+                          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" style={{ marginLeft: 8 }}><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
+                        </>
+                      )}
                     </button>
                   )}
                 </div>
               </div>
             </div>
 
-            {/* Job sidebar */}
+            {/* Job Sidebar */}
             <div style={s.sideCol}>
               <div style={s.jobCard}>
-                <div style={s.jobCardTitle}>Applying For</div>
-                <div style={s.jobLogo}>
+                <div style={s.jobCardLabel}>Applying For</div>
+                <div style={s.jobLogoWrap}>
                   {job.logoUrl
-                    ? <img src={job.logoUrl} alt={job.employerName} style={{ width: "100%", height: "100%", objectFit: "contain" }} />
-                    : <div style={{ ...s.jobLogoPlaceholder, background: job.brandColour || "#0099fa" }}>{job.employerName?.[0]}</div>
+                    ? <img src={job.logoUrl} alt={job.employerName} style={s.jobLogoImg} />
+                    : <div style={{ ...s.jobLogoPlaceholder, background: job.brandColour || "#1a73e8" }}>{job.employerName?.[0]}</div>
                   }
                 </div>
                 <div style={s.jobTitle}>{job.title}</div>
                 <div style={s.jobCompany}>{job.employerName}</div>
                 <div style={s.jobMeta}>
-                  <span>📍 {job.city}, {job.province}</span>
-                  <span>💼 {job.type}</span>
-                  {job.salary && <span>💰 {job.salary}</span>}
-                  <span>📅 Closes {job.closes}</span>
+                  <div style={s.jobMetaItem}>
+                    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
+                    {job.city}, {job.province}
+                  </div>
+                  <div style={s.jobMetaItem}>
+                    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"/></svg>
+                    {job.type}
+                  </div>
+                  {job.salary && (
+                    <div style={{ ...s.jobMetaItem, color: "#1e8e3e" }}>
+                      <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
+                      {job.salary}
+                    </div>
+                  )}
+                  <div style={s.jobMetaItem}>
+                    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+                    Closes {job.closes}
+                  </div>
                 </div>
               </div>
+
+              {!user && (
+                <div style={s.signInPrompt}>
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#1a73e8" strokeWidth="2" style={{ marginBottom: 8 }}><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+                  <p style={s.signInPromptText}>
+                    <Link to="/jobseeker/login" style={{ color: "#1a73e8", fontWeight: "500" }}>Sign in</Link> to track your applications and pre-fill your details.
+                  </p>
+                </div>
+              )}
             </div>
           </div>
         </div>
       </div>
       <Footer />
+
+      <style>{`
+        @media (max-width: 768px) {
+          .apply-layout { grid-template-columns: 1fr !important; }
+          .apply-side-col { position: static !important; }
+          .apply-row { grid-template-columns: 1fr !important; }
+        }
+        @media (max-width: 480px) {
+          .apply-card { padding: 20px !important; }
+          .apply-body { padding: 16px !important; }
+        }
+      `}</style>
     </div>
   );
 }
 
-// ── Navbar ────────────────────────────────────────────────────────────
+// ── Navbar ────────────────────────────────────────────────
 function Navbar() {
   const navigate = useNavigate();
   return (
@@ -415,6 +541,7 @@ function Navbar() {
         </div>
         <div style={s.navLinks}>
           <Link to="/jobs" style={s.navLink}>Browse Jobs</Link>
+          <Link to="/jobseeker/login" style={s.navLink}>Sign In</Link>
           <Link to="/employer/login" style={s.navLinkBtn}>Employer Login</Link>
         </div>
       </div>
@@ -422,7 +549,7 @@ function Navbar() {
   );
 }
 
-// ── Footer ────────────────────────────────────────────────────────────
+// ── Footer ────────────────────────────────────────────────
 function Footer() {
   return (
     <footer style={s.footer}>
@@ -439,15 +566,11 @@ function Footer() {
   );
 }
 
-// ── Helpers ───────────────────────────────────────────────────────────
-function Row({ children }) {
-  return <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "14px" }}>{children}</div>;
-}
-
+// ── Helpers ───────────────────────────────────────────────
 function Field({ label, children }) {
   return (
     <div style={{ display: "flex", flexDirection: "column", gap: "6px" }}>
-      <label style={{ color: "#6b7fa3", fontSize: "12px", fontWeight: "500" }}>{label}</label>
+      <label style={{ color: "#5f6368", fontSize: "13px", fontWeight: "500" }}>{label}</label>
       {children}
     </div>
   );
@@ -455,8 +578,8 @@ function Field({ label, children }) {
 
 function ReviewSection({ title, children }) {
   return (
-    <div style={{ background: "#131b33", border: "1px solid #1e2d52", borderRadius: "10px", padding: "16px 20px", marginBottom: "12px" }}>
-      <div style={{ color: "#0099fa", fontSize: "11px", fontWeight: "600", textTransform: "uppercase", letterSpacing: "0.06em", marginBottom: "12px" }}>{title}</div>
+    <div style={{ background: "#f8f9fa", border: "1px solid #e0e0e0", borderRadius: "10px", padding: "16px 20px", marginBottom: "12px" }}>
+      <div style={{ color: "#1a73e8", fontSize: "11px", fontWeight: "600", textTransform: "uppercase", letterSpacing: "0.06em", marginBottom: "12px" }}>{title}</div>
       {children}
     </div>
   );
@@ -465,72 +588,116 @@ function ReviewSection({ title, children }) {
 function ReviewRow({ label, value }) {
   if (!value) return null;
   return (
-    <div style={{ display: "flex", justifyContent: "space-between", gap: "12px", padding: "6px 0", borderBottom: "1px solid #1e2d52", fontSize: "13px" }}>
-      <span style={{ color: "#6b7fa3" }}>{label}</span>
-      <span style={{ color: "#e8edf8", textAlign: "right", maxWidth: "60%" }}>{value}</span>
+    <div style={{ display: "flex", justifyContent: "space-between", gap: "12px", padding: "7px 0", borderBottom: "1px solid #e0e0e0", fontSize: "13px" }}>
+      <span style={{ color: "#5f6368" }}>{label}</span>
+      <span style={{ color: "#202124", textAlign: "right", maxWidth: "60%", wordBreak: "break-word" }}>{value}</span>
     </div>
   );
 }
 
 const s = {
-  page: { background: "#080d1b", minHeight: "100vh", fontFamily: "sans-serif", color: "#e8edf8", display: "flex", flexDirection: "column" },
-  navbar: { background: "#0d1428", borderBottom: "1px solid #1e2d52", position: "sticky", top: 0, zIndex: 100 },
-  navInner: { maxWidth: "1200px", margin: "0 auto", padding: "0 32px", height: "64px", display: "flex", alignItems: "center", justifyContent: "space-between" },
+  page: { background: "#f8f9fa", minHeight: "100vh", fontFamily: "'Circular Std', sans-serif", color: "#202124", display: "flex", flexDirection: "column" },
+
+  // Navbar
+  navbar: { background: "#202124", position: "sticky", top: 0, zIndex: 100 },
+  navInner: { maxWidth: "1200px", margin: "0 auto", padding: "0 24px", height: "64px", display: "flex", alignItems: "center", justifyContent: "space-between" },
   navLogo: { cursor: "pointer" },
-  navLogoImg: { height: "32px", objectFit: "contain" },
-  navLinks: { display: "flex", alignItems: "center", gap: "24px" },
-  navLink: { color: "#6b7fa3", fontSize: "14px", textDecoration: "none" },
-  navLinkBtn: { background: "rgba(0,153,250,0.12)", border: "1px solid rgba(0,153,250,0.25)", color: "#0099fa", borderRadius: "8px", padding: "8px 16px", fontSize: "13px", textDecoration: "none" },
-  body: { flex: 1, padding: "40px 32px" },
-  inner: { maxWidth: "1100px", margin: "0 auto" },
-  backBtn: { background: "none", border: "none", color: "#6b7fa3", fontSize: "14px", cursor: "pointer", padding: "0 0 24px", display: "block" },
-  layout: { display: "grid", gridTemplateColumns: "1fr 300px", gap: "32px", alignItems: "start" },
+  navLogoImg: { height: "30px", objectFit: "contain" },
+  navLinks: { display: "flex", alignItems: "center", gap: "8px" },
+  navLink: { color: "rgba(255,255,255,0.75)", fontSize: "14px", textDecoration: "none", padding: "8px 12px", borderRadius: "6px" },
+  navLinkBtn: { background: "#1a73e8", color: "#fff", padding: "8px 16px", borderRadius: "999px", fontSize: "13px", fontWeight: "500", textDecoration: "none" },
+
+  // Body
+  body: { flex: 1, padding: "32px 24px" },
+  inner: { maxWidth: "1060px", margin: "0 auto" },
+  backBtn: { display: "inline-flex", alignItems: "center", background: "none", border: "none", color: "#5f6368", fontSize: "14px", cursor: "pointer", padding: "0 0 20px", fontFamily: "'Circular Std', sans-serif" },
+
+  // Layout
+  layout: { display: "grid", gridTemplateColumns: "1fr 300px", gap: "28px", alignItems: "start" },
   formCol: {},
-  card: { background: "#0d1428", border: "1px solid #1e2d52", borderRadius: "14px", padding: "32px" },
-  stepper: { display: "flex", gap: "8px", marginBottom: "32px", flexWrap: "wrap" },
-  stepItem: { display: "flex", alignItems: "center", gap: "8px", flex: 1, minWidth: "80px" },
-  stepDot: { width: "28px", height: "28px", borderRadius: "50%", background: "#131b33", border: "1px solid #1e2d52", color: "#3d4f73", fontSize: "12px", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0, fontWeight: "600" },
-  stepActive: { background: "#0099fa", border: "1px solid #0099fa", color: "#fff" },
-  stepDone: { background: "rgba(0,229,160,0.12)", border: "1px solid rgba(0,229,160,0.3)", color: "#00e5a0" },
-  stepLabel: { fontSize: "12px", color: "#3d4f73" },
-  error: { background: "rgba(255,79,106,0.1)", border: "1px solid rgba(255,79,106,0.3)", color: "#ff4f6a", borderRadius: "8px", padding: "12px 16px", fontSize: "13px", marginBottom: "20px" },
-  form: { display: "flex", flexDirection: "column", gap: "16px", marginBottom: "28px" },
-  input: { background: "#131b33", border: "1px solid #1e2d52", borderRadius: "8px", padding: "10px 13px", color: "#e8edf8", fontSize: "13px", outline: "none", width: "100%", fontFamily: "sans-serif" },
-  uploadNote: { background: "#131b33", border: "1px solid #1e2d52", borderRadius: "8px", padding: "12px 16px", color: "#6b7fa3", fontSize: "13px" },
-  docGroup: { background: "#131b33", border: "1px solid #1e2d52", borderRadius: "10px", padding: "18px 20px", display: "flex", flexDirection: "column", gap: "14px" },
-  docGroupTitle: { color: "#e8edf8", fontSize: "13px", fontWeight: "600", marginBottom: "4px" },
-  docGroupNote: { color: "#3d4f73", fontSize: "12px", margin: "0 0 4px", lineHeight: "1.5" },
-  optionalTag: { color: "#3d4f73", fontWeight: "400", fontSize: "12px" },
-  fileLabel: { display: "flex", alignItems: "center", gap: "8px", background: "#0d1428", border: "1px dashed #1e2d52", borderRadius: "8px", padding: "10px 14px", color: "#6b7fa3", fontSize: "13px", cursor: "pointer", transition: "border-color 0.15s" },
-  fileAttached: { display: "flex", alignItems: "center", justifyContent: "space-between", background: "rgba(0,229,160,0.06)", border: "1px solid rgba(0,229,160,0.2)", borderRadius: "8px", padding: "10px 14px" },
-  fileAttachedName: { color: "#00e5a0", fontSize: "13px", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap", maxWidth: "70%" },
-  removeFileBtn: { background: "none", border: "none", color: "#ff4f6a", fontSize: "12px", cursor: "pointer", whiteSpace: "nowrap", flexShrink: 0 },
-  declCard: { background: "#0d1428", border: "1px solid #1e2d52", borderRadius: "10px", padding: "20px", display: "flex", flexDirection: "column", gap: "14px" },
-  declTitle: { color: "#e8edf8", fontSize: "14px", fontWeight: "600" },
-  checkRow: { display: "flex", alignItems: "flex-start", gap: "10px", cursor: "pointer" },
-  checkLabel: { color: "#6b7fa3", fontSize: "13px", lineHeight: "1.5" },
-  navRow: { display: "flex", alignItems: "center", gap: "12px" },
-  btnBack2: { background: "none", border: "1px solid #1e2d52", color: "#6b7fa3", borderRadius: "8px", padding: "11px 20px", fontSize: "14px", cursor: "pointer" },
-  btnNext: { background: "#0099fa", color: "#fff", border: "none", borderRadius: "8px", padding: "11px 24px", fontSize: "14px", fontWeight: "600", cursor: "pointer" },
-  btnSubmit: { background: "#00e5a0", color: "#080d1b", border: "none", borderRadius: "8px", padding: "11px 24px", fontSize: "14px", fontWeight: "700", cursor: "pointer" },
-  sideCol: { position: "sticky", top: "80px" },
-  jobCard: { background: "#0d1428", border: "1px solid #1e2d52", borderRadius: "14px", padding: "24px" },
-  jobCardTitle: { color: "#0099fa", fontSize: "11px", fontWeight: "600", textTransform: "uppercase", letterSpacing: "0.06em", marginBottom: "16px" },
-  jobLogo: { width: "48px", height: "48px", borderRadius: "10px", overflow: "hidden", border: "1px solid #1e2d52", marginBottom: "12px" },
+  sideCol: { position: "sticky", top: "80px", display: "flex", flexDirection: "column", gap: "14px" },
+
+  // Card
+  card: { background: "#fff", border: "1px solid #e0e0e0", borderRadius: "14px", padding: "28px", boxShadow: "0 1px 3px rgba(60,64,67,0.08)" },
+
+  // Stepper
+  stepper: { display: "flex", alignItems: "center", marginBottom: "28px" },
+  stepItem: { display: "flex", alignItems: "center", flex: 1 },
+  stepDot: { width: "30px", height: "30px", borderRadius: "50%", background: "#f1f3f4", border: "2px solid #e0e0e0", color: "#80868b", fontSize: "13px", fontWeight: "600", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0, transition: "all 0.2s" },
+  stepActive: { background: "#1a73e8", border: "2px solid #1a73e8", color: "#fff" },
+  stepDone: { background: "#1e8e3e", border: "2px solid #1e8e3e", color: "#fff" },
+  stepLabel: { fontSize: "12px", color: "#80868b", marginLeft: "8px", whiteSpace: "nowrap" },
+  stepLabelActive: { color: "#202124", fontWeight: "500" },
+  stepLabelDone: { color: "#1e8e3e" },
+  stepLine: { flex: 1, height: "2px", background: "#e0e0e0", margin: "0 8px" },
+  stepLineDone: { background: "#1e8e3e" },
+
+  // Alerts
+  error: { display: "flex", alignItems: "flex-start", background: "#fce8e6", border: "1px solid rgba(217,48,37,0.2)", color: "#d93025", borderRadius: "8px", padding: "12px 14px", fontSize: "13px", marginBottom: "20px" },
+  prefillNote: { display: "flex", alignItems: "center", background: "#e8f0fe", border: "1px solid rgba(26,115,232,0.2)", color: "#1a73e8", borderRadius: "8px", padding: "10px 14px", fontSize: "13px" },
+
+  // Form
+  form: { display: "flex", flexDirection: "column", gap: "16px", marginBottom: "24px" },
+  row: { display: "grid", gridTemplateColumns: "1fr 1fr", gap: "14px" },
+  input: { background: "#fff", border: "1px solid #dadce0", borderRadius: "8px", padding: "10px 13px", color: "#202124", fontSize: "13px", outline: "none", width: "100%", fontFamily: "'Circular Std', sans-serif", transition: "border-color 0.15s, box-shadow 0.15s" },
+
+  // Upload
+  uploadNote: { display: "flex", alignItems: "center", background: "#f8f9fa", border: "1px solid #e0e0e0", borderRadius: "8px", padding: "10px 14px", color: "#5f6368", fontSize: "13px" },
+  docGroup: { background: "#f8f9fa", border: "1px solid #e0e0e0", borderRadius: "10px", padding: "16px 18px", display: "flex", flexDirection: "column", gap: "12px" },
+  docGroupTitle: { color: "#202124", fontSize: "13px", fontWeight: "600", display: "flex", alignItems: "center", marginBottom: "2px" },
+  docGroupNote: { color: "#80868b", fontSize: "12px", margin: "0", lineHeight: "1.5" },
+  optionalBadge: { background: "#e0e0e0", color: "#5f6368", borderRadius: "999px", padding: "2px 8px", fontSize: "11px", fontWeight: "400", marginLeft: "8px" },
+  fileLabel: { display: "flex", alignItems: "center", background: "#fff", border: "1px dashed #dadce0", borderRadius: "8px", padding: "10px 14px", color: "#5f6368", fontSize: "13px", cursor: "pointer" },
+  fileAttached: { display: "flex", alignItems: "center", background: "#e6f4ea", border: "1px solid rgba(30,142,62,0.2)", borderRadius: "8px", padding: "10px 14px" },
+  fileAttachedName: { color: "#1e8e3e", fontSize: "13px", flex: 1, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" },
+  removeFileBtn: { display: "flex", alignItems: "center", gap: "4px", background: "none", border: "none", color: "#d93025", fontSize: "12px", cursor: "pointer", whiteSpace: "nowrap", flexShrink: 0, fontFamily: "'Circular Std', sans-serif" },
+
+  // Declarations — custom checkboxes
+  declCard: { background: "#fff", border: "1px solid #e0e0e0", borderRadius: "10px", padding: "18px", display: "flex", flexDirection: "column", gap: "0" },
+  declTitle: { color: "#202124", fontSize: "14px", fontWeight: "600", marginBottom: "6px" },
+  declNote: { color: "#5f6368", fontSize: "12px", marginBottom: "14px", lineHeight: "1.5" },
+  checkRow: { display: "flex", alignItems: "flex-start", gap: "12px", cursor: "pointer", padding: "10px 12px", borderRadius: "8px", margin: "0 -12px", transition: "background 0.15s" },
+  checkRowChecked: { background: "#f0f7ff" },
+  checkbox: { width: "18px", height: "18px", borderRadius: "4px", border: "2px solid #dadce0", background: "#fff", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0, marginTop: "1px", transition: "all 0.15s" },
+  checkboxChecked: { background: "#1a73e8", border: "2px solid #1a73e8" },
+  checkLabel: { color: "#202124", fontSize: "13px", lineHeight: "1.5", userSelect: "none" },
+
+  // Navigation
+  navRow: { display: "flex", alignItems: "center", gap: "12px", paddingTop: "4px" },
+  btnBack2: { display: "inline-flex", alignItems: "center", background: "#fff", border: "1px solid #dadce0", color: "#5f6368", borderRadius: "8px", padding: "10px 18px", fontSize: "14px", cursor: "pointer", fontFamily: "'Circular Std', sans-serif" },
+  btnNext: { display: "inline-flex", alignItems: "center", background: "#1a73e8", color: "#fff", border: "none", borderRadius: "8px", padding: "10px 22px", fontSize: "14px", fontWeight: "500", cursor: "pointer", fontFamily: "'Circular Std', sans-serif", boxShadow: "0 1px 3px rgba(26,115,232,0.3)" },
+  btnSubmit: { display: "inline-flex", alignItems: "center", background: "#1e8e3e", color: "#fff", border: "none", borderRadius: "8px", padding: "10px 22px", fontSize: "14px", fontWeight: "500", cursor: "pointer", fontFamily: "'Circular Std', sans-serif", boxShadow: "0 1px 3px rgba(30,142,62,0.3)" },
+
+  // Review
+  reviewNote: { background: "#fef7e0", border: "1px solid rgba(249,171,0,0.3)", borderRadius: "8px", padding: "12px 14px", color: "#b06000", fontSize: "12px", lineHeight: "1.6" },
+
+  // Job sidebar card
+  jobCard: { background: "#fff", border: "1px solid #e0e0e0", borderRadius: "14px", padding: "20px", boxShadow: "0 1px 3px rgba(60,64,67,0.08)" },
+  jobCardLabel: { color: "#1a73e8", fontSize: "11px", fontWeight: "600", textTransform: "uppercase", letterSpacing: "0.06em", marginBottom: "14px" },
+  jobLogoWrap: { width: "48px", height: "48px", borderRadius: "10px", overflow: "hidden", border: "1px solid #e0e0e0", marginBottom: "12px" },
+  jobLogoImg: { width: "100%", height: "100%", objectFit: "contain" },
   jobLogoPlaceholder: { width: "100%", height: "100%", display: "flex", alignItems: "center", justifyContent: "center", color: "#fff", fontWeight: "700", fontSize: "20px" },
-  jobTitle: { color: "#e8edf8", fontSize: "16px", fontWeight: "700", marginBottom: "4px" },
-  jobCompany: { color: "#6b7fa3", fontSize: "13px", marginBottom: "12px" },
-  jobMeta: { display: "flex", flexDirection: "column", gap: "6px", fontSize: "12px", color: "#3d4f73" },
-  successCard: { maxWidth: "480px", margin: "80px auto", background: "#0d1428", border: "1px solid #1e2d52", borderRadius: "16px", padding: "48px", textAlign: "center" },
-  successIcon: { width: "64px", height: "64px", borderRadius: "50%", background: "rgba(0,229,160,0.12)", border: "1px solid rgba(0,229,160,0.3)", color: "#00e5a0", fontSize: "28px", display: "flex", alignItems: "center", justifyContent: "center", margin: "0 auto 24px" },
-  successTitle: { color: "#e8edf8", fontSize: "26px", fontWeight: "700", margin: "0 0 12px" },
-  successSub: { color: "#6b7fa3", fontSize: "15px", lineHeight: "1.6", margin: "0 0 32px" },
+  jobTitle: { color: "#202124", fontSize: "16px", fontWeight: "700", marginBottom: "4px" },
+  jobCompany: { color: "#5f6368", fontSize: "13px", marginBottom: "14px" },
+  jobMeta: { display: "flex", flexDirection: "column", gap: "8px" },
+  jobMetaItem: { display: "flex", alignItems: "center", gap: "7px", color: "#5f6368", fontSize: "12px" },
+
+  // Sign in prompt
+  signInPrompt: { background: "#e8f0fe", border: "1px solid rgba(26,115,232,0.2)", borderRadius: "12px", padding: "16px", textAlign: "center", display: "flex", flexDirection: "column", alignItems: "center" },
+  signInPromptText: { color: "#5f6368", fontSize: "13px", lineHeight: "1.5", margin: 0 },
+
+  // Success
+  successCard: { maxWidth: "480px", margin: "60px auto", background: "#fff", border: "1px solid #e0e0e0", borderRadius: "16px", padding: "48px 40px", textAlign: "center", boxShadow: "0 2px 8px rgba(60,64,67,0.1)" },
+  successIcon: { width: "64px", height: "64px", borderRadius: "50%", background: "#e6f4ea", color: "#1e8e3e", display: "flex", alignItems: "center", justifyContent: "center", margin: "0 auto 24px" },
+  successTitle: { color: "#202124", fontSize: "24px", fontWeight: "700", margin: "0 0 12px" },
+  successSub: { color: "#5f6368", fontSize: "15px", lineHeight: "1.6", margin: "0 0 28px" },
   successActions: { display: "flex", gap: "12px", justifyContent: "center", flexWrap: "wrap" },
-  btnPrimary: { background: "#0099fa", color: "#fff", border: "none", borderRadius: "8px", padding: "12px 24px", fontSize: "14px", fontWeight: "600", cursor: "pointer" },
-  btnOutline: { background: "none", border: "1px solid #1e2d52", color: "#6b7fa3", borderRadius: "8px", padding: "12px 24px", fontSize: "14px", cursor: "pointer" },
-  empty: { color: "#6b7fa3", textAlign: "center", padding: "80px", fontSize: "16px" },
-  footer: { background: "#0d1428", borderTop: "1px solid #1e2d52", padding: "24px 32px" },
+  btnPrimary: { background: "#1a73e8", color: "#fff", border: "none", borderRadius: "8px", padding: "11px 24px", fontSize: "14px", fontWeight: "500", cursor: "pointer", fontFamily: "'Circular Std', sans-serif" },
+  btnOutline: { background: "#fff", border: "1px solid #dadce0", color: "#5f6368", borderRadius: "8px", padding: "11px 24px", fontSize: "14px", cursor: "pointer", fontFamily: "'Circular Std', sans-serif" },
+
+  empty: { color: "#5f6368", textAlign: "center", padding: "80px", fontSize: "16px" },
+  footer: { background: "#202124", padding: "24px" },
   footerInner: { maxWidth: "1200px", margin: "0 auto" },
-  footerBottom: { display: "flex", justifyContent: "space-between", color: "#3d4f73", fontSize: "12px", flexWrap: "wrap", gap: "8px" },
-  footerLink: { color: "#3d4f73", textDecoration: "none" },
+  footerBottom: { display: "flex", justifyContent: "space-between", color: "rgba(255,255,255,0.3)", fontSize: "12px", flexWrap: "wrap", gap: "8px" },
+  footerLink: { color: "rgba(255,255,255,0.4)", textDecoration: "none" },
 };

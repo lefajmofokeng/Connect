@@ -18,6 +18,9 @@ import Terms from "./pages/public/Terms";
 import Privacy from "./pages/public/Privacy";
 import NotFound from "./pages/public/NotFound";
 import AdminLogin from "./pages/admin/AdminLogin";
+import JobSeekerRegister from "./pages/jobseeker/Register";
+import JobSeekerLogin from "./pages/jobseeker/Login";
+import JobSeekerDashboard from "./pages/jobseeker/Dashboard";
 
 function ProtectedRoute({ children }) {
   const { user, loading } = useAuth();
@@ -61,6 +64,11 @@ export default function App() {
         {/* Admin */}
         <Route path="/admin/login" element={<AdminLogin />} />
         <Route path="/admin" element={<AdminRoute><Admin /></AdminRoute>} />
+
+        {/* Job Seeker */}
+        <Route path="/jobseeker/register" element={<JobSeekerRegister />} />
+        <Route path="/jobseeker/login" element={<JobSeekerLogin />} />
+        <Route path="/jobseeker/dashboard" element={<JobSeekerDashboard />} />
 
         {/* 404 — must be last */}
         <Route path="*" element={<NotFound />} />
