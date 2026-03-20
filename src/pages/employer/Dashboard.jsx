@@ -54,7 +54,7 @@ export default function Dashboard() {
   };
 
   const deleteJob = async (jobId) => {
-    if (!window.confirm("Delete this job listing? This cannot be undone.")) return;
+    if (!window.confirm("Delete this job listing? This action cannot be undone.")) return;
     try {
       await deleteDoc(doc(db, "jobs", jobId));
       setActionMsg("Job deleted.");
@@ -100,16 +100,19 @@ export default function Dashboard() {
       </div>
 
       {actionMsg && (
-        <div style={s.actionMsg} onClick={() => setActionMsg("")}>{actionMsg} ✕</div>
+        <div style={s.actionMsg} onClick={() => setActionMsg("")}>
+          {actionMsg} 
+          <span style={{ cursor: "pointer", marginLeft: "8px", fontWeight: "bold" }}>✕</span>
+        </div>
       )}
 
       {/* Stats */}
       <div style={s.statsGrid}>
-        <StatCard label="Live Jobs" value={liveJobs.length} color="#0099fa" />
-        <StatCard label="Draft Jobs" value={draftJobs.length} color="#f5a623" />
-        <StatCard label="Total Applicants" value={applications.length} color="#00e5a0" />
-        <StatCard label="New Applications" value={newApps.length} color="#ff4f6a" />
-        <StatCard label="Top Location" value={topLocation} color="#0099fa" small />
+        <StatCard label="Live Jobs" value={liveJobs.length} color="#1a73e8" />
+        <StatCard label="Draft Jobs" value={draftJobs.length} color="#b06000" />
+        <StatCard label="Total Applicants" value={applications.length} color="#137333" />
+        <StatCard label="New Applications" value={newApps.length} color="#c5221f" />
+        <StatCard label="Top Location" value={topLocation} color="#1a73e8" small />
       </div>
 
       {/* Invoice / Amount Payable Card */}
@@ -158,7 +161,8 @@ export default function Dashboard() {
             <span style={s.refValue}>{paymentRef}</span>
           </div>
           <div style={s.refNote}>
-            ⚠ Always use your email address as the payment reference so we can match your payment.
+            <span style={{ fontSize: "14px", marginRight: "6px" }}>ℹ️</span>
+            Always use your email address as the payment reference so we can match your payment.
           </div>
         </div>
       </div>
@@ -200,7 +204,9 @@ export default function Dashboard() {
                       <td style={s.td}>
                         <span style={{ ...s.pill, ...pillColor(job.status) }}>{job.status}</span>
                       </td>
-                      <td style={s.td}>{jobApps.length}</td>
+                      <td style={{ ...s.td, fontWeight: "600", color: "#3c4043" }}>
+                        {jobApps.length}
+                      </td>
                       <td style={s.td}>
                         {job.status === "live"
                           ? <span style={s.costLive}>R{JOB_PRICE}</span>
@@ -233,7 +239,7 @@ export default function Dashboard() {
         <h2 style={s.sectionTitle}>Quick Actions</h2>
         <div style={s.quickGrid}>
           <QuickAction icon="📋" label="View Applications" to="/employer/applications" />
-          <QuickAction icon="✏️" label="Edit Company Profile" to="/employer/profile" />
+          <QuickAction icon="🏢" label="Company Profile" to="/employer/profile" />
           <QuickAction icon="💼" label="Post a New Job" to="/employer/post-job" />
         </div>
       </div>
@@ -265,16 +271,22 @@ function Layout({ children, profile, onSignOut }) {
           {navItems.map(item => (
             <button key={item.to} onClick={() => navigate(item.to)}
               style={{ ...s.navBtn, ...(path === item.to ? s.navBtnActive : {}) }}>
-              <span>{item.icon}</span><span>{item.label}</span>
+              <span style={s.navIcon}>{item.icon}</span>
+              <span style={s.navLabel}>{item.label}</span>
             </button>
           ))}
         </nav>
         <div style={s.sidebarBottom}>
           <div style={s.profileChip}>
-            <div style={s.profileAvatar}>{profile?.companyName?.[0] || "E"}</div>
+            <div style={s.profileAvatarWrap}>
+                {profile?.logoUrl
+                ? <img src={profile.logoUrl} alt={profile.companyName} style={s.profileLogoImg} />
+                : <div style={s.profileAvatar}>{profile?.companyName?.[0] || "E"}</div>
+                }
+            </div>
             <div>
-              <div style={s.profileName}>{profile?.companyName || "Employer"}</div>
-              <div style={s.profilePlan}>Verified Employer</div>
+                <div style={s.profileName}>{profile?.companyName || "Employer"}</div>
+                <div style={s.profilePlan}>Verified Employer</div>
             </div>
           </div>
           <button onClick={onSignOut} style={s.signOutBtn}>Sign Out</button>
@@ -288,8 +300,8 @@ function Layout({ children, profile, onSignOut }) {
 // ── Helpers ──────────────────────────────────────────────────────────
 function StatCard({ label, value, color, small }) {
   return (
-    <div style={s.statCard}>
-      <div style={{ ...s.statValue, color, fontSize: small ? "22px" : "36px" }}>{value}</div>
+    <div style={{ ...s.statCard, borderBottom: `3px solid ${color}` }}>
+      <div style={{ ...s.statValue, color: "#202124", fontSize: small ? "24px" : "36px" }}>{value}</div>
       <div style={s.statLabel}>{label}</div>
     </div>
   );
@@ -306,85 +318,111 @@ function QuickAction({ icon, label, to }) {
 }
 
 function pillColor(status) {
+  // Google Material light theme status colors
   const map = {
-    live: { background: "rgba(0,229,160,0.12)", color: "#00e5a0" },
-    draft: { background: "rgba(107,127,163,0.12)", color: "#6b7fa3" },
-    paused: { background: "rgba(245,166,35,0.12)", color: "#f5a623" },
-    expired: { background: "rgba(255,79,106,0.12)", color: "#ff4f6a" },
+    live:    { background: "#e6f4ea", color: "#137333" }, // Green
+    draft:   { background: "#f1f3f4", color: "#5f6368" }, // Gray
+    paused:  { background: "#fef7e0", color: "#b06000" }, // Yellow
+    expired: { background: "#fce8e6", color: "#c5221f" }, // Red
   };
-  return map[status] || { background: "rgba(107,127,163,0.12)", color: "#6b7fa3" };
+  return map[status] || { background: "#f1f3f4", color: "#5f6368" };
 }
 
 const s = {
-  page: { display: "flex", minHeight: "100vh", background: "#080d1b", fontFamily: "sans-serif" },
-  sidebar: { width: "240px", flexShrink: 0, background: "#0d1428", borderRight: "1px solid #1e2d52", padding: "28px 16px", display: "flex", flexDirection: "column" },
-  sidebarLogo: { display: "flex", alignItems: "center", gap: "12px", marginBottom: "36px", paddingLeft: "8px" },
-  logoMark: { width: "36px", height: "36px", borderRadius: "10px", background: "#0099fa", color: "#fff", fontWeight: "800", fontSize: "18px", display: "flex", alignItems: "center", justifyContent: "center" },
-  logoText: { color: "#e8edf8", fontWeight: "700", fontSize: "15px" },
-  logoSub: { color: "#6b7fa3", fontSize: "11px" },
-  nav: { display: "flex", flexDirection: "column", gap: "4px", flex: 1 },
-  navBtn: { background: "none", border: "none", color: "#6b7fa3", fontSize: "13px", padding: "11px 12px", borderRadius: "8px", cursor: "pointer", textAlign: "left", display: "flex", alignItems: "center", gap: "10px" },
-  navBtnActive: { background: "rgba(0,153,250,0.12)", color: "#0099fa" },
-  sidebarBottom: { borderTop: "1px solid #1e2d52", paddingTop: "16px", display: "flex", flexDirection: "column", gap: "10px" },
-  profileChip: { display: "flex", alignItems: "center", gap: "10px", padding: "8px" },
-  profileAvatar: { width: "32px", height: "32px", borderRadius: "8px", background: "#0099fa", color: "#fff", fontWeight: "700", fontSize: "14px", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 },
-  profileName: { color: "#e8edf8", fontSize: "13px", fontWeight: "500" },
-  profilePlan: { color: "#00e5a0", fontSize: "11px" },
-  signOutBtn: { background: "none", border: "1px solid #1e2d52", color: "#6b7fa3", borderRadius: "8px", padding: "8px", fontSize: "12px", cursor: "pointer", textAlign: "center" },
+  // Base Google/Material Light Theme
+  page: { display: "flex", minHeight: "100vh", background: "#f8f9fa", fontFamily: '"Google Sans", Roboto, Arial, sans-serif' },
+
+  // Sidebar (Identical to Applications.jsx)
+  sidebar: { width: "260px", flexShrink: 0, background: "#ffffff", borderRight: "1px solid #dadce0", padding: "24px 0", display: "flex", flexDirection: "column" },
+  sidebarLogo: { display: "flex", alignItems: "center", gap: "12px", marginBottom: "32px", padding: "0 24px" },
+  logoMark: { width: "40px", height: "40px", borderRadius: "8px", background: "#1a73e8", color: "#ffffff", fontWeight: "700", fontSize: "20px", display: "flex", alignItems: "center", justifyContent: "center", boxShadow: "0 2px 6px rgba(26,115,232,0.3)" },
+  logoText: { color: "#202124", fontWeight: "600", fontSize: "16px", letterSpacing: "-0.2px" },
+  logoSub: { color: "#5f6368", fontSize: "12px", fontWeight: "500" },
+  nav: { display: "flex", flexDirection: "column", gap: "4px", flex: 1, paddingRight: "16px" },
+  navBtn: { background: "none", border: "none", color: "#3c4043", fontSize: "14px", fontWeight: "500", padding: "12px 24px", borderRadius: "0 24px 24px 0", cursor: "pointer", textAlign: "left", display: "flex", alignItems: "center", gap: "16px", transition: "background 0.2s" },
+  navBtnActive: { background: "#e8f0fe", color: "#1a73e8", fontWeight: "600" },
+  navIcon: { fontSize: "16px", display: "flex", alignItems: "center", justifyContent: "center", width: "24px" },
+  navLabel: { flex: 1 },
+  sidebarBottom: { borderTop: "1px solid #dadce0", padding: "16px 24px 0", display: "flex", flexDirection: "column", gap: "16px" },
+  profileChip: { display: "flex", alignItems: "center", gap: "12px" },
+  profileAvatar: { width: "36px", height: "36px", borderRadius: "50%", background: "#e8f0fe", color: "#1a73e8", fontWeight: "600", fontSize: "15px", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 },
+  profileName: { color: "#202124", fontSize: "14px", fontWeight: "600", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" },
+  profilePlan: { color: "#137333", fontSize: "12px", fontWeight: "500" },
+  profileAvatarWrap: { width: "36px", height: "36px", borderRadius: "50%", overflow: "hidden", flexShrink: 0, border: "1px solid #dadce0" },
+  profileLogoImg: { width: "100%", height: "100%", objectFit: "contain", background: "#ffffff" },
+  signOutBtn: { background: "#ffffff", border: "1px solid #dadce0", color: "#5f6368", borderRadius: "8px", padding: "8px", fontSize: "13px", fontWeight: "600", cursor: "pointer", textAlign: "center", transition: "all 0.2s" },
+
+  // Main Content
   main: { flex: 1, padding: "40px", overflowX: "auto" },
   topbar: { display: "flex", alignItems: "flex-start", justifyContent: "space-between", marginBottom: "32px", gap: "16px", flexWrap: "wrap" },
-  pageTitle: { color: "#e8edf8", fontSize: "24px", fontWeight: "700", margin: "0 0 4px" },
-  pageSub: { color: "#6b7fa3", fontSize: "14px", margin: 0 },
-  actionMsg: { background: "rgba(0,153,250,0.12)", border: "1px solid rgba(0,153,250,0.3)", color: "#0099fa", borderRadius: "8px", padding: "10px 16px", fontSize: "13px", cursor: "pointer", marginBottom: "24px" },
-  statsGrid: { display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(140px, 1fr))", gap: "16px", marginBottom: "24px" },
-  statCard: { background: "#0d1428", border: "1px solid #1e2d52", borderRadius: "12px", padding: "20px" },
-  statValue: { fontWeight: "700", lineHeight: 1, marginBottom: "8px" },
-  statLabel: { color: "#6b7fa3", fontSize: "12px" },
-  // Invoice card
-  invoiceCard: { background: "#0d1428", border: "1px solid rgba(0,153,250,0.3)", borderRadius: "14px", padding: "28px", marginBottom: "40px", display: "grid", gridTemplateColumns: "1fr auto 1fr", gap: "32px", alignItems: "start" },
-  invoiceLeft: {},
-  invoiceTag: { color: "#0099fa", fontSize: "11px", fontWeight: "600", textTransform: "uppercase", letterSpacing: "0.08em", marginBottom: "12px" },
-  invoiceAmount: { color: "#e8edf8", fontSize: "48px", fontWeight: "800", lineHeight: 1, marginBottom: "8px", letterSpacing: "-0.02em" },
-  invoiceBreakdown: { color: "#6b7fa3", fontSize: "13px", marginBottom: "16px" },
-  invoiceDue: { display: "flex", alignItems: "center", gap: "8px", background: "rgba(245,166,35,0.08)", border: "1px solid rgba(245,166,35,0.2)", borderRadius: "8px", padding: "10px 14px" },
-  invoiceDueLabel: { color: "#6b7fa3", fontSize: "12px" },
-  invoiceDueDate: { color: "#f5a623", fontSize: "13px", fontWeight: "600" },
-  invoiceZero: { color: "#00e5a0", fontSize: "13px", marginTop: "12px" },
-  invoiceDivider: { width: "1px", background: "#1e2d52", alignSelf: "stretch" },
+  pageTitle: { color: "#202124", fontSize: "28px", fontWeight: "400", margin: "0 0 4px", letterSpacing: "-0.5px" },
+  pageSub: { color: "#5f6368", fontSize: "14px", margin: 0, fontWeight: "500" },
+  
+  // Action Messages
+  actionMsg: { background: "#e8f0fe", border: "1px solid #aecbfa", color: "#1a73e8", borderRadius: "8px", padding: "12px 16px", fontSize: "14px", fontWeight: "500", display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: "24px" },
+  
+  // Stats Grid
+  statsGrid: { display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(180px, 1fr))", gap: "20px", marginBottom: "32px" },
+  statCard: { background: "#ffffff", border: "1px solid #dadce0", borderRadius: "12px", padding: "24px", boxShadow: "0 1px 2px 0 rgba(60,64,67,0.05)", transition: "box-shadow 0.2s" },
+  statValue: { fontWeight: "400", lineHeight: 1, marginBottom: "8px", letterSpacing: "-0.5px" },
+  statLabel: { color: "#5f6368", fontSize: "13px", fontWeight: "500" },
+
+  // Invoice / Billing Card (Styled like Google Cloud Billing)
+  invoiceCard: { background: "#ffffff", border: "1px solid #dadce0", borderRadius: "16px", padding: "32px", marginBottom: "48px", display: "grid", gridTemplateColumns: "1fr auto 1fr", gap: "40px", alignItems: "start", boxShadow: "0 2px 6px rgba(60,64,67,0.05)" },
+  invoiceLeft: { display: "flex", flexDirection: "column" },
+  invoiceTag: { color: "#1a73e8", fontSize: "12px", fontWeight: "600", textTransform: "uppercase", letterSpacing: "1px", marginBottom: "16px", display: "flex", alignItems: "center", gap: "6px" },
+  invoiceAmount: { color: "#202124", fontSize: "48px", fontWeight: "400", lineHeight: 1, marginBottom: "12px", letterSpacing: "-1px" },
+  invoiceBreakdown: { color: "#5f6368", fontSize: "14px", marginBottom: "24px", fontWeight: "500" },
+  invoiceDue: { display: "inline-flex", alignItems: "center", gap: "8px", background: "#fff8e1", border: "1px solid #ffecb3", borderRadius: "8px", padding: "10px 16px", alignSelf: "flex-start" },
+  invoiceDueLabel: { color: "#5f6368", fontSize: "13px", fontWeight: "500" },
+  invoiceDueDate: { color: "#b06000", fontSize: "14px", fontWeight: "600" },
+  invoiceZero: { color: "#137333", fontSize: "14px", marginTop: "16px", fontWeight: "500", background: "#e6f4ea", padding: "10px 16px", borderRadius: "8px", display: "inline-block", alignSelf: "flex-start" },
+  invoiceDivider: { width: "1px", background: "#f1f3f4", alignSelf: "stretch" },
   invoiceRight: {},
-  bankTitle: { color: "#e8edf8", fontSize: "14px", fontWeight: "600", marginBottom: "16px" },
-  bankRow: { display: "flex", justifyContent: "space-between", gap: "12px", padding: "8px 0", borderBottom: "1px solid #131b33", fontSize: "13px" },
-  bankLabel: { color: "#6b7fa3" },
-  bankValue: { color: "#e8edf8", textAlign: "right", fontWeight: "500" },
-  refRow: { display: "flex", justifyContent: "space-between", gap: "12px", padding: "10px 0", borderBottom: "1px solid #131b33", fontSize: "13px" },
-  refValue: { color: "#0099fa", textAlign: "right", fontWeight: "600", fontFamily: "monospace" },
-  refNote: { color: "#f5a623", fontSize: "12px", marginTop: "12px", lineHeight: "1.5" },
-  // Section
-  section: { marginBottom: "40px" },
-  sectionHeader: { display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: "16px" },
-  sectionTitle: { color: "#e8edf8", fontSize: "17px", fontWeight: "600", margin: 0 },
-  tableWrap: { overflowX: "auto", border: "1px solid #1e2d52", borderRadius: "12px" },
-  table: { width: "100%", borderCollapse: "collapse", fontSize: "13px" },
-  th: { color: "#6b7fa3", fontWeight: "500", textAlign: "left", padding: "12px 16px", borderBottom: "1px solid #1e2d52", whiteSpace: "nowrap" },
-  tr: { borderBottom: "1px solid #1e2d52" },
-  td: { color: "#e8edf8", padding: "14px 16px", verticalAlign: "middle" },
-  jobTitle: { fontWeight: "500", marginBottom: "2px" },
-  jobSub: { color: "#6b7fa3", fontSize: "12px" },
-  pill: { padding: "3px 10px", borderRadius: "20px", fontSize: "11px", fontWeight: "500" },
-  costLive: { color: "#00e5a0", fontWeight: "600", fontSize: "13px" },
-  costInactive: { color: "#3d4f73", fontSize: "13px" },
-  actions: { display: "flex", gap: "6px", flexWrap: "wrap" },
-  btnAction: { background: "rgba(0,153,250,0.12)", color: "#0099fa", border: "1px solid rgba(0,153,250,0.25)", borderRadius: "6px", padding: "5px 10px", fontSize: "11px", cursor: "pointer" },
-  btnActionGreen: { background: "rgba(0,229,160,0.12)", color: "#00e5a0", border: "1px solid rgba(0,229,160,0.25)", borderRadius: "6px", padding: "5px 10px", fontSize: "11px", cursor: "pointer" },
-  btnActionAmber: { background: "rgba(245,166,35,0.12)", color: "#f5a623", border: "1px solid rgba(245,166,35,0.25)", borderRadius: "6px", padding: "5px 10px", fontSize: "11px", cursor: "pointer" },
-  btnActionRed: { background: "rgba(255,79,106,0.12)", color: "#ff4f6a", border: "1px solid rgba(255,79,106,0.25)", borderRadius: "6px", padding: "5px 10px", fontSize: "11px", cursor: "pointer" },
-  emptyCard: { background: "#0d1428", border: "1px dashed #1e2d52", borderRadius: "12px", padding: "48px", textAlign: "center" },
-  emptyText: { color: "#6b7fa3", marginBottom: "16px" },
-  empty: { color: "#6b7fa3", padding: "40px", textAlign: "center" },
-  quickGrid: { display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(160px, 1fr))", gap: "16px" },
-  quickCard: { background: "#0d1428", border: "1px solid #1e2d52", borderRadius: "12px", padding: "24px", display: "flex", flexDirection: "column", alignItems: "center", gap: "12px", cursor: "pointer" },
-  quickIcon: { fontSize: "24px" },
-  quickLabel: { color: "#6b7fa3", fontSize: "13px", fontWeight: "500" },
-  btnPrimary: { background: "#0099fa", color: "#fff", border: "none", borderRadius: "8px", padding: "10px 20px", fontSize: "13px", fontWeight: "600", cursor: "pointer", textDecoration: "none", display: "inline-block" },
-  btnOutline: { background: "none", color: "#0099fa", border: "1px solid rgba(0,153,250,0.3)", borderRadius: "8px", padding: "8px 16px", fontSize: "13px", cursor: "pointer", textDecoration: "none", display: "inline-block" },
+  bankTitle: { color: "#202124", fontSize: "16px", fontWeight: "600", marginBottom: "20px" },
+  bankRow: { display: "flex", justifyContent: "space-between", gap: "16px", padding: "10px 0", borderBottom: "1px solid #f8f9fa", fontSize: "14px" },
+  bankLabel: { color: "#5f6368", fontWeight: "500" },
+  bankValue: { color: "#202124", textAlign: "right", fontWeight: "500" },
+  refRow: { display: "flex", justifyContent: "space-between", gap: "16px", padding: "12px 0", borderBottom: "1px solid #f8f9fa", fontSize: "14px" },
+  refValue: { color: "#1a73e8", textAlign: "right", fontWeight: "600", fontFamily: '"Roboto Mono", monospace', letterSpacing: "0.5px" },
+  refNote: { background: "#f8f9fa", color: "#5f6368", fontSize: "13px", marginTop: "16px", lineHeight: "1.5", padding: "12px", borderRadius: "8px", border: "1px solid #f1f3f4", fontWeight: "500" },
+
+  // Sections
+  section: { marginBottom: "48px" },
+  sectionHeader: { display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: "20px" },
+  sectionTitle: { color: "#202124", fontSize: "18px", fontWeight: "600", margin: 0 },
+  
+  // Table
+  tableWrap: { overflowX: "auto", background: "#ffffff", border: "1px solid #dadce0", borderRadius: "12px", boxShadow: "0 1px 2px 0 rgba(60,64,67,0.05)" },
+  table: { width: "100%", borderCollapse: "collapse", fontSize: "14px" },
+  th: { color: "#5f6368", fontWeight: "600", textAlign: "left", padding: "14px 20px", borderBottom: "1px solid #dadce0", whiteSpace: "nowrap", background: "#f8f9fa" },
+  tr: { borderBottom: "1px solid #f1f3f4", transition: "background 0.2s" },
+  td: { color: "#202124", padding: "16px 20px", verticalAlign: "middle" },
+  jobTitle: { fontWeight: "600", marginBottom: "4px", fontSize: "15px", color: "#1a73e8" },
+  jobSub: { color: "#5f6368", fontSize: "13px", fontWeight: "500" },
+  pill: { padding: "4px 12px", borderRadius: "16px", fontSize: "12px", fontWeight: "600", textTransform: "capitalize" },
+  costLive: { color: "#137333", fontWeight: "600", fontSize: "14px" },
+  costInactive: { color: "#5f6368", fontSize: "14px" },
+  
+  // Table Actions
+  actions: { display: "flex", gap: "8px", flexWrap: "wrap" },
+  btnAction: { background: "#ffffff", color: "#1a73e8", border: "1px solid #dadce0", borderRadius: "6px", padding: "6px 12px", fontSize: "12px", fontWeight: "600", cursor: "pointer", transition: "all 0.2s" },
+  btnActionGreen: { background: "#e6f4ea", color: "#137333", border: "1px solid #ceead6", borderRadius: "6px", padding: "6px 12px", fontSize: "12px", fontWeight: "600", cursor: "pointer" },
+  btnActionAmber: { background: "#fef7e0", color: "#b06000", border: "1px solid #fde293", borderRadius: "6px", padding: "6px 12px", fontSize: "12px", fontWeight: "600", cursor: "pointer" },
+  btnActionRed: { background: "#fce8e6", color: "#c5221f", border: "1px solid #fad2cf", borderRadius: "6px", padding: "6px 12px", fontSize: "12px", fontWeight: "600", cursor: "pointer" },
+  
+  // Empty States
+  emptyCard: { background: "#f8f9fa", border: "1px dashed #dadce0", borderRadius: "12px", padding: "48px", textAlign: "center" },
+  emptyText: { color: "#5f6368", marginBottom: "16px", fontSize: "15px", fontWeight: "500" },
+  empty: { color: "#5f6368", padding: "48px", textAlign: "center", fontSize: "15px", fontWeight: "500" },
+  
+  // Quick Actions
+  quickGrid: { display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(200px, 1fr))", gap: "20px" },
+  quickCard: { background: "#ffffff", border: "1px solid #dadce0", borderRadius: "12px", padding: "32px 24px", display: "flex", flexDirection: "column", alignItems: "center", gap: "16px", cursor: "pointer", boxShadow: "0 1px 2px 0 rgba(60,64,67,0.05)", transition: "all 0.2s ease" },
+  quickIcon: { fontSize: "32px" },
+  quickLabel: { color: "#3c4043", fontSize: "14px", fontWeight: "600" },
+  
+  // Primary Buttons
+  btnPrimary: { background: "#1a73e8", color: "#ffffff", border: "none", borderRadius: "8px", padding: "10px 24px", fontSize: "14px", fontWeight: "600", cursor: "pointer", textDecoration: "none", display: "inline-block", transition: "background 0.2s", boxShadow: "0 1px 2px rgba(26,115,232,0.3)" },
+  btnOutline: { background: "#ffffff", color: "#1a73e8", border: "1px solid #dadce0", borderRadius: "8px", padding: "8px 20px", fontSize: "14px", fontWeight: "600", cursor: "pointer", textDecoration: "none", display: "inline-block", transition: "all 0.2s" },
 };
