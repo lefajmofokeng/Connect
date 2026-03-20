@@ -109,169 +109,222 @@ export default function Profile() {
     <div style={s.page}>
       <Sidebar profile={employerProfile} />
 
-      <div style={s.main}>
-        <div style={s.topbar}>
-          <div>
-            <h1 style={s.pageTitle}>Company Profile</h1>
-            <p style={s.pageSub}>This information appears on your public company page and job listings</p>
-          </div>
-        </div>
+      <div style={s.mainWrapper}>
+        <div style={s.mainInner}>
 
-        {error && <div style={s.error}>{error}</div>}
-        {successMsg && <div style={s.success}>{successMsg}</div>}
-
-        <form onSubmit={handleSave} style={s.layout}>
-          {/* Left column */}
-          <div style={s.formCol}>
-
-            {/* Logo & Brand */}
-            <div style={s.card}>
-              <div style={s.cardTitle}>Logo & Branding</div>
-              <div style={s.logoRow}>
-                <div style={s.logoPreview}>
-                  {logoPreview
-                    ? <img src={logoPreview} alt="Logo" style={s.logoImg} />
-                    : <div style={s.logoPlaceholder}>{form.companyName?.[0] || "C"}</div>
-                  }
-                </div>
-                <div style={s.logoMeta}>
-                  <label style={s.uploadBtn}>
-                    Upload Logo
-                    <input type="file" accept="image/jpeg,image/png,image/webp" onChange={handleLogoChange} style={{ display: "none" }} />
-                  </label>
-                  <p style={s.logoHint}>JPG, PNG or WebP. Max 2MB. Recommended: 200×200px square.</p>
-                  {logoFile && <p style={s.logoFileName}>✓ {logoFile.name}</p>}
-                </div>
-              </div>
-
-              <div style={s.field}>
-                <label style={s.label}>Brand Colour</label>
-                <div style={s.colourRow}>
-                  <input
-                    type="color"
-                    value={form.brandColour}
-                    onChange={set("brandColour")}
-                    style={s.colourPicker}
-                  />
-                  <input
-                    style={{ ...s.input, flex: 1 }}
-                    value={form.brandColour}
-                    onChange={set("brandColour")}
-                    placeholder="#0099fa"
-                    maxLength={7}
-                  />
-                  <div style={{ ...s.colourSwatch, background: form.brandColour }} />
-                </div>
-              </div>
+          {/* Topbar */}
+          <div style={s.topbar}>
+            <div>
+              <h1 style={s.pageTitle}>Settings</h1>
+              <p style={s.pageSub}>Manage your public company profile and application preferences</p>
             </div>
+          </div>
 
-            {/* Company Info */}
-            <div style={s.card}>
-              <div style={s.cardTitle}>Company Information</div>
-              <div style={s.fields}>
-                <Field label="Company Name *">
-                  <input style={s.input} value={form.companyName} onChange={set("companyName")} placeholder="Acme (Pty) Ltd" />
+          {/* Alerts */}
+          {error && (
+            <div style={s.alertError}>
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" style={{ flexShrink: 0 }}><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+              {error}
+            </div>
+          )}
+          {successMsg && (
+            <div style={s.actionMsg}>{successMsg}</div>
+          )}
+
+          <form onSubmit={handleSave} style={s.layout}>
+
+            {/* ── Left Column ── */}
+            <div style={s.formCol}>
+
+              {/* Logo & Branding */}
+              <div style={s.card}>
+                <div style={s.cardHeader}>
+                  <div style={s.cardTitle}>Logo &amp; Branding</div>
+                  <div style={s.cardSub}>Appears on your public company page and job listings</div>
+                </div>
+
+                <div style={s.logoRow}>
+                  <div style={s.logoPreview}>
+                    {logoPreview
+                      ? <img src={logoPreview} alt="Logo" style={s.logoImg} />
+                      : <div style={s.logoPlaceholder}>{form.companyName?.[0] || "C"}</div>
+                    }
+                  </div>
+                  <div style={s.logoMeta}>
+                    <label style={s.uploadBtn}>
+                      Upload Logo
+                      <input type="file" accept="image/jpeg,image/png,image/webp" onChange={handleLogoChange} style={{ display: "none" }} />
+                    </label>
+                    <p style={s.logoHint}>JPG, PNG or WebP · Max 2MB · Recommended 200×200px</p>
+                    {logoFile && (
+                      <p style={s.logoFileName}>
+                        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" style={{ marginRight: 4 }}><polyline points="20 6 9 17 4 12"/></svg>
+                        {logoFile.name}
+                      </p>
+                    )}
+                  </div>
+                </div>
+
+                <div style={s.field}>
+                  <label style={s.fieldLabel}>Brand Colour</label>
+                  <div style={s.colourRow}>
+                    <input
+                      type="color"
+                      value={form.brandColour}
+                      onChange={set("brandColour")}
+                      style={s.colourPicker}
+                    />
+                    <input
+                      style={{ ...s.input, flex: 1 }}
+                      value={form.brandColour}
+                      onChange={set("brandColour")}
+                      placeholder="#0099fa"
+                      maxLength={7}
+                    />
+                    <div style={{ ...s.colourSwatch, background: form.brandColour }} />
+                  </div>
+                </div>
+              </div>
+
+              {/* Company Information */}
+              <div style={s.card}>
+                <div style={s.cardHeader}>
+                  <div style={s.cardTitle}>Company Information</div>
+                  <div style={s.cardSub}>Basic details about your organisation</div>
+                </div>
+                <div style={s.fields}>
+                  <Field label="Company Name *">
+                    <input style={s.input} value={form.companyName} onChange={set("companyName")} placeholder="Acme (Pty) Ltd" />
+                  </Field>
+                  <Row>
+                    <Field label="Industry">
+                      <select style={s.input} value={form.industry} onChange={set("industry")}>
+                        <option value="">Select</option>
+                        {INDUSTRIES.map(i => <option key={i}>{i}</option>)}
+                      </select>
+                    </Field>
+                    <Field label="Company Size">
+                      <select style={s.input} value={form.companySize} onChange={set("companySize")}>
+                        <option value="">Select</option>
+                        {["1–10","11–50","51–200","201–500","500+"].map(sz => <option key={sz}>{sz}</option>)}
+                      </select>
+                    </Field>
+                  </Row>
+                  <Row>
+                    <Field label="Province">
+                      <select style={s.input} value={form.province} onChange={set("province")}>
+                        <option value="">Select</option>
+                        {PROVINCES.map(p => <option key={p}>{p}</option>)}
+                      </select>
+                    </Field>
+                    <Field label="City">
+                      <input style={s.input} value={form.city} onChange={set("city")} placeholder="Johannesburg" />
+                    </Field>
+                  </Row>
+                  <Row>
+                    <Field label="Website">
+                      <input style={s.input} value={form.website} onChange={set("website")} placeholder="https://acme.co.za" />
+                    </Field>
+                    <Field label="LinkedIn">
+                      <input style={s.input} value={form.linkedin} onChange={set("linkedin")} placeholder="https://linkedin.com/company/..." />
+                    </Field>
+                  </Row>
+                </div>
+              </div>
+
+              {/* About */}
+              <div style={s.card}>
+                <div style={s.cardHeader}>
+                  <div style={s.cardTitle}>About the Company</div>
+                  <div style={s.cardSub}>Tell job seekers about your culture, mission, and values</div>
+                </div>
+                <Field label="Company Description">
+                  <textarea
+                    style={{ ...s.input, minHeight: "120px", resize: "vertical", lineHeight: "1.6" }}
+                    value={form.about}
+                    onChange={set("about")}
+                    placeholder="Tell job seekers about your company culture, mission, and values..."
+                  />
                 </Field>
-                <Row>
-                  <Field label="Industry">
-                    <select style={s.input} value={form.industry} onChange={set("industry")}>
-                      <option value="">Select</option>
-                      {INDUSTRIES.map(i => <option key={i}>{i}</option>)}
-                    </select>
-                  </Field>
-                  <Field label="Company Size">
-                    <select style={s.input} value={form.companySize} onChange={set("companySize")}>
-                      <option value="">Select</option>
-                      {["1–10","11–50","51–200","201–500","500+"].map(sz => <option key={sz}>{sz}</option>)}
-                    </select>
-                  </Field>
-                </Row>
-                <Row>
-                  <Field label="Province">
-                    <select style={s.input} value={form.province} onChange={set("province")}>
-                      <option value="">Select</option>
-                      {PROVINCES.map(p => <option key={p}>{p}</option>)}
-                    </select>
-                  </Field>
-                  <Field label="City">
-                    <input style={s.input} value={form.city} onChange={set("city")} placeholder="Johannesburg" />
-                  </Field>
-                </Row>
-                <Row>
-                  <Field label="Website">
-                    <input style={s.input} value={form.website} onChange={set("website")} placeholder="https://acme.co.za" />
-                  </Field>
-                  <Field label="LinkedIn">
-                    <input style={s.input} value={form.linkedin} onChange={set("linkedin")} placeholder="https://linkedin.com/company/..." />
-                  </Field>
-                </Row>
               </div>
-            </div>
 
-            {/* About */}
-            <div style={s.card}>
-              <div style={s.cardTitle}>About the Company</div>
-              <Field label="Company Description">
-                <textarea
-                  style={{ ...s.input, minHeight: "120px", resize: "vertical" }}
-                  value={form.about}
-                  onChange={set("about")}
-                  placeholder="Tell job seekers about your company culture, mission, and values..."
-                />
-              </Field>
-            </div>
-
-            {/* Applications Settings */}
-            <div style={s.card}>
-              <div style={s.cardTitle}>Applications Settings</div>
-              <div style={s.fields}>
-                <Row>
-                  <Field label="Applications Email *">
-                    <input style={s.input} type="email" value={form.appEmail} onChange={set("appEmail")} placeholder="careers@acme.co.za" />
-                  </Field>
-                  <Field label="Reply Name">
-                    <input style={s.input} value={form.replyName} onChange={set("replyName")} placeholder="Acme Careers" />
-                  </Field>
-                </Row>
-              </div>
-            </div>
-
-            <div style={s.actionRow}>
-              <button type="button" onClick={() => navigate("/employer/dashboard")} style={s.btnCancel}>
-                Cancel
-              </button>
-              <button type="submit" disabled={loading} style={s.btnSave}>
-                {loading ? "Saving…" : "Save Profile"}
-              </button>
-            </div>
-          </div>
-
-          {/* Right column — preview */}
-          <div style={s.previewCol}>
-            <div style={s.card}>
-              <div style={s.cardTitle}>Public Page Preview</div>
-              <div style={{ ...s.previewBanner, background: form.brandColour + "22", borderColor: form.brandColour + "44" }}>
-                <div style={s.previewLogoWrap}>
-                  {logoPreview
-                    ? <img src={logoPreview} alt="Logo" style={s.previewLogo} />
-                    : <div style={{ ...s.previewLogoPlaceholder, background: form.brandColour }}>{form.companyName?.[0] || "C"}</div>
-                  }
+              {/* Applications Settings */}
+              <div style={s.card}>
+                <div style={s.cardHeader}>
+                  <div style={s.cardTitle}>Applications Settings</div>
+                  <div style={s.cardSub}>Where candidate applications are routed</div>
                 </div>
-                <div style={s.previewCompanyName}>{form.companyName || "Company Name"}</div>
-                <div style={s.previewIndustry}>{form.industry || "Industry"} · {form.city || "City"}{form.province ? `, ${form.province}` : ""}</div>
-              </div>
-              {form.about && (
-                <div style={s.previewAbout}>
-                  {form.about.slice(0, 200)}{form.about.length > 200 ? "…" : ""}
+                <div style={s.fields}>
+                  <Row>
+                    <Field label="Applications Email *">
+                      <input style={s.input} type="email" value={form.appEmail} onChange={set("appEmail")} placeholder="careers@acme.co.za" />
+                    </Field>
+                    <Field label="Reply Name">
+                      <input style={s.input} value={form.replyName} onChange={set("replyName")} placeholder="Acme Careers" />
+                    </Field>
+                  </Row>
                 </div>
-              )}
-              <div style={s.previewLinks}>
-                {form.website && <a href={form.website} style={{ ...s.previewLink, color: form.brandColour }} target="_blank" rel="noreferrer">🌐 Website</a>}
-                {form.linkedin && <a href={form.linkedin} style={{ ...s.previewLink, color: form.brandColour }} target="_blank" rel="noreferrer">💼 LinkedIn</a>}
+              </div>
+
+              {/* Action Row */}
+              <div style={s.actionRow}>
+                <button type="button" onClick={() => navigate("/employer/dashboard")} style={s.btnCancel}>
+                  Cancel
+                </button>
+                <button type="submit" disabled={loading} style={s.btnSave}>
+                  {loading ? "Saving…" : "Save Changes"}
+                </button>
+              </div>
+
+            </div>
+
+            {/* ── Right Column — Preview ── */}
+            <div style={s.previewCol}>
+              <div style={s.card}>
+                <div style={s.previewHeaderBar}>
+                  <span style={s.previewHeaderLabel}>Public Page Preview</span>
+                  <span style={s.previewHeaderDot} />
+                </div>
+
+                {/* Brand banner */}
+                <div style={{ ...s.previewBanner, background: form.brandColour + "18", borderColor: form.brandColour + "40" }}>
+                  <div style={s.previewLogoWrap}>
+                    {logoPreview
+                      ? <img src={logoPreview} alt="Logo" style={s.previewLogo} />
+                      : <div style={{ ...s.previewLogoPlaceholder, background: form.brandColour }}>{form.companyName?.[0] || "C"}</div>
+                    }
+                  </div>
+                  <div style={s.previewCompanyName}>{form.companyName || "Company Name"}</div>
+                  <div style={s.previewIndustry}>
+                    {form.industry || "Industry"} · {form.city || "City"}{form.province ? `, ${form.province}` : ""}
+                  </div>
+                </div>
+
+                {form.about && (
+                  <div style={s.previewAbout}>
+                    {form.about.slice(0, 200)}{form.about.length > 200 ? "…" : ""}
+                  </div>
+                )}
+
+                {(form.website || form.linkedin) && (
+                  <div style={s.previewLinks}>
+                    {form.website && (
+                      <a href={form.website} style={{ ...s.previewLink, color: form.brandColour }} target="_blank" rel="noreferrer">
+                        🌐 Website
+                      </a>
+                    )}
+                    {form.linkedin && (
+                      <a href={form.linkedin} style={{ ...s.previewLink, color: form.brandColour }} target="_blank" rel="noreferrer">
+                        💼 LinkedIn
+                      </a>
+                    )}
+                  </div>
+                )}
               </div>
             </div>
-          </div>
-        </form>
+
+          </form>
+        </div>
       </div>
     </div>
   );
@@ -282,34 +335,49 @@ function Sidebar({ profile }) {
   const navigate = useNavigate();
   const path = window.location.pathname;
   const navItems = [
-    { label: "Dashboard", to: "/employer/dashboard", icon: "⬡" },
-    { label: "Post a Job", to: "/employer/post-job", icon: "+" },
-    { label: "Applications", to: "/employer/applications", icon: "📋" },
-    { label: "Company Profile", to: "/employer/profile", icon: "🏢" },
+    { label: "Project Overview", to: "/employer/dashboard", icon: "⌂" },
+    { label: "Deploy Job", to: "/employer/post-job", icon: "+" },
+    { label: "Database (Applications)", to: "/employer/applications", icon: "≡" },
+    { label: "Settings", to: "/employer/profile", icon: "⚙" },
   ];
   return (
     <div style={s.sidebar}>
-      <div style={s.sidebarLogo}>
-        <div style={s.logoMark}>C</div>
-        <div>
-          <div style={s.logoText}>Cronos Jobs</div>
-          <div style={s.logoSub}>Employer Portal</div>
+      <div style={s.sidebarHeader}>
+        <div style={s.projectSelector}>
+          <div style={s.logoMark}>V</div>
+          <div style={s.projectInfo}>
+            <div style={s.logoText}>Vetted</div>
+            <div style={s.logoSub}>Spark Plan</div>
+          </div>
+          <div style={s.dropdownArrow}>▾</div>
         </div>
       </div>
       <nav style={s.nav}>
+        <div style={s.navSectionTitle}>Develop</div>
         {navItems.map(item => (
-          <button key={item.to} onClick={() => navigate(item.to)}
-            style={{ ...s.navBtn, ...(path === item.to ? s.navBtnActive : {}) }}>
-            <span>{item.icon}</span><span>{item.label}</span>
+          <button
+            key={item.to}
+            onClick={() => navigate(item.to)}
+            style={{ ...s.navBtn, ...(path === item.to ? s.navBtnActive : {}) }}
+          >
+            <span style={{ ...s.navIcon, ...(path === item.to ? s.navIconActive : {}) }}>
+              {item.icon}
+            </span>
+            <span style={s.navLabel}>{item.label}</span>
           </button>
         ))}
       </nav>
       <div style={s.sidebarBottom}>
         <div style={s.profileChip}>
-          <div style={s.profileAvatar}>{profile?.companyName?.[0] || "E"}</div>
-          <div>
+          <div style={s.profileAvatarWrap}>
+            {profile?.logoUrl
+              ? <img src={profile.logoUrl} alt={profile.companyName} style={s.profileLogoImg} />
+              : <div style={s.profileAvatar}>{profile?.companyName?.[0] || "E"}</div>
+            }
+          </div>
+          <div style={{ overflow: "hidden" }}>
             <div style={s.profileName}>{profile?.companyName || "Employer"}</div>
-            <div style={s.profilePlan}>{profile?.plan || "No plan"}</div>
+            <div style={s.profileEmail}>Admin Access</div>
           </div>
         </div>
       </div>
@@ -319,69 +387,141 @@ function Sidebar({ profile }) {
 
 // ── Helpers ──────────────────────────────────────────────────────────
 function Row({ children }) {
-  return <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "14px" }}>{children}</div>;
-}
-
-function Field({ label, children }) {
   return (
-    <div style={{ display: "flex", flexDirection: "column", gap: "6px" }}>
-      <label style={{ color: "#6b7fa3", fontSize: "12px", fontWeight: "500" }}>{label}</label>
+    <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "14px" }}>
       {children}
     </div>
   );
 }
 
+function Field({ label, children }) {
+  return (
+    <div style={{ display: "flex", flexDirection: "column", gap: "6px" }}>
+      <label style={s.fieldLabel}>{label}</label>
+      {children}
+    </div>
+  );
+}
+
+// ── Styles ────────────────────────────────────────────────────────────
 const s = {
-  page: { display: "flex", minHeight: "100vh", background: "#080d1b", fontFamily: "sans-serif" },
-  sidebar: { width: "240px", flexShrink: 0, background: "#0d1428", borderRight: "1px solid #1e2d52", padding: "28px 16px", display: "flex", flexDirection: "column" },
-  sidebarLogo: { display: "flex", alignItems: "center", gap: "12px", marginBottom: "36px", paddingLeft: "8px" },
-  logoMark: { width: "36px", height: "36px", borderRadius: "10px", background: "#0099fa", color: "#fff", fontWeight: "800", fontSize: "18px", display: "flex", alignItems: "center", justifyContent: "center" },
-  logoText: { color: "#e8edf8", fontWeight: "700", fontSize: "15px" },
-  logoSub: { color: "#6b7fa3", fontSize: "11px" },
-  nav: { display: "flex", flexDirection: "column", gap: "4px", flex: 1 },
-  navBtn: { background: "none", border: "none", color: "#6b7fa3", fontSize: "13px", padding: "11px 12px", borderRadius: "8px", cursor: "pointer", textAlign: "left", display: "flex", alignItems: "center", gap: "10px" },
-  navBtnActive: { background: "rgba(0,153,250,0.12)", color: "#0099fa" },
-  sidebarBottom: { borderTop: "1px solid #1e2d52", paddingTop: "16px" },
-  profileChip: { display: "flex", alignItems: "center", gap: "10px", padding: "8px" },
-  profileAvatar: { width: "32px", height: "32px", borderRadius: "8px", background: "#0099fa", color: "#fff", fontWeight: "700", fontSize: "14px", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 },
-  profileName: { color: "#e8edf8", fontSize: "13px", fontWeight: "500" },
-  profilePlan: { color: "#6b7fa3", fontSize: "11px" },
-  main: { flex: 1, padding: "40px", overflowX: "auto" },
-  topbar: { marginBottom: "32px" },
-  pageTitle: { color: "#e8edf8", fontSize: "24px", fontWeight: "700", margin: "0 0 4px" },
-  pageSub: { color: "#6b7fa3", fontSize: "14px", margin: 0 },
-  error: { background: "rgba(255,79,106,0.1)", border: "1px solid rgba(255,79,106,0.3)", color: "#ff4f6a", borderRadius: "8px", padding: "12px 16px", fontSize: "13px", marginBottom: "20px" },
-  success: { background: "rgba(0,229,160,0.1)", border: "1px solid rgba(0,229,160,0.3)", color: "#00e5a0", borderRadius: "8px", padding: "12px 16px", fontSize: "13px", marginBottom: "20px" },
-  layout: { display: "grid", gridTemplateColumns: "1fr 320px", gap: "24px", alignItems: "start" },
+  // ── Page Shell ──
+  page: {
+    display: "flex",
+    height: "100vh",
+    overflow: "hidden",
+    background: "#f4f5f7",
+    fontFamily: '"Circular", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif',
+  },
+
+  // ── Sidebar ──
+  sidebar: {
+    width: "256px",
+    flexShrink: 0,
+    height: "100%",
+    background: "#ffffff",
+    borderRight: "1px solid #e3e3e3",
+    display: "flex",
+    flexDirection: "column",
+    zIndex: 10,
+  },
+  sidebarHeader: { padding: "16px 20px", borderBottom: "1px solid #e3e3e3" },
+  projectSelector: { display: "flex", alignItems: "center", gap: "12px", cursor: "pointer", padding: "8px", borderRadius: "8px", transition: "background 0.2s" },
+  logoMark: { width: "32px", height: "32px", borderRadius: "6px", background: "#ffca28", color: "#d84315", fontWeight: "700", fontSize: "18px", display: "flex", alignItems: "center", justifyContent: "center" },
+  projectInfo: { flex: 1, overflow: "hidden" },
+  logoText: { color: "#202124", fontWeight: "600", fontSize: "14px", whiteSpace: "nowrap", textOverflow: "ellipsis", overflow: "hidden" },
+  logoSub: { color: "#5f6368", fontSize: "12px", fontWeight: "500" },
+  dropdownArrow: { color: "#5f6368", fontSize: "12px" },
+
+  nav: { display: "flex", flexDirection: "column", gap: "2px", flex: 1, padding: "16px 12px", overflowY: "auto" },
+  navSectionTitle: { color: "#5f6368", fontSize: "11px", fontWeight: "700", textTransform: "uppercase", letterSpacing: "0.5px", padding: "0 12px", marginBottom: "8px", marginTop: "8px" },
+  navBtn: { background: "none", border: "none", color: "#3c4043", fontSize: "13px", fontWeight: "500", padding: "10px 12px", borderRadius: "6px", cursor: "pointer", textAlign: "left", display: "flex", alignItems: "center", gap: "12px", transition: "all 0.15s" },
+  navBtnActive: { background: "#e3f2fd", color: "#1967d2", fontWeight: "600" },
+  navIcon: { fontSize: "18px", color: "#5f6368", display: "flex", alignItems: "center", justifyContent: "center", width: "24px" },
+  navIconActive: { color: "#1967d2" },
+  navLabel: { flex: 1 },
+
+  sidebarBottom: { borderTop: "1px solid #e3e3e3", padding: "16px", background: "#f8f9fa" },
+  profileChip: { display: "flex", alignItems: "center", gap: "10px" },
+  profileAvatarWrap: { width: "32px", height: "32px", borderRadius: "50%", overflow: "hidden", flexShrink: 0, border: "1px solid #dadce0" },
+  profileAvatar: { width: "100%", height: "100%", background: "#1a73e8", color: "#ffffff", fontWeight: "600", fontSize: "14px", display: "flex", alignItems: "center", justifyContent: "center" },
+  profileLogoImg: { width: "100%", height: "100%", objectFit: "cover", background: "#ffffff" },
+  profileName: { color: "#202124", fontSize: "13px", fontWeight: "600", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" },
+  profileEmail: { color: "#5f6368", fontSize: "12px" },
+
+  // ── Main Content ──
+  mainWrapper: { flex: 1, height: "100%", overflowY: "auto", position: "relative" },
+  mainInner: { padding: "32px 48px", maxWidth: "1400px", margin: "0 auto" },
+
+  topbar: { display: "flex", alignItems: "flex-start", justifyContent: "space-between", marginBottom: "32px", gap: "16px" },
+  pageTitle: { color: "#202124", fontSize: "24px", fontWeight: "600", margin: "0 0 4px", letterSpacing: "-0.5px" },
+  pageSub: { color: "#5f6368", fontSize: "14px", margin: 0 },
+
+  // ── Alerts ──
+  alertError: { background: "#fce8e6", border: "1px solid #f5c6c2", color: "#c5221f", borderRadius: "4px", padding: "12px 16px", fontSize: "13px", fontWeight: "500", marginBottom: "24px", display: "flex", alignItems: "center", gap: "8px" },
+  actionMsg: { background: "#323232", color: "#ffffff", borderRadius: "4px", padding: "12px 16px", fontSize: "13px", display: "inline-flex", alignItems: "center", marginBottom: "24px", boxShadow: "0 2px 4px rgba(0,0,0,0.2)" },
+
+  // ── Layout ──
+  layout: { display: "grid", gridTemplateColumns: "1fr 300px", gap: "24px", alignItems: "start" },
   formCol: { display: "flex", flexDirection: "column", gap: "20px" },
-  card: { background: "#0d1428", border: "1px solid #1e2d52", borderRadius: "12px", padding: "24px" },
-  cardTitle: { color: "#e8edf8", fontSize: "15px", fontWeight: "600", marginBottom: "20px" },
+
+  // ── Cards ──
+  card: { background: "#ffffff", border: "1px solid #e3e3e3", borderRadius: "8px", padding: "24px", boxShadow: "0 1px 2px 0 rgba(60,64,67,0.1)" },
+  cardHeader: { marginBottom: "20px" },
+  cardTitle: { color: "#202124", fontSize: "14px", fontWeight: "600", marginBottom: "2px" },
+  cardSub: { color: "#5f6368", fontSize: "12px" },
+
+  // ── Form Elements ──
   fields: { display: "flex", flexDirection: "column", gap: "14px" },
   field: { display: "flex", flexDirection: "column", gap: "6px" },
-  label: { color: "#6b7fa3", fontSize: "12px", fontWeight: "500" },
-  input: { background: "#131b33", border: "1px solid #1e2d52", borderRadius: "8px", padding: "10px 13px", color: "#e8edf8", fontSize: "13px", outline: "none", width: "100%", fontFamily: "sans-serif" },
+  fieldLabel: { color: "#5f6368", fontSize: "12px", fontWeight: "600", textTransform: "uppercase", letterSpacing: "0.3px" },
+  input: {
+    background: "#ffffff",
+    border: "1px solid #e3e3e3",
+    borderRadius: "4px",
+    padding: "9px 12px",
+    color: "#202124",
+    fontSize: "13px",
+    outline: "none",
+    width: "100%",
+    fontFamily: '"Circular", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif',
+    boxSizing: "border-box",
+    transition: "border-color 0.2s",
+  },
+
+  // ── Logo Upload ──
   logoRow: { display: "flex", alignItems: "center", gap: "20px", marginBottom: "20px" },
-  logoPreview: { width: "72px", height: "72px", borderRadius: "12px", border: "1px solid #1e2d52", overflow: "hidden", flexShrink: 0, display: "flex", alignItems: "center", justifyContent: "center", background: "#131b33" },
+  logoPreview: { width: "68px", height: "68px", borderRadius: "8px", border: "1px solid #e3e3e3", overflow: "hidden", flexShrink: 0, display: "flex", alignItems: "center", justifyContent: "center", background: "#f8f9fa" },
   logoImg: { width: "100%", height: "100%", objectFit: "contain" },
-  logoPlaceholder: { color: "#0099fa", fontWeight: "800", fontSize: "28px" },
+  logoPlaceholder: { color: "#1a73e8", fontWeight: "700", fontSize: "26px" },
   logoMeta: { flex: 1 },
-  uploadBtn: { display: "inline-block", background: "rgba(0,153,250,0.12)", border: "1px solid rgba(0,153,250,0.25)", color: "#0099fa", borderRadius: "8px", padding: "8px 16px", fontSize: "13px", cursor: "pointer", marginBottom: "8px" },
-  logoHint: { color: "#3d4f73", fontSize: "11px", lineHeight: "1.5", margin: 0 },
-  logoFileName: { color: "#00e5a0", fontSize: "12px", margin: "6px 0 0" },
+  uploadBtn: { display: "inline-block", background: "#ffffff", border: "1px solid #dadce0", color: "#1a73e8", borderRadius: "4px", padding: "7px 14px", fontSize: "13px", fontWeight: "600", cursor: "pointer", marginBottom: "8px", transition: "background 0.2s" },
+  logoHint: { color: "#9aa0a6", fontSize: "11px", lineHeight: "1.5", margin: 0 },
+  logoFileName: { color: "#0d652d", fontSize: "12px", fontWeight: "500", margin: "6px 0 0", display: "flex", alignItems: "center" },
+
+  // ── Brand Colour ──
   colourRow: { display: "flex", alignItems: "center", gap: "10px" },
-  colourPicker: { width: "44px", height: "38px", border: "1px solid #1e2d52", borderRadius: "8px", cursor: "pointer", padding: "2px", background: "#131b33" },
-  colourSwatch: { width: "38px", height: "38px", borderRadius: "8px", flexShrink: 0 },
-  actionRow: { display: "flex", gap: "12px", justifyContent: "flex-end" },
-  btnCancel: { background: "none", border: "1px solid #1e2d52", color: "#6b7fa3", borderRadius: "8px", padding: "11px 20px", fontSize: "14px", cursor: "pointer" },
-  btnSave: { background: "#0099fa", color: "#fff", border: "none", borderRadius: "8px", padding: "11px 24px", fontSize: "14px", fontWeight: "600", cursor: "pointer" },
-  previewCol: { position: "sticky", top: "40px" },
-  previewBanner: { border: "1px solid", borderRadius: "10px", padding: "24px", textAlign: "center", marginBottom: "16px" },
-  previewLogoWrap: { marginBottom: "12px", display: "flex", justifyContent: "center" },
-  previewLogo: { width: "64px", height: "64px", borderRadius: "10px", objectFit: "contain" },
-  previewLogoPlaceholder: { width: "64px", height: "64px", borderRadius: "10px", display: "flex", alignItems: "center", justifyContent: "center", color: "#fff", fontWeight: "800", fontSize: "28px" },
-  previewCompanyName: { color: "#e8edf8", fontSize: "18px", fontWeight: "700", marginBottom: "4px" },
-  previewIndustry: { color: "#6b7fa3", fontSize: "13px" },
-  previewAbout: { color: "#6b7fa3", fontSize: "13px", lineHeight: "1.6", marginBottom: "16px", padding: "0 4px" },
+  colourPicker: { width: "40px", height: "36px", border: "1px solid #e3e3e3", borderRadius: "4px", cursor: "pointer", padding: "2px", background: "#ffffff", flexShrink: 0 },
+  colourSwatch: { width: "36px", height: "36px", borderRadius: "4px", flexShrink: 0, border: "1px solid #e3e3e3" },
+
+  // ── Action Row ──
+  actionRow: { display: "flex", gap: "12px", justifyContent: "flex-end", paddingBottom: "48px" },
+  btnCancel: { background: "#ffffff", border: "1px solid #dadce0", color: "#3c4043", borderRadius: "4px", padding: "9px 20px", fontSize: "13px", fontWeight: "600", cursor: "pointer", transition: "background 0.2s" },
+  btnSave: { background: "#1a73e8", color: "#ffffff", border: "none", borderRadius: "4px", padding: "9px 24px", fontSize: "13px", fontWeight: "600", cursor: "pointer", boxShadow: "0 1px 2px rgba(0,0,0,0.1)", transition: "background 0.2s" },
+
+  // ── Preview Column ──
+  previewCol: { position: "sticky", top: "32px" },
+  previewHeaderBar: { display: "flex", alignItems: "center", justifyContent: "space-between", padding: "10px 16px", background: "#f8f9fa", borderBottom: "1px solid #e3e3e3", borderRadius: "8px 8px 0 0", margin: "-24px -24px 20px -24px" },
+  previewHeaderLabel: { color: "#5f6368", fontSize: "11px", fontWeight: "700", textTransform: "uppercase", letterSpacing: "0.5px" },
+  previewHeaderDot: { width: "8px", height: "8px", borderRadius: "50%", background: "#34a853" },
+
+  previewBanner: { border: "1px solid", borderRadius: "6px", padding: "20px 16px", textAlign: "center", marginBottom: "16px" },
+  previewLogoWrap: { marginBottom: "10px", display: "flex", justifyContent: "center" },
+  previewLogo: { width: "56px", height: "56px", borderRadius: "8px", objectFit: "contain" },
+  previewLogoPlaceholder: { width: "56px", height: "56px", borderRadius: "8px", display: "flex", alignItems: "center", justifyContent: "center", color: "#fff", fontWeight: "700", fontSize: "24px" },
+  previewCompanyName: { color: "#202124", fontSize: "16px", fontWeight: "600", marginBottom: "4px" },
+  previewIndustry: { color: "#5f6368", fontSize: "12px" },
+  previewAbout: { color: "#5f6368", fontSize: "12px", lineHeight: "1.6", marginBottom: "16px" },
   previewLinks: { display: "flex", gap: "12px", flexWrap: "wrap" },
-  previewLink: { fontSize: "13px", textDecoration: "none", fontWeight: "500" },
+  previewLink: { fontSize: "12px", textDecoration: "none", fontWeight: "600" },
 };

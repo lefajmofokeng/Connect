@@ -19,19 +19,19 @@ export default function Login() {
     try {
       const cred = await signInWithEmailAndPassword(auth, email, password);
 
-        // Admin bypasses Firestore check entirely
-        if (cred.user.email === "lefamjack@gmail.com") {
+      // Admin bypasses Firestore check entirely
+      if (cred.user.email === "lefamjack@gmail.com") {
         navigate("/admin");
         return;
-        }
+      }
 
-        const snap = await getDoc(doc(db, "employers", cred.user.uid));
+      const snap = await getDoc(doc(db, "employers", cred.user.uid));
 
-        if (!snap.exists()) {
+      if (!snap.exists()) {
         setError("No employer account found. Please contact support.");
         setLoading(false);
         return;
-        }
+      }
 
       const profile = snap.data();
       const { verificationStatus, planStatus } = profile;
@@ -60,10 +60,6 @@ export default function Login() {
         return;
       }
 
-      // Plan gate
-      // All verified and approved employers can access dashboard
-        // (invoice system handles payment tracking)
-
       // All good
       navigate("/employer/dashboard");
 
@@ -78,142 +74,276 @@ export default function Login() {
   };
 
   return (
-    <div style={styles.page}>
-      <div style={styles.card}>
-        <div style={styles.logo}>Cronos Jobs</div>
-        <h1 style={styles.heading}>Employer Login</h1>
-        <p style={styles.sub}>Access your hiring portal</p>
+    <div style={s.page}>
 
-        {error && <div style={styles.error}>{error}</div>}
-
-        <form onSubmit={handleLogin} style={styles.form}>
-          <div style={styles.field}>
-            <label style={styles.label}>Email address</label>
-            <input
-              type="email"
-              value={email}
-              onChange={e => setEmail(e.target.value)}
-              required
-              style={styles.input}
-              placeholder="you@company.co.za"
-            />
-          </div>
-
-          <div style={styles.field}>
-            <label style={styles.label}>Password</label>
-            <input
-              type="password"
-              value={password}
-              onChange={e => setPassword(e.target.value)}
-              required
-              style={styles.input}
-              placeholder="••••••••"
-            />
-          </div>
-
-          <button type="submit" disabled={loading} style={styles.btn}>
-            {loading ? "Signing in…" : "Sign In"}
-          </button>
-        </form>
-
-        <p style={styles.footer}>
-          Want to list jobs on Cronos?{" "}
-          <Link to="/employer/join" style={styles.link}>Apply for access</Link>
-        </p>
+      {/* Left panel — branding */}
+      <div style={s.leftPanel}>
+        <div style={s.brandArea}>
+          <div style={s.logoMark}>V</div>
+          <div style={s.logoText}>Vetted</div>
+        </div>
+        <div style={s.tagline}>
+          <div style={s.taglineHeading}>Your hiring console.</div>
+          <div style={s.taglineSub}>Post jobs, review applications, and manage your employer presence — all in one place.</div>
+        </div>
+        <div style={s.leftFooter}>jobs-42a5d · Spark Plan</div>
       </div>
+
+      {/* Right panel — form */}
+      <div style={s.rightPanel}>
+        <div style={s.card}>
+
+          <div style={s.cardHeader}>
+            <h1 style={s.heading}>Sign in</h1>
+            <p style={s.sub}>to continue to Vetted Employer Portal</p>
+          </div>
+
+          {error && (
+            <div style={s.alertError}>
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" style={{ flexShrink: 0 }}><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+              {error}
+            </div>
+          )}
+
+          <form onSubmit={handleLogin} style={s.form}>
+            <div style={s.field}>
+              <label style={s.label}>Email address</label>
+              <input
+                type="email"
+                value={email}
+                onChange={e => setEmail(e.target.value)}
+                required
+                style={s.input}
+                placeholder="you@company.co.za"
+              />
+            </div>
+
+            <div style={s.field}>
+              <label style={s.label}>Password</label>
+              <input
+                type="password"
+                value={password}
+                onChange={e => setPassword(e.target.value)}
+                required
+                style={s.input}
+                placeholder="••••••••"
+              />
+            </div>
+
+            <button type="submit" disabled={loading} style={s.btn}>
+              {loading ? "Signing in…" : "Sign In"}
+            </button>
+          </form>
+
+          <div style={s.divider}>
+            <div style={s.dividerLine} />
+            <span style={s.dividerText}>New to Vetted?</span>
+            <div style={s.dividerLine} />
+          </div>
+
+          <p style={s.footer}>
+            <Link to="/employer/join" style={s.link}>Apply for employer access →</Link>
+          </p>
+
+        </div>
+      </div>
+
     </div>
   );
 }
 
-const styles = {
+// ── Styles ────────────────────────────────────────────────────────────
+const s = {
   page: {
+    display: "flex",
     minHeight: "100vh",
-    background: "#080d1b",
+    background: "#f4f5f7",
+    fontFamily: '"Circular", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif',
+  },
+
+  // ── Left Branding Panel ──
+  leftPanel: {
+    width: "380px",
+    flexShrink: 0,
+    background: "#ffffff",
+    borderRight: "1px solid #e3e3e3",
+    display: "flex",
+    flexDirection: "column",
+    padding: "48px 40px",
+    justifyContent: "space-between",
+  },
+  brandArea: {
+    display: "flex",
+    alignItems: "center",
+    gap: "12px",
+  },
+  logoMark: {
+    width: "32px",
+    height: "32px",
+    borderRadius: "6px",
+    background: "#ffca28",
+    color: "#d84315",
+    fontWeight: "700",
+    fontSize: "18px",
     display: "flex",
     alignItems: "center",
     justifyContent: "center",
-    padding: "24px",
+    flexShrink: 0,
+  },
+  logoText: {
+    color: "#202124",
+    fontWeight: "600",
+    fontSize: "16px",
+  },
+  tagline: {
+    flex: 1,
+    display: "flex",
+    flexDirection: "column",
+    justifyContent: "center",
+    padding: "48px 0",
+  },
+  taglineHeading: {
+    color: "#202124",
+    fontSize: "28px",
+    fontWeight: "600",
+    letterSpacing: "-0.5px",
+    marginBottom: "12px",
+    lineHeight: 1.2,
+  },
+  taglineSub: {
+    color: "#5f6368",
+    fontSize: "14px",
+    lineHeight: "1.7",
+  },
+  leftFooter: {
+    color: "#9aa0a6",
+    fontSize: "11px",
+    fontWeight: "500",
+    fontFamily: '"Roboto Mono", monospace',
+  },
+
+  // ── Right Form Panel ──
+  rightPanel: {
+    flex: 1,
+    display: "flex",
+    alignItems: "center",
+    justifyContent: "center",
+    padding: "48px 24px",
   },
   card: {
-    background: "#0d1428",
-    border: "1px solid #1e2d52",
-    borderRadius: "16px",
-    padding: "48px 40px",
+    background: "#ffffff",
+    border: "1px solid #e3e3e3",
+    borderRadius: "8px",
+    padding: "40px",
     width: "100%",
-    maxWidth: "420px",
+    maxWidth: "400px",
+    boxShadow: "0 1px 3px 1px rgba(60,64,67,0.05), 0 1px 2px 0 rgba(60,64,67,0.08)",
   },
-  logo: {
-    color: "#0099fa",
-    fontWeight: "700",
-    fontSize: "18px",
-    marginBottom: "32px",
-    letterSpacing: "-0.02em",
+  cardHeader: {
+    marginBottom: "28px",
   },
   heading: {
-    color: "#e8edf8",
-    fontSize: "26px",
-    fontWeight: "700",
-    margin: "0 0 6px",
+    color: "#202124",
+    fontSize: "22px",
+    fontWeight: "600",
+    margin: "0 0 4px",
+    letterSpacing: "-0.3px",
   },
   sub: {
-    color: "#6b7fa3",
-    fontSize: "14px",
-    margin: "0 0 32px",
+    color: "#5f6368",
+    fontSize: "13px",
+    margin: 0,
   },
-  error: {
-    background: "rgba(255,79,106,0.1)",
-    border: "1px solid rgba(255,79,106,0.3)",
-    color: "#ff4f6a",
-    borderRadius: "8px",
+
+  // ── Alert ──
+  alertError: {
+    background: "#fce8e6",
+    border: "1px solid #f5c6c2",
+    color: "#c5221f",
+    borderRadius: "4px",
     padding: "12px 16px",
     fontSize: "13px",
-    marginBottom: "24px",
+    fontWeight: "500",
+    marginBottom: "20px",
+    display: "flex",
+    alignItems: "center",
+    gap: "8px",
   },
+
+  // ── Form ──
   form: {
     display: "flex",
     flexDirection: "column",
-    gap: "20px",
+    gap: "18px",
   },
   field: {
     display: "flex",
     flexDirection: "column",
-    gap: "8px",
+    gap: "6px",
   },
   label: {
-    color: "#6b7fa3",
-    fontSize: "13px",
-    fontWeight: "500",
+    color: "#5f6368",
+    fontSize: "12px",
+    fontWeight: "600",
+    textTransform: "uppercase",
+    letterSpacing: "0.3px",
   },
   input: {
-    background: "#131b33",
-    border: "1px solid #1e2d52",
-    borderRadius: "8px",
-    padding: "12px 14px",
-    color: "#e8edf8",
+    background: "#ffffff",
+    border: "1px solid #e3e3e3",
+    borderRadius: "4px",
+    padding: "10px 12px",
+    color: "#202124",
     fontSize: "14px",
     outline: "none",
     width: "100%",
+    boxSizing: "border-box",
+    fontFamily: '"Circular", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif',
+    transition: "border-color 0.2s",
   },
   btn: {
-    background: "#0099fa",
-    color: "#fff",
+    background: "#1a73e8",
+    color: "#ffffff",
     border: "none",
-    borderRadius: "8px",
-    padding: "13px",
-    fontSize: "15px",
+    borderRadius: "4px",
+    padding: "11px",
+    fontSize: "14px",
     fontWeight: "600",
     cursor: "pointer",
-    marginTop: "8px",
+    marginTop: "4px",
+    boxShadow: "0 1px 2px rgba(0,0,0,0.1)",
+    transition: "background 0.2s",
+    width: "100%",
   },
+
+  // ── Divider ──
+  divider: {
+    display: "flex",
+    alignItems: "center",
+    gap: "12px",
+    margin: "24px 0 20px",
+  },
+  dividerLine: {
+    flex: 1,
+    height: "1px",
+    background: "#e3e3e3",
+  },
+  dividerText: {
+    color: "#9aa0a6",
+    fontSize: "12px",
+    fontWeight: "500",
+    whiteSpace: "nowrap",
+  },
+
+  // ── Footer ──
   footer: {
-    color: "#6b7fa3",
-    fontSize: "13px",
     textAlign: "center",
-    marginTop: "28px",
+    margin: 0,
   },
   link: {
-    color: "#0099fa",
+    color: "#1a73e8",
     textDecoration: "none",
-    fontWeight: "500",
+    fontSize: "13px",
+    fontWeight: "600",
   },
 };

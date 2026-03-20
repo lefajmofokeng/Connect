@@ -210,7 +210,7 @@ export default function JobSeekerDashboard() {
       <nav style={s.navbar}>
         <div style={s.navInner}>
           <div style={s.navLogo} onClick={() => navigate("/")}>
-            <img src="/logo.png" alt="Cronos Jobs" style={s.navLogoImg} />
+            <img src="/logo.png" alt="Vetted" style={s.navLogoImg} />
           </div>
           <div style={s.navRight}>
             <Link to="/jobs" style={s.navLink}>Browse Jobs</Link>
@@ -525,7 +525,7 @@ export default function JobSeekerDashboard() {
                     { q: "How do I apply for a job?", a: "Browse jobs, click on a listing, then click Apply Now. You can apply with or without an account." },
                     { q: "Will employers see my profile?", a: "No. Your profile is private. Employers only see the information you submit in your application." },
                     { q: "How do I withdraw an application?", a: "Contact the employer directly using their company contact details on the job listing." },
-                    { q: "Is it free to use Cronos Jobs?", a: "Yes, applying for jobs on Cronos Jobs is completely free for job seekers." },
+                    { q: "Is it free to use Cronos Jobs?", a: "Yes, applying for jobs on Vetted is completely free for job seekers." },
                     { q: "Why can't I see my application status?", a: "Application statuses are updated by employers. If your status hasn't changed, the employer hasn't reviewed it yet." },
                   ].map((item, i) => (
                     <div key={i} style={s.helpItem}>
@@ -625,21 +625,21 @@ function Field({ label, children }) {
 
 function statusColor(status) {
   const map = {
-    new:         { background: "#e8f0fe", color: "#1a73e8" },
-    reviewed:    { background: "#fef7e0", color: "#b06000" },
-    shortlisted: { background: "#e6f4ea", color: "#1e8e3e" },
-    rejected:    { background: "#fce8e6", color: "#d93025" },
-    hired:       { background: "#e6f4ea", color: "#1e8e3e" },
+    new:         { background: "#e3f2fd", color: "#1967d2" },
+    reviewed:    { background: "#fef7e0", color: "#ea8600" },
+    shortlisted: { background: "#e6f4ea", color: "#0d652d" },
+    rejected:    { background: "#fce8e6", color: "#c5221f" },
+    hired:       { background: "#e6f4ea", color: "#0d652d" },
   };
   return map[status] || { background: "#f1f3f4", color: "#5f6368" };
 }
 
 const s = {
-  page: { background: "#f8f9fa", minHeight: "100vh", fontFamily: "'Circular Std', sans-serif", color: "#202124" },
+  page: { background: "#f4f5f7", minHeight: "100vh", fontFamily: '"Circular", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif', color: "#202124" },
 
   // Navbar
   navbar: { background: "#202124", position: "sticky", top: 0, zIndex: 100 },
-  navInner: { maxWidth: "1100px", margin: "0 auto", padding: "0 24px", height: "64px", display: "flex", alignItems: "center", justifyContent: "space-between" },
+  navInner: { maxWidth: "1100px", margin: "0 auto", padding: "0 24px", height: "60px", display: "flex", alignItems: "center", justifyContent: "space-between" },
   navLogo: { cursor: "pointer" },
   navLogoImg: { height: "28px", objectFit: "contain" },
   navRight: { display: "flex", alignItems: "center", gap: "16px" },
@@ -651,20 +651,20 @@ const s = {
   avatarInitials: { width: "100%", height: "100%", background: "#1a73e8", color: "#fff", display: "flex", alignItems: "center", justifyContent: "center", fontSize: "14px", fontWeight: "700" },
 
   // Dropdown
-  dropdown: { position: "absolute", right: 0, top: "calc(100% + 10px)", background: "#fff", border: "1px solid #e0e0e0", borderRadius: "12px", boxShadow: "0 4px 16px rgba(60,64,67,0.15)", minWidth: "220px", zIndex: 200, overflow: "hidden" },
-  dropdownHeader: { padding: "16px", display: "flex", alignItems: "center", gap: "12px", background: "#f8f9fa" },
+  dropdown: { position: "absolute", right: 0, top: "calc(100% + 10px)", background: "#fff", border: "1px solid #e3e3e3", borderRadius: "8px", boxShadow: "0 4px 16px rgba(60,64,67,0.15)", minWidth: "220px", zIndex: 200, overflow: "hidden" },
+  dropdownHeader: { padding: "16px", display: "flex", alignItems: "center", gap: "12px", background: "#f4f5f7" },
   dropdownAvatar: { width: "36px", height: "36px", borderRadius: "50%", overflow: "hidden", flexShrink: 0 },
   dropdownAvatarInitials: { width: "100%", height: "100%", background: "#1a73e8", color: "#fff", display: "flex", alignItems: "center", justifyContent: "center", fontSize: "14px", fontWeight: "700", borderRadius: "50%" },
   dropdownName: { color: "#202124", fontSize: "13px", fontWeight: "600", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" },
   dropdownDivider: { height: "1px", background: "#e0e0e0" },
-  dropdownItem: { display: "flex", alignItems: "center", width: "100%", padding: "12px 16px", background: "none", border: "none", color: "#202124", fontSize: "14px", cursor: "pointer", textAlign: "left", fontFamily: "'Circular Std', sans-serif", transition: "background 0.15s" },
+  dropdownItem: { display: "flex", alignItems: "center", width: "100%", padding: "12px 16px", background: "none", border: "none", color: "#202124", fontSize: "14px", cursor: "pointer", textAlign: "left", fontFamily: '"Circular", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif', transition: "background 0.15s" },
 
   // Body
   body: { padding: "28px 24px" },
   inner: { maxWidth: "1100px", margin: "0 auto" },
 
   // Profile Header
-  profileHeader: { background: "#fff", border: "1px solid #e0e0e0", borderRadius: "14px", padding: "24px 28px", marginBottom: "20px", boxShadow: "0 1px 3px rgba(60,64,67,0.08)" },
+  profileHeader: { background: "#fff", border: "1px solid #e3e3e3", borderRadius: "8px 8px 0 0", padding: "24px 28px", marginBottom: "20px", boxShadow: "0 1px 3px rgba(60,64,67,0.08)" },
   profileHeaderLeft: { display: "flex", alignItems: "flex-start", gap: "18px", marginBottom: "12px" },
   headerAvatar: { width: "72px", height: "72px", borderRadius: "50%", overflow: "hidden", border: "2px solid #e0e0e0", flexShrink: 0 },
   headerAvatarImg: { width: "100%", height: "100%", objectFit: "cover" },
@@ -674,58 +674,58 @@ const s = {
   profileMeta: { display: "flex", gap: "16px", flexWrap: "wrap" },
   metaItem: { display: "flex", alignItems: "center", gap: "5px", color: "#5f6368", fontSize: "13px" },
   headerSkills: { display: "flex", flexWrap: "wrap", gap: "6px", marginTop: "10px" },
-  headerSkillTag: { background: "#e8f0fe", color: "#1a73e8", borderRadius: "999px", padding: "3px 10px", fontSize: "12px", fontWeight: "500" },
-  headerSkillMore: { background: "#f1f3f4", color: "#5f6368", borderRadius: "999px", padding: "3px 10px", fontSize: "12px" },
+  headerSkillTag: { background: "#e3f2fd", color: "#1967d2", borderRadius: "4px", padding: "3px 8px", fontSize: "12px", fontWeight: "500" },
+  headerSkillMore: { background: "#f1f3f4", color: "#5f6368", borderRadius: "4px", padding: "3px 8px", fontSize: "12px" },
   profileBio: { color: "#5f6368", fontSize: "14px", lineHeight: "1.6", margin: "0", borderTop: "1px solid #f1f3f4", paddingTop: "12px" },
 
   // Tabs
-  tabs: { display: "flex", gap: "4px", marginBottom: "20px", background: "#fff", border: "1px solid #e0e0e0", borderRadius: "10px", padding: "5px", boxShadow: "0 1px 3px rgba(60,64,67,0.06)" },
-  tab: { flex: 1, padding: "9px 14px", borderRadius: "7px", background: "none", border: "none", color: "#5f6368", fontSize: "13px", fontWeight: "400", cursor: "pointer", fontFamily: "'Circular Std', sans-serif", transition: "all 0.15s" },
-  tabActive: { background: "#1a73e8", color: "#fff", fontWeight: "500" },
+  tabs: { display: "flex", alignItems: "center", background: "#ffffff", border: "1px solid #e3e3e3", borderTop: "none", borderRadius: "0 0 8px 8px", padding: "0 8px", marginBottom: "20px", boxShadow: "0 1px 2px 0 rgba(60,64,67,0.06)" },
+  tab: { flex: 1, padding: "9px 14px", borderRadius: "7px", background: "none", border: "none", color: "#5f6368", fontSize: "13px", fontWeight: "400", cursor: "pointer", fontFamily: '"Circular", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif', transition: "all 0.15s" },
+  tabActive: { color: "#1967d2", borderBottom: "2px solid #1967d2", fontWeight: "600" },
 
   // Profile Form
   profileForm: {},
   formGrid: { display: "grid", gridTemplateColumns: "260px 1fr", gap: "18px", marginBottom: "18px" },
   formLeft: { display: "flex", flexDirection: "column", gap: "14px" },
   formRight: { display: "flex", flexDirection: "column", gap: "14px" },
-  card: { background: "#fff", border: "1px solid #e0e0e0", borderRadius: "12px", padding: "20px", boxShadow: "0 1px 3px rgba(60,64,67,0.06)" },
+  card: { background: "#fff", border: "1px solid #e3e3e3", borderRadius: "8px", padding: "20px", boxShadow: "0 1px 3px rgba(60,64,67,0.06)" },
   cardTitle: { color: "#202124", fontSize: "14px", fontWeight: "600", marginBottom: "14px" },
   fields: { display: "flex", flexDirection: "column", gap: "12px" },
   row: { display: "grid", gridTemplateColumns: "1fr 1fr", gap: "12px" },
-  input: { background: "#fff", border: "1px solid #dadce0", borderRadius: "8px", padding: "10px 13px", color: "#202124", fontSize: "13px", outline: "none", width: "100%", fontFamily: "'Circular Std', sans-serif" },
+  input: { background: "#fff", border: "1px solid #e3e3e3", borderRadius: "4px", padding: "9px 12px", color: "#202124", fontSize: "13px", outline: "none", width: "100%", fontFamily: '"Circular", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif' },
   photoSection: { display: "flex", alignItems: "center", gap: "14px" },
-  photoPreview: { width: "56px", height: "56px", borderRadius: "50%", overflow: "hidden", border: "1px solid #e0e0e0", flexShrink: 0 },
+  photoPreview: { width: "56px", height: "56px", borderRadius: "50%", overflow: "hidden", border: "1px solid #e3e3e3", flexShrink: 0 },
   photoImg: { width: "100%", height: "100%", objectFit: "cover" },
   photoPlaceholder: { width: "100%", height: "100%", background: "#1a73e8", color: "#fff", display: "flex", alignItems: "center", justifyContent: "center", fontSize: "20px", fontWeight: "700" },
-  uploadBtn: { display: "inline-flex", alignItems: "center", background: "#f8f9fa", border: "1px solid #dadce0", color: "#202124", borderRadius: "7px", padding: "7px 12px", fontSize: "13px", cursor: "pointer", marginBottom: "6px" },
+  uploadBtn: { display: "inline-flex", alignItems: "center", background: "#f4f5f7", border: "1px solid #e3e3e3", color: "#202124", borderRadius: "7px", padding: "7px 12px", fontSize: "13px", cursor: "pointer", marginBottom: "6px" },
   uploadHint: { color: "#80868b", fontSize: "11px", margin: "4px 0 0", lineHeight: "1.5" },
-  uploadFile: { color: "#1e8e3e", fontSize: "12px", margin: "4px 0 0" },
+  uploadFile: { color: "#0d652d", fontSize: "12px", margin: "4px 0 0" },
   cvLink: { display: "inline-flex", alignItems: "center", color: "#1a73e8", fontSize: "13px", textDecoration: "none", marginBottom: "10px" },
   skillInputRow: { display: "flex", gap: "8px", marginBottom: "10px" },
-  addSkillBtn: { background: "#1a73e8", color: "#fff", border: "none", borderRadius: "7px", padding: "10px 14px", fontSize: "13px", cursor: "pointer", whiteSpace: "nowrap", fontFamily: "'Circular Std', sans-serif" },
+  addSkillBtn: { background: "#1a73e8", color: "#fff", border: "none", borderRadius: "7px", padding: "10px 14px", fontSize: "13px", cursor: "pointer", whiteSpace: "nowrap", fontFamily: '"Circular", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif' },
   skillTags: { display: "flex", flexWrap: "wrap", gap: "8px" },
-  skillTag: { display: "flex", alignItems: "center", gap: "6px", background: "#e8f0fe", color: "#1a73e8", borderRadius: "999px", padding: "5px 12px", fontSize: "13px", fontWeight: "500" },
+  skillTag: { display: "flex", alignItems: "center", gap: "6px", background: "#e8f0fe", color: "#1a73e8", borderRadius: "4px", padding: "4px 10px", fontSize: "13px", fontWeight: "500" },
   removeSkillBtn: { background: "none", border: "none", color: "#1a73e8", cursor: "pointer", fontSize: "16px", padding: 0, lineHeight: 1 },
   saveRow: { display: "flex", justifyContent: "flex-end" },
-  saveBtn: { background: "#1a73e8", color: "#fff", border: "none", borderRadius: "8px", padding: "11px 28px", fontSize: "14px", fontWeight: "500", cursor: "pointer", fontFamily: "'Circular Std', sans-serif" },
-  errorMsg: { background: "#fce8e6", border: "1px solid rgba(217,48,37,0.2)", color: "#d93025", borderRadius: "8px", padding: "12px 16px", fontSize: "13px", marginBottom: "16px", display: "flex", alignItems: "center" },
-  successMsgBox: { background: "#e6f4ea", border: "1px solid rgba(30,142,62,0.2)", color: "#1e8e3e", borderRadius: "8px", padding: "12px 16px", fontSize: "13px", marginBottom: "16px", display: "flex", alignItems: "center" },
+  saveBtn: { background: "#1a73e8", color: "#fff", border: "none", borderRadius: "8px", padding: "11px 28px", fontSize: "14px", fontWeight: "500", cursor: "pointer", fontFamily: '"Circular", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif' },
+  errorMsg: { background: "#fce8e6", border: "1px solid #f5c6c2", color: "#c5221f", borderRadius: "4px", padding: "12px 16px", fontSize: "13px", fontWeight: "500", marginBottom: "16px", display: "flex", alignItems: "center", gap: "8px" },
+  successMsgBox: { background: "#e6f4ea", border: "1px solid #ceead6", color: "#0d652d", borderRadius: "4px", padding: "12px 16px", fontSize: "13px", fontWeight: "500", marginBottom: "16px", display: "flex", alignItems: "center", gap: "8px" },
 
   // Jobs / Apps list
-  listSection: { background: "#fff", border: "1px solid #e0e0e0", borderRadius: "12px", overflow: "hidden", boxShadow: "0 1px 3px rgba(60,64,67,0.06)" },
+  listSection: { background: "#fff", border: "1px solid #e3e3e3", borderRadius: "8px", overflow: "hidden", boxShadow: "0 1px 3px rgba(60,64,67,0.06)" },
   jobList: { display: "flex", flexDirection: "column" },
   jobRow: { display: "flex", alignItems: "center", gap: "14px", padding: "14px 20px", borderBottom: "1px solid #f1f3f4" },
-  jobLogo: { width: "40px", height: "40px", borderRadius: "8px", overflow: "hidden", border: "1px solid #e0e0e0", flexShrink: 0 },
+  jobLogo: { width: "40px", height: "40px", borderRadius: "8px", overflow: "hidden", border: "1px solid #e3e3e3", flexShrink: 0 },
   jobLogoImg: { width: "100%", height: "100%", objectFit: "contain" },
   jobLogoPlaceholder: { width: "40px", height: "40px", borderRadius: "8px", display: "flex", alignItems: "center", justifyContent: "center", color: "#fff", fontWeight: "700", fontSize: "16px" },
   jobInfo: { flex: 1 },
   jobTitle: { color: "#202124", fontSize: "14px", fontWeight: "600", marginBottom: "3px" },
   jobMeta: { color: "#5f6368", fontSize: "12px" },
   jobActions: { display: "flex", alignItems: "center", gap: "8px", flexShrink: 0 },
-  viewBtn: { background: "#f8f9fa", border: "1px solid #dadce0", color: "#202124", borderRadius: "6px", padding: "6px 12px", fontSize: "12px", cursor: "pointer", fontFamily: "'Circular Std', sans-serif" },
-  applyBtn: { background: "#1a73e8", color: "#fff", border: "none", borderRadius: "6px", padding: "6px 12px", fontSize: "12px", cursor: "pointer", fontFamily: "'Circular Std', sans-serif" },
-  removeBtn: { background: "none", border: "1px solid #dadce0", color: "#5f6368", borderRadius: "6px", padding: "6px", cursor: "pointer", display: "flex", alignItems: "center" },
-  statusPill: { padding: "4px 12px", borderRadius: "999px", fontSize: "12px", fontWeight: "500", flexShrink: 0 },
+  viewBtn: { background: "#f4f5f7", border: "1px solid #e3e3e3", color: "#202124", borderRadius: "6px", padding: "6px 12px", fontSize: "12px", cursor: "pointer", fontFamily: '"Circular", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif' },
+  applyBtn: { background: "#1a73e8", color: "#fff", border: "none", borderRadius: "4px", padding: "6px 12px", fontSize: "12px", cursor: "pointer", fontFamily: '"Circular", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif' },
+  removeBtn: { background: "none", border: "1px solid #e3e3e3", color: "#5f6368", borderRadius: "6px", padding: "6px", cursor: "pointer", display: "flex", alignItems: "center" },
+  statusPill: { padding: "3px 10px", borderRadius: "4px", fontSize: "11px", fontWeight: "600", textTransform: "uppercase", letterSpacing: "0.4px", flexShrink: 0 },
 
   // Settings
   settingsSection: { display: "flex", flexDirection: "column", gap: "16px" },
@@ -737,12 +737,12 @@ const s = {
   helpQ: { color: "#202124", fontSize: "14px", fontWeight: "600", marginBottom: "4px" },
   helpA: { color: "#5f6368", fontSize: "13px", lineHeight: "1.6" },
   deleteRow: { display: "flex", gap: "12px", alignItems: "center", marginTop: "14px", flexWrap: "wrap" },
-  deleteBtn: { background: "#d93025", color: "#fff", border: "none", borderRadius: "8px", padding: "10px 20px", fontSize: "13px", fontWeight: "500", cursor: "pointer", fontFamily: "'Circular Std', sans-serif" },
+  deleteBtn: { background: "#d93025", color: "#fff", border: "none", borderRadius: "8px", padding: "10px 20px", fontSize: "13px", fontWeight: "500", cursor: "pointer", fontFamily: '"Circular", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif' },
 
   // Empty states
   empty: { color: "#5f6368", padding: "40px", textAlign: "center" },
   emptyState: { display: "flex", flexDirection: "column", alignItems: "center", padding: "56px 24px", textAlign: "center" },
   emptyTitle: { color: "#202124", fontSize: "16px", fontWeight: "600", margin: "0 0 6px" },
   emptySub: { color: "#5f6368", fontSize: "14px", margin: "0 0 20px" },
-  emptyBtn: { background: "#1a73e8", color: "#fff", borderRadius: "8px", padding: "10px 24px", fontSize: "14px", textDecoration: "none", fontWeight: "500" },
+  emptyBtn: { background: "#1a73e8", color: "#fff", borderRadius: "4px", padding: "9px 24px", fontSize: "13px", fontWeight: "600", textDecoration: "none" },
 };

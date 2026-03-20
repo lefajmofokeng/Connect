@@ -8,12 +8,12 @@ import { db, storage } from "../../lib/firebase";
 const STEPS = ["Personal Info", "Documents", "Review & Submit"];
 
 const OPTIONAL_DOCS = [
-  { key: "academic", label: "Academic Certificates" },
-  { key: "sars", label: "SARS Letter / Tax Clearance" },
+  { key: "academic",  label: "Academic Certificates" },
+  { key: "sars",      label: "SARS Letter / Tax Clearance" },
   { key: "residence", label: "Proof of Residence" },
   { key: "reference", label: "Reference Letter" },
-  { key: "drivers", label: "Driver's Licence" },
-  { key: "other", label: "Other Document" },
+  { key: "drivers",   label: "Driver's Licence" },
+  { key: "other",     label: "Other Document" },
 ];
 
 export default function Apply() {
@@ -42,7 +42,6 @@ export default function Apply() {
 
   useEffect(() => { fetchJob(); }, [id]);
 
-  // Pre-fill from job seeker profile
   useEffect(() => {
     if (jobSeekerProfile) {
       setForm(prev => ({
@@ -119,12 +118,10 @@ export default function Apply() {
     try {
       const appId = `${id}_${Date.now()}`;
       const base = `applications/${appId}`;
-
       const [cvPath, idPath] = await Promise.all([
         uploadFile(cvFile, `${base}/cv_${cvFile.name}`),
         uploadFile(idFile, `${base}/id_${idFile.name}`),
       ]);
-
       const optionalPaths = {};
       await Promise.all(
         Object.entries(optionalFiles).map(async ([key, file]) => {
@@ -134,28 +131,16 @@ export default function Apply() {
           }
         })
       );
-
       await addDoc(collection(db, "applications"), {
-        jobId: id,
-        jobTitle: job.title,
-        jobDepartment: job.department || "",
-        employerId: job.employerId,
-        employerName: job.employerName,
+        jobId: id, jobTitle: job.title, jobDepartment: job.department || "",
+        employerId: job.employerId, employerName: job.employerName,
         applyEmail: job.applyEmail || "",
-        ...form,
-        cvPath,
-        cvMime: cvFile.type,
-        cvFilename: cvFile.name,
-        idPath,
-        idFilename: idFile.name,
-        optionalDocs: optionalPaths,
+        ...form, cvPath, cvMime: cvFile.type, cvFilename: cvFile.name,
+        idPath, idFilename: idFile.name, optionalDocs: optionalPaths,
         jobSeekerId: user?.uid || null,
-        status: "new",
-        notes: "",
-        createdAt: serverTimestamp(),
-        updatedAt: serverTimestamp(),
+        status: "new", notes: "",
+        createdAt: serverTimestamp(), updatedAt: serverTimestamp(),
       });
-
       setSubmitted(true);
     } catch (err) {
       console.error(err);
@@ -172,13 +157,16 @@ export default function Apply() {
     <div style={s.page}><Navbar /><div style={s.empty}>Job not found.</div></div>
   );
 
+  // ── Success state ──
   if (submitted) return (
     <div style={s.page}>
       <Navbar />
       <div style={s.body}>
         <div style={s.successCard}>
           <div style={s.successIcon}>
-            <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+            <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#0d652d" strokeWidth="2.5">
+              <polyline points="20 6 9 17 4 12"/>
+            </svg>
           </div>
           <h1 style={s.successTitle}>Application Submitted!</h1>
           <p style={s.successSub}>
@@ -187,8 +175,8 @@ export default function Apply() {
           </p>
           {user && jobSeekerProfile && (
             <p style={{ ...s.successSub, fontSize: "13px", marginBottom: "24px" }}>
-              You can track your application status in your{" "}
-              <Link to="/jobseeker/dashboard" style={{ color: "#1a73e8" }}>dashboard</Link>.
+              Track your application status in your{" "}
+              <Link to="/jobseeker/dashboard" style={{ color: "#1a73e8", fontWeight: "600" }}>dashboard</Link>.
             </p>
           )}
           <div style={s.successActions}>
@@ -200,40 +188,65 @@ export default function Apply() {
     </div>
   );
 
+  // ── Main form ──
   return (
     <div style={s.page}>
       <Navbar />
       <div style={s.body}>
         <div style={s.inner}>
+
+          {/* Back */}
           <button onClick={() => navigate(`/jobs/${id}`)} style={s.backBtn}>
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" style={{ marginRight: 6 }}><line x1="19" y1="12" x2="5" y2="12"/><polyline points="12 19 5 12 12 5"/></svg>
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" style={{ marginRight: 6 }}>
+              <line x1="19" y1="12" x2="5" y2="12"/><polyline points="12 19 5 12 12 5"/>
+            </svg>
             Back to Job
           </button>
 
           <div style={s.layout}>
-            {/* Form */}
+
+            {/* ── Form column ── */}
             <div style={s.formCol}>
               <div style={s.card}>
 
-                {/* Stepper */}
+                {/* Horizontal stepper */}
                 <div style={s.stepper}>
-                  {STEPS.map((label, i) => (
-                    <div key={label} style={s.stepItem}>
-                      <div style={{ ...s.stepDot, ...(i === step ? s.stepActive : i < step ? s.stepDone : {}) }}>
-                        {i < step
-                          ? <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3"><polyline points="20 6 9 17 4 12"/></svg>
-                          : i + 1
-                        }
+                  {STEPS.map((label, i) => {
+                    const isDone   = i < step;
+                    const isActive = i === step;
+                    return (
+                      <div key={label} style={s.stepItem}>
+                        <div style={{
+                          ...s.stepDot,
+                          ...(isActive ? s.stepDotActive : {}),
+                          ...(isDone   ? s.stepDotDone   : {}),
+                        }}>
+                          {isDone
+                            ? <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3"><polyline points="20 6 9 17 4 12"/></svg>
+                            : i + 1
+                          }
+                        </div>
+                        <span style={{
+                          ...s.stepLabel,
+                          ...(isActive ? s.stepLabelActive : {}),
+                          ...(isDone   ? s.stepLabelDone   : {}),
+                        }}>
+                          {label}
+                        </span>
+                        {i < STEPS.length - 1 && (
+                          <div style={{ ...s.stepLine, ...(isDone ? s.stepLineDone : {}) }} />
+                        )}
                       </div>
-                      <div style={{ ...s.stepLabel, ...(i === step ? s.stepLabelActive : i < step ? s.stepLabelDone : {}) }}>{label}</div>
-                      {i < STEPS.length - 1 && <div style={{ ...s.stepLine, ...(i < step ? s.stepLineDone : {}) }} />}
-                    </div>
-                  ))}
+                    );
+                  })}
                 </div>
 
+                {/* Error */}
                 {error && (
-                  <div style={s.error}>
-                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" style={{ marginRight: 8, flexShrink: 0 }}><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+                  <div style={s.alertError}>
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" style={{ marginRight: 8, flexShrink: 0 }}>
+                      <circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/>
+                    </svg>
                     {error}
                   </div>
                 )}
@@ -243,45 +256,31 @@ export default function Apply() {
                   <div style={s.form}>
                     {jobSeekerProfile && (
                       <div style={s.prefillNote}>
-                        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" style={{ marginRight: 6, flexShrink: 0 }}><circle cx="12" cy="12" r="10"/><polyline points="20 6 9 17 4 12"/></svg>
+                        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" style={{ marginRight: 6, flexShrink: 0 }}>
+                          <circle cx="12" cy="12" r="10"/><polyline points="20 6 9 17 4 12"/>
+                        </svg>
                         Some fields have been pre-filled from your profile. Review and update as needed.
                       </div>
                     )}
                     <div style={s.row}>
-                      <Field label="First Name *">
-                        <input style={s.input} value={form.firstName} onChange={set("firstName")} placeholder="Jane" />
-                      </Field>
-                      <Field label="Last Name *">
-                        <input style={s.input} value={form.lastName} onChange={set("lastName")} placeholder="Smith" />
-                      </Field>
+                      <Field label="First Name *"><input style={s.input} value={form.firstName} onChange={set("firstName")} placeholder="Jane" /></Field>
+                      <Field label="Last Name *"><input style={s.input} value={form.lastName} onChange={set("lastName")} placeholder="Smith" /></Field>
                     </div>
                     <div style={s.row}>
-                      <Field label="Email Address *">
-                        <input style={s.input} type="email" value={form.email} onChange={set("email")} placeholder="jane@email.com" />
-                      </Field>
-                      <Field label="Phone Number *">
-                        <input style={s.input} type="tel" value={form.phone} onChange={set("phone")} placeholder="071 000 0000" />
-                      </Field>
+                      <Field label="Email Address *"><input style={s.input} type="email" value={form.email} onChange={set("email")} placeholder="jane@email.com" /></Field>
+                      <Field label="Phone Number *"><input style={s.input} type="tel" value={form.phone} onChange={set("phone")} placeholder="071 000 0000" /></Field>
                     </div>
                     <div style={s.row}>
-                      <Field label="City *">
-                        <input style={s.input} value={form.city} onChange={set("city")} placeholder="Cape Town" />
-                      </Field>
-                      <Field label="Notice Period">
-                        <input style={s.input} value={form.notice} onChange={set("notice")} placeholder="e.g. 1 month" />
-                      </Field>
+                      <Field label="City *"><input style={s.input} value={form.city} onChange={set("city")} placeholder="Cape Town" /></Field>
+                      <Field label="Notice Period"><input style={s.input} value={form.notice} onChange={set("notice")} placeholder="e.g. 1 month" /></Field>
                     </div>
                     <div style={s.row}>
-                      <Field label="Years of Experience">
-                        <input style={s.input} value={form.experience} onChange={set("experience")} placeholder="e.g. 3 years" />
-                      </Field>
-                      <Field label="Salary Expectation">
-                        <input style={s.input} value={form.salaryExpectation} onChange={set("salaryExpectation")} placeholder="e.g. R25 000 pm" />
-                      </Field>
+                      <Field label="Years of Experience"><input style={s.input} value={form.experience} onChange={set("experience")} placeholder="e.g. 3 years" /></Field>
+                      <Field label="Salary Expectation"><input style={s.input} value={form.salaryExpectation} onChange={set("salaryExpectation")} placeholder="e.g. R25 000 pm" /></Field>
                     </div>
                     <Field label="Cover Note">
                       <textarea
-                        style={{ ...s.input, minHeight: "120px", resize: "vertical" }}
+                        style={{ ...s.input, minHeight: "120px", resize: "vertical", lineHeight: "1.6" }}
                         value={form.coverNote}
                         onChange={set("coverNote")}
                         placeholder="Briefly introduce yourself and why you're a great fit..."
@@ -293,22 +292,26 @@ export default function Apply() {
                 {/* ── Step 1 — Documents ── */}
                 {step === 1 && (
                   <div style={s.form}>
-                    <div style={s.uploadNote}>
-                      <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" style={{ marginRight: 6, flexShrink: 0 }}><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+                    <div style={s.infoNote}>
+                      <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" style={{ marginRight: 6, flexShrink: 0 }}>
+                        <circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/>
+                      </svg>
                       Accepted: PDF, DOC, DOCX, JPG, PNG · Max 5MB per file
                     </div>
 
-                    {/* Required */}
+                    {/* Required documents */}
                     <div style={s.docGroup}>
                       <div style={s.docGroupTitle}>
-                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" style={{ marginRight: 6 }}><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+                        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" style={{ marginRight: 6, flexShrink: 0 }}>
+                          <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/>
+                        </svg>
                         Required Documents
                       </div>
 
                       <Field label="CV / Resume *">
                         {cvFile ? (
                           <div style={s.fileAttached}>
-                            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#1e8e3e" strokeWidth="2" style={{ marginRight: 6, flexShrink: 0 }}><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+                            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#0d652d" strokeWidth="2" style={{ marginRight: 6, flexShrink: 0 }}><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
                             <span style={s.fileAttachedName}>{cvFile.name}</span>
                             <button style={s.removeFileBtn} onClick={() => setCvFile(null)}>
                               <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
@@ -327,7 +330,7 @@ export default function Apply() {
                       <Field label="ID Document *">
                         {idFile ? (
                           <div style={s.fileAttached}>
-                            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#1e8e3e" strokeWidth="2" style={{ marginRight: 6, flexShrink: 0 }}><rect x="2" y="5" width="20" height="14" rx="2"/><line x1="2" y1="10" x2="22" y2="10"/></svg>
+                            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#0d652d" strokeWidth="2" style={{ marginRight: 6, flexShrink: 0 }}><rect x="2" y="5" width="20" height="14" rx="2"/><line x1="2" y1="10" x2="22" y2="10"/></svg>
                             <span style={s.fileAttachedName}>{idFile.name}</span>
                             <button style={s.removeFileBtn} onClick={() => setIdFile(null)}>
                               <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
@@ -344,10 +347,12 @@ export default function Apply() {
                       </Field>
                     </div>
 
-                    {/* Optional */}
+                    {/* Optional documents */}
                     <div style={s.docGroup}>
                       <div style={s.docGroupTitle}>
-                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" style={{ marginRight: 6 }}><path d="M13 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V9z"/><polyline points="13 2 13 9 20 9"/></svg>
+                        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" style={{ marginRight: 6, flexShrink: 0 }}>
+                          <path d="M13 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V9z"/><polyline points="13 2 13 9 20 9"/>
+                        </svg>
                         Additional Documents
                         <span style={s.optionalBadge}>Optional</span>
                       </div>
@@ -357,7 +362,7 @@ export default function Apply() {
                         <Field key={key} label={label}>
                           {optionalFiles[key] ? (
                             <div style={s.fileAttached}>
-                              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#1e8e3e" strokeWidth="2" style={{ marginRight: 6, flexShrink: 0 }}><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+                              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#0d652d" strokeWidth="2" style={{ marginRight: 6, flexShrink: 0 }}><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
                               <span style={s.fileAttachedName}>{optionalFiles[key].name}</span>
                               <button style={s.removeFileBtn} onClick={() => removeOptionalFile(key)}>
                                 <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
@@ -375,15 +380,14 @@ export default function Apply() {
                       ))}
                     </div>
 
-                    {/* Declarations — FIXED */}
+                    {/* Declarations */}
                     <div style={s.declCard}>
                       <div style={s.declTitle}>Declarations</div>
                       <p style={s.declNote}>Please read and confirm each declaration before proceeding.</p>
-
                       {[
-                        { key: "accurate", text: "All information I have provided is accurate and truthful." },
-                        { key: "rightToWork", text: "I have the legal right to work in South Africa." },
-                        { key: "consent", text: `I consent to my information being shared with ${job.employerName} for recruitment purposes.` },
+                        { key: "accurate",     text: "All information I have provided is accurate and truthful." },
+                        { key: "rightToWork",  text: "I have the legal right to work in South Africa." },
+                        { key: "consent",      text: `I consent to my information being shared with ${job.employerName} for recruitment purposes.` },
                       ].map(({ key, text }) => (
                         <div
                           key={key}
@@ -392,7 +396,7 @@ export default function Apply() {
                         >
                           <div style={{ ...s.checkbox, ...(declarations[key] ? s.checkboxChecked : {}) }}>
                             {declarations[key] && (
-                              <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="3"><polyline points="20 6 9 17 4 12"/></svg>
+                              <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="3"><polyline points="20 6 9 17 4 12"/></svg>
                             )}
                           </div>
                           <span style={s.checkLabel}>{text}</span>
@@ -406,12 +410,12 @@ export default function Apply() {
                 {step === 2 && (
                   <div style={s.form}>
                     <ReviewSection title="Personal Information">
-                      <ReviewRow label="Name" value={`${form.firstName} ${form.lastName}`} />
-                      <ReviewRow label="Email" value={form.email} />
-                      <ReviewRow label="Phone" value={form.phone} />
-                      <ReviewRow label="City" value={form.city} />
-                      <ReviewRow label="Notice Period" value={form.notice} />
-                      <ReviewRow label="Experience" value={form.experience} />
+                      <ReviewRow label="Name"               value={`${form.firstName} ${form.lastName}`} />
+                      <ReviewRow label="Email"              value={form.email} />
+                      <ReviewRow label="Phone"              value={form.phone} />
+                      <ReviewRow label="City"               value={form.city} />
+                      <ReviewRow label="Notice Period"      value={form.notice} />
+                      <ReviewRow label="Experience"         value={form.experience} />
                       <ReviewRow label="Salary Expectation" value={form.salaryExpectation} />
                     </ReviewSection>
 
@@ -422,8 +426,8 @@ export default function Apply() {
                     )}
 
                     <ReviewSection title="Documents">
-                      <ReviewRow label="CV / Resume" value={cvFile?.name} />
-                      <ReviewRow label="ID Document" value={idFile?.name} />
+                      <ReviewRow label="CV / Resume"  value={cvFile?.name} />
+                      <ReviewRow label="ID Document"  value={idFile?.name} />
                       {Object.entries(optionalFiles).map(([key, file]) => {
                         const docLabel = OPTIONAL_DOCS.find(d => d.key === key)?.label || key;
                         return file ? <ReviewRow key={key} label={docLabel} value={file.name} /> : null;
@@ -440,34 +444,39 @@ export default function Apply() {
                 <div style={s.navRow}>
                   {step > 0 && (
                     <button onClick={() => { setError(""); setStep(s => s - 1); }} style={s.btnBack2}>
-                      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" style={{ marginRight: 6 }}><line x1="19" y1="12" x2="5" y2="12"/><polyline points="12 19 5 12 12 5"/></svg>
+                      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" style={{ marginRight: 6 }}>
+                        <line x1="19" y1="12" x2="5" y2="12"/><polyline points="12 19 5 12 12 5"/>
+                      </svg>
                       Back
                     </button>
                   )}
                   <div style={{ flex: 1 }} />
                   {step < 2 && (
                     <button onClick={handleNext} style={s.btnNext}>
-                      Next
-                      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" style={{ marginLeft: 6 }}><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
+                      Continue
+                      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" style={{ marginLeft: 6 }}>
+                        <line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/>
+                      </svg>
                     </button>
                   )}
                   {step === 2 && (
                     <button onClick={handleSubmit} disabled={submitting} style={s.btnSubmit}>
-                      {submitting ? (
-                        <>Uploading &amp; Submitting…</>
-                      ) : (
+                      {submitting ? "Uploading & Submitting…" : (
                         <>
                           Submit Application
-                          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" style={{ marginLeft: 8 }}><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
+                          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" style={{ marginLeft: 8 }}>
+                            <line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/>
+                          </svg>
                         </>
                       )}
                     </button>
                   )}
                 </div>
+
               </div>
             </div>
 
-            {/* Job Sidebar */}
+            {/* ── Job sidebar ── */}
             <div style={s.sideCol}>
               <div style={s.jobCard}>
                 <div style={s.jobCardLabel}>Applying For</div>
@@ -489,7 +498,7 @@ export default function Apply() {
                     {job.type}
                   </div>
                   {job.salary && (
-                    <div style={{ ...s.jobMetaItem, color: "#1e8e3e" }}>
+                    <div style={{ ...s.jobMetaItem, color: "#0d652d" }}>
                       <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
                       {job.salary}
                     </div>
@@ -503,41 +512,32 @@ export default function Apply() {
 
               {!user && (
                 <div style={s.signInPrompt}>
-                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#1a73e8" strokeWidth="2" style={{ marginBottom: 8 }}><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#1967d2" strokeWidth="2" style={{ marginBottom: 8 }}>
+                    <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/>
+                  </svg>
                   <p style={s.signInPromptText}>
-                    <Link to="/jobseeker/login" style={{ color: "#1a73e8", fontWeight: "500" }}>Sign in</Link> to track your applications and pre-fill your details.
+                    <Link to="/jobseeker/login" style={{ color: "#1a73e8", fontWeight: "600" }}>Sign in</Link> to track your applications and pre-fill your details.
                   </p>
                 </div>
               )}
             </div>
+
           </div>
         </div>
       </div>
       <Footer />
-
-      <style>{`
-        @media (max-width: 768px) {
-          .apply-layout { grid-template-columns: 1fr !important; }
-          .apply-side-col { position: static !important; }
-          .apply-row { grid-template-columns: 1fr !important; }
-        }
-        @media (max-width: 480px) {
-          .apply-card { padding: 20px !important; }
-          .apply-body { padding: 16px !important; }
-        }
-      `}</style>
     </div>
   );
 }
 
-// ── Navbar ────────────────────────────────────────────────
+// ── Navbar ────────────────────────────────────────────────────────────
 function Navbar() {
   const navigate = useNavigate();
   return (
     <nav style={s.navbar}>
       <div style={s.navInner}>
         <div onClick={() => navigate("/")} style={s.navLogo}>
-          <img src="/logo.png" alt="Cronos Jobs" style={s.navLogoImg} />
+          <img src="/logo.png" alt="Vetted" style={s.navLogoImg} />
         </div>
         <div style={s.navLinks}>
           <Link to="/jobs" style={s.navLink}>Browse Jobs</Link>
@@ -549,13 +549,13 @@ function Navbar() {
   );
 }
 
-// ── Footer ────────────────────────────────────────────────
+// ── Footer ────────────────────────────────────────────────────────────
 function Footer() {
   return (
     <footer style={s.footer}>
       <div style={s.footerInner}>
         <div style={s.footerBottom}>
-          <span>© {new Date().getFullYear()} Cronos Jobs. All rights reserved.</span>
+          <span>© {new Date().getFullYear()} Vetted. All rights reserved.</span>
           <div style={{ display: "flex", gap: "24px" }}>
             <Link to="/terms" style={s.footerLink}>Terms</Link>
             <Link to="/privacy" style={s.footerLink}>Privacy</Link>
@@ -566,11 +566,11 @@ function Footer() {
   );
 }
 
-// ── Helpers ───────────────────────────────────────────────
+// ── Helpers ───────────────────────────────────────────────────────────
 function Field({ label, children }) {
   return (
     <div style={{ display: "flex", flexDirection: "column", gap: "6px" }}>
-      <label style={{ color: "#5f6368", fontSize: "13px", fontWeight: "500" }}>{label}</label>
+      <label style={s.fieldLabel}>{label}</label>
       {children}
     </div>
   );
@@ -578,8 +578,8 @@ function Field({ label, children }) {
 
 function ReviewSection({ title, children }) {
   return (
-    <div style={{ background: "#f8f9fa", border: "1px solid #e0e0e0", borderRadius: "10px", padding: "16px 20px", marginBottom: "12px" }}>
-      <div style={{ color: "#1a73e8", fontSize: "11px", fontWeight: "600", textTransform: "uppercase", letterSpacing: "0.06em", marginBottom: "12px" }}>{title}</div>
+    <div style={s.reviewSection}>
+      <div style={s.reviewSectionTitle}>{title}</div>
       {children}
     </div>
   );
@@ -588,116 +588,132 @@ function ReviewSection({ title, children }) {
 function ReviewRow({ label, value }) {
   if (!value) return null;
   return (
-    <div style={{ display: "flex", justifyContent: "space-between", gap: "12px", padding: "7px 0", borderBottom: "1px solid #e0e0e0", fontSize: "13px" }}>
-      <span style={{ color: "#5f6368" }}>{label}</span>
-      <span style={{ color: "#202124", textAlign: "right", maxWidth: "60%", wordBreak: "break-word" }}>{value}</span>
+    <div style={s.reviewRow}>
+      <span style={s.reviewLabel}>{label}</span>
+      <span style={s.reviewValue}>{value}</span>
     </div>
   );
 }
 
+// ── Styles ────────────────────────────────────────────────────────────
 const s = {
-  page: { background: "#f8f9fa", minHeight: "100vh", fontFamily: "'Circular Std', sans-serif", color: "#202124", display: "flex", flexDirection: "column" },
+  page: {
+    background: "#f4f5f7",
+    minHeight: "100vh",
+    fontFamily: '"Circular", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif',
+    color: "#202124",
+    display: "flex",
+    flexDirection: "column",
+  },
 
-  // Navbar
-  navbar: { background: "#202124", position: "sticky", top: 0, zIndex: 100 },
-  navInner: { maxWidth: "1200px", margin: "0 auto", padding: "0 24px", height: "64px", display: "flex", alignItems: "center", justifyContent: "space-between" },
+  // ── Navbar ──
+  navbar: { background: "#202124", position: "sticky", top: 0, zIndex: 100, borderBottom: "1px solid rgba(255,255,255,0.08)" },
+  navInner: { maxWidth: "1200px", margin: "0 auto", padding: "0 24px", height: "60px", display: "flex", alignItems: "center", justifyContent: "space-between" },
   navLogo: { cursor: "pointer" },
-  navLogoImg: { height: "30px", objectFit: "contain" },
+  navLogoImg: { height: "26px", objectFit: "contain" },
   navLinks: { display: "flex", alignItems: "center", gap: "8px" },
-  navLink: { color: "rgba(255,255,255,0.75)", fontSize: "14px", textDecoration: "none", padding: "8px 12px", borderRadius: "6px" },
-  navLinkBtn: { background: "#1a73e8", color: "#fff", padding: "8px 16px", borderRadius: "999px", fontSize: "13px", fontWeight: "500", textDecoration: "none" },
+  navLink: { color: "rgba(255,255,255,0.7)", fontSize: "13px", fontWeight: "500", textDecoration: "none", padding: "7px 12px", borderRadius: "4px" },
+  navLinkBtn: { background: "#1a73e8", color: "#fff", padding: "7px 14px", borderRadius: "4px", fontSize: "13px", fontWeight: "600", textDecoration: "none" },
 
-  // Body
+  // ── Body ──
   body: { flex: 1, padding: "32px 24px" },
   inner: { maxWidth: "1060px", margin: "0 auto" },
-  backBtn: { display: "inline-flex", alignItems: "center", background: "none", border: "none", color: "#5f6368", fontSize: "14px", cursor: "pointer", padding: "0 0 20px", fontFamily: "'Circular Std', sans-serif" },
+  backBtn: { display: "inline-flex", alignItems: "center", background: "none", border: "none", color: "#5f6368", fontSize: "13px", fontWeight: "500", cursor: "pointer", padding: "0 0 20px", fontFamily: "inherit" },
 
-  // Layout
-  layout: { display: "grid", gridTemplateColumns: "1fr 300px", gap: "28px", alignItems: "start" },
+  // ── Layout ──
+  layout: { display: "grid", gridTemplateColumns: "1fr 300px", gap: "24px", alignItems: "start" },
   formCol: {},
-  sideCol: { position: "sticky", top: "80px", display: "flex", flexDirection: "column", gap: "14px" },
+  sideCol: { position: "sticky", top: "76px", display: "flex", flexDirection: "column", gap: "12px" },
 
-  // Card
-  card: { background: "#fff", border: "1px solid #e0e0e0", borderRadius: "14px", padding: "28px", boxShadow: "0 1px 3px rgba(60,64,67,0.08)" },
+  // ── Main card ──
+  card: { background: "#ffffff", border: "1px solid #e3e3e3", borderRadius: "8px", padding: "28px", boxShadow: "0 1px 2px 0 rgba(60,64,67,0.08)" },
 
-  // Stepper
+  // ── Horizontal stepper ──
   stepper: { display: "flex", alignItems: "center", marginBottom: "28px" },
   stepItem: { display: "flex", alignItems: "center", flex: 1 },
-  stepDot: { width: "30px", height: "30px", borderRadius: "50%", background: "#f1f3f4", border: "2px solid #e0e0e0", color: "#80868b", fontSize: "13px", fontWeight: "600", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0, transition: "all 0.2s" },
-  stepActive: { background: "#1a73e8", border: "2px solid #1a73e8", color: "#fff" },
-  stepDone: { background: "#1e8e3e", border: "2px solid #1e8e3e", color: "#fff" },
-  stepLabel: { fontSize: "12px", color: "#80868b", marginLeft: "8px", whiteSpace: "nowrap" },
-  stepLabelActive: { color: "#202124", fontWeight: "500" },
-  stepLabelDone: { color: "#1e8e3e" },
-  stepLine: { flex: 1, height: "2px", background: "#e0e0e0", margin: "0 8px" },
-  stepLineDone: { background: "#1e8e3e" },
+  stepDot: { width: "28px", height: "28px", borderRadius: "50%", background: "#f1f3f4", border: "2px solid #e3e3e3", color: "#9aa0a6", fontSize: "12px", fontWeight: "700", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0, transition: "all 0.2s" },
+  stepDotActive: { background: "#1a73e8", border: "2px solid #1a73e8", color: "#ffffff" },
+  stepDotDone:   { background: "#e6f4ea", border: "2px solid #34a853", color: "#0d652d" },
+  stepLabel: { fontSize: "12px", color: "#9aa0a6", marginLeft: "8px", whiteSpace: "nowrap", fontWeight: "500" },
+  stepLabelActive: { color: "#202124", fontWeight: "600" },
+  stepLabelDone:   { color: "#0d652d" },
+  stepLine: { flex: 1, height: "2px", background: "#e3e3e3", margin: "0 8px", borderRadius: "1px" },
+  stepLineDone: { background: "#34a853" },
 
-  // Alerts
-  error: { display: "flex", alignItems: "flex-start", background: "#fce8e6", border: "1px solid rgba(217,48,37,0.2)", color: "#d93025", borderRadius: "8px", padding: "12px 14px", fontSize: "13px", marginBottom: "20px" },
-  prefillNote: { display: "flex", alignItems: "center", background: "#e8f0fe", border: "1px solid rgba(26,115,232,0.2)", color: "#1a73e8", borderRadius: "8px", padding: "10px 14px", fontSize: "13px" },
+  // ── Alerts / notes ──
+  alertError: { display: "flex", alignItems: "flex-start", background: "#fce8e6", border: "1px solid #f5c6c2", color: "#c5221f", borderRadius: "4px", padding: "12px 14px", fontSize: "13px", fontWeight: "500", marginBottom: "20px" },
+  prefillNote: { display: "flex", alignItems: "center", background: "#e3f2fd", border: "1px solid #bdd7f5", color: "#1967d2", borderRadius: "4px", padding: "10px 14px", fontSize: "13px" },
+  infoNote: { display: "flex", alignItems: "center", background: "#f8f9fa", border: "1px solid #e3e3e3", borderRadius: "4px", padding: "10px 14px", color: "#5f6368", fontSize: "13px" },
 
-  // Form
+  // ── Form ──
   form: { display: "flex", flexDirection: "column", gap: "16px", marginBottom: "24px" },
   row: { display: "grid", gridTemplateColumns: "1fr 1fr", gap: "14px" },
-  input: { background: "#fff", border: "1px solid #dadce0", borderRadius: "8px", padding: "10px 13px", color: "#202124", fontSize: "13px", outline: "none", width: "100%", fontFamily: "'Circular Std', sans-serif", transition: "border-color 0.15s, box-shadow 0.15s" },
+  fieldLabel: { color: "#5f6368", fontSize: "12px", fontWeight: "600", textTransform: "uppercase", letterSpacing: "0.3px" },
+  input: { background: "#ffffff", border: "1px solid #e3e3e3", borderRadius: "4px", padding: "9px 12px", color: "#202124", fontSize: "13px", outline: "none", width: "100%", fontFamily: "inherit", boxSizing: "border-box", transition: "border-color 0.15s" },
 
-  // Upload
-  uploadNote: { display: "flex", alignItems: "center", background: "#f8f9fa", border: "1px solid #e0e0e0", borderRadius: "8px", padding: "10px 14px", color: "#5f6368", fontSize: "13px" },
-  docGroup: { background: "#f8f9fa", border: "1px solid #e0e0e0", borderRadius: "10px", padding: "16px 18px", display: "flex", flexDirection: "column", gap: "12px" },
+  // ── Document groups ──
+  docGroup: { background: "#f8f9fa", border: "1px solid #e3e3e3", borderRadius: "8px", padding: "16px 18px", display: "flex", flexDirection: "column", gap: "12px" },
   docGroupTitle: { color: "#202124", fontSize: "13px", fontWeight: "600", display: "flex", alignItems: "center", marginBottom: "2px" },
-  docGroupNote: { color: "#80868b", fontSize: "12px", margin: "0", lineHeight: "1.5" },
-  optionalBadge: { background: "#e0e0e0", color: "#5f6368", borderRadius: "999px", padding: "2px 8px", fontSize: "11px", fontWeight: "400", marginLeft: "8px" },
-  fileLabel: { display: "flex", alignItems: "center", background: "#fff", border: "1px dashed #dadce0", borderRadius: "8px", padding: "10px 14px", color: "#5f6368", fontSize: "13px", cursor: "pointer" },
-  fileAttached: { display: "flex", alignItems: "center", background: "#e6f4ea", border: "1px solid rgba(30,142,62,0.2)", borderRadius: "8px", padding: "10px 14px" },
-  fileAttachedName: { color: "#1e8e3e", fontSize: "13px", flex: 1, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" },
-  removeFileBtn: { display: "flex", alignItems: "center", gap: "4px", background: "none", border: "none", color: "#d93025", fontSize: "12px", cursor: "pointer", whiteSpace: "nowrap", flexShrink: 0, fontFamily: "'Circular Std', sans-serif" },
+  docGroupNote: { color: "#9aa0a6", fontSize: "12px", margin: 0, lineHeight: "1.5" },
+  optionalBadge: { background: "#e3e3e3", color: "#5f6368", borderRadius: "4px", padding: "2px 7px", fontSize: "11px", fontWeight: "500", marginLeft: "8px" },
+  fileLabel: { display: "flex", alignItems: "center", background: "#ffffff", border: "1px dashed #dadce0", borderRadius: "4px", padding: "10px 14px", color: "#5f6368", fontSize: "13px", cursor: "pointer", transition: "border-color 0.15s" },
+  fileAttached: { display: "flex", alignItems: "center", background: "#e6f4ea", border: "1px solid #ceead6", borderRadius: "4px", padding: "10px 14px" },
+  fileAttachedName: { color: "#0d652d", fontSize: "13px", fontWeight: "500", flex: 1, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" },
+  removeFileBtn: { display: "flex", alignItems: "center", gap: "4px", background: "none", border: "none", color: "#c5221f", fontSize: "12px", fontWeight: "500", cursor: "pointer", whiteSpace: "nowrap", flexShrink: 0, fontFamily: "inherit" },
 
-  // Declarations — custom checkboxes
-  declCard: { background: "#fff", border: "1px solid #e0e0e0", borderRadius: "10px", padding: "18px", display: "flex", flexDirection: "column", gap: "0" },
-  declTitle: { color: "#202124", fontSize: "14px", fontWeight: "600", marginBottom: "6px" },
+  // ── Declarations ──
+  declCard: { background: "#ffffff", border: "1px solid #e3e3e3", borderRadius: "8px", padding: "18px", display: "flex", flexDirection: "column", gap: 0 },
+  declTitle: { color: "#202124", fontSize: "13px", fontWeight: "600", marginBottom: "6px" },
   declNote: { color: "#5f6368", fontSize: "12px", marginBottom: "14px", lineHeight: "1.5" },
-  checkRow: { display: "flex", alignItems: "flex-start", gap: "12px", cursor: "pointer", padding: "10px 12px", borderRadius: "8px", margin: "0 -12px", transition: "background 0.15s" },
-  checkRowChecked: { background: "#f0f7ff" },
-  checkbox: { width: "18px", height: "18px", borderRadius: "4px", border: "2px solid #dadce0", background: "#fff", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0, marginTop: "1px", transition: "all 0.15s" },
+  checkRow: { display: "flex", alignItems: "flex-start", gap: "12px", cursor: "pointer", padding: "10px 12px", borderRadius: "6px", margin: "0 -12px", transition: "background 0.15s" },
+  checkRowChecked: { background: "#e3f2fd" },
+  checkbox: { width: "17px", height: "17px", borderRadius: "3px", border: "2px solid #dadce0", background: "#ffffff", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0, marginTop: "2px", transition: "all 0.15s" },
   checkboxChecked: { background: "#1a73e8", border: "2px solid #1a73e8" },
   checkLabel: { color: "#202124", fontSize: "13px", lineHeight: "1.5", userSelect: "none" },
 
-  // Navigation
+  // ── Navigation ──
   navRow: { display: "flex", alignItems: "center", gap: "12px", paddingTop: "4px" },
-  btnBack2: { display: "inline-flex", alignItems: "center", background: "#fff", border: "1px solid #dadce0", color: "#5f6368", borderRadius: "8px", padding: "10px 18px", fontSize: "14px", cursor: "pointer", fontFamily: "'Circular Std', sans-serif" },
-  btnNext: { display: "inline-flex", alignItems: "center", background: "#1a73e8", color: "#fff", border: "none", borderRadius: "8px", padding: "10px 22px", fontSize: "14px", fontWeight: "500", cursor: "pointer", fontFamily: "'Circular Std', sans-serif", boxShadow: "0 1px 3px rgba(26,115,232,0.3)" },
-  btnSubmit: { display: "inline-flex", alignItems: "center", background: "#1e8e3e", color: "#fff", border: "none", borderRadius: "8px", padding: "10px 22px", fontSize: "14px", fontWeight: "500", cursor: "pointer", fontFamily: "'Circular Std', sans-serif", boxShadow: "0 1px 3px rgba(30,142,62,0.3)" },
+  btnBack2: { display: "inline-flex", alignItems: "center", background: "#ffffff", border: "1px solid #dadce0", color: "#5f6368", borderRadius: "4px", padding: "9px 16px", fontSize: "13px", fontWeight: "600", cursor: "pointer", fontFamily: "inherit" },
+  btnNext: { display: "inline-flex", alignItems: "center", background: "#1a73e8", color: "#ffffff", border: "none", borderRadius: "4px", padding: "9px 20px", fontSize: "13px", fontWeight: "600", cursor: "pointer", fontFamily: "inherit", boxShadow: "0 1px 2px rgba(0,0,0,0.1)" },
+  btnSubmit: { display: "inline-flex", alignItems: "center", background: "#1a73e8", color: "#ffffff", border: "none", borderRadius: "4px", padding: "9px 20px", fontSize: "13px", fontWeight: "600", cursor: "pointer", fontFamily: "inherit", boxShadow: "0 1px 2px rgba(0,0,0,0.1)" },
 
-  // Review
-  reviewNote: { background: "#fef7e0", border: "1px solid rgba(249,171,0,0.3)", borderRadius: "8px", padding: "12px 14px", color: "#b06000", fontSize: "12px", lineHeight: "1.6" },
+  // ── Review sections ──
+  reviewSection: { background: "#f8f9fa", border: "1px solid #e3e3e3", borderRadius: "8px", padding: "16px 20px", marginBottom: "12px" },
+  reviewSectionTitle: { color: "#5f6368", fontSize: "11px", fontWeight: "700", textTransform: "uppercase", letterSpacing: "0.5px", marginBottom: "12px" },
+  reviewRow: { display: "flex", justifyContent: "space-between", gap: "12px", padding: "7px 0", borderBottom: "1px solid #e3e3e3", fontSize: "13px" },
+  reviewLabel: { color: "#5f6368" },
+  reviewValue: { color: "#202124", textAlign: "right", maxWidth: "60%", wordBreak: "break-word", fontWeight: "500" },
+  reviewNote: { background: "#fef7e0", border: "1px solid #fde68a", borderRadius: "4px", padding: "12px 14px", color: "#ea8600", fontSize: "12px", lineHeight: "1.6" },
 
-  // Job sidebar card
-  jobCard: { background: "#fff", border: "1px solid #e0e0e0", borderRadius: "14px", padding: "20px", boxShadow: "0 1px 3px rgba(60,64,67,0.08)" },
-  jobCardLabel: { color: "#1a73e8", fontSize: "11px", fontWeight: "600", textTransform: "uppercase", letterSpacing: "0.06em", marginBottom: "14px" },
-  jobLogoWrap: { width: "48px", height: "48px", borderRadius: "10px", overflow: "hidden", border: "1px solid #e0e0e0", marginBottom: "12px" },
+  // ── Job sidebar card ──
+  jobCard: { background: "#ffffff", border: "1px solid #e3e3e3", borderRadius: "8px", padding: "20px", boxShadow: "0 1px 2px 0 rgba(60,64,67,0.06)" },
+  jobCardLabel: { color: "#5f6368", fontSize: "11px", fontWeight: "700", textTransform: "uppercase", letterSpacing: "0.5px", marginBottom: "14px" },
+  jobLogoWrap: { width: "44px", height: "44px", borderRadius: "8px", overflow: "hidden", border: "1px solid #e3e3e3", marginBottom: "12px" },
   jobLogoImg: { width: "100%", height: "100%", objectFit: "contain" },
-  jobLogoPlaceholder: { width: "100%", height: "100%", display: "flex", alignItems: "center", justifyContent: "center", color: "#fff", fontWeight: "700", fontSize: "20px" },
-  jobTitle: { color: "#202124", fontSize: "16px", fontWeight: "700", marginBottom: "4px" },
+  jobLogoPlaceholder: { width: "100%", height: "100%", display: "flex", alignItems: "center", justifyContent: "center", color: "#fff", fontWeight: "700", fontSize: "18px" },
+  jobTitle: { color: "#202124", fontSize: "15px", fontWeight: "600", marginBottom: "3px", letterSpacing: "-0.2px" },
   jobCompany: { color: "#5f6368", fontSize: "13px", marginBottom: "14px" },
   jobMeta: { display: "flex", flexDirection: "column", gap: "8px" },
   jobMetaItem: { display: "flex", alignItems: "center", gap: "7px", color: "#5f6368", fontSize: "12px" },
 
-  // Sign in prompt
-  signInPrompt: { background: "#e8f0fe", border: "1px solid rgba(26,115,232,0.2)", borderRadius: "12px", padding: "16px", textAlign: "center", display: "flex", flexDirection: "column", alignItems: "center" },
+  // ── Sign-in prompt ──
+  signInPrompt: { background: "#e3f2fd", border: "1px solid #bdd7f5", borderRadius: "8px", padding: "16px", textAlign: "center", display: "flex", flexDirection: "column", alignItems: "center" },
   signInPromptText: { color: "#5f6368", fontSize: "13px", lineHeight: "1.5", margin: 0 },
 
-  // Success
-  successCard: { maxWidth: "480px", margin: "60px auto", background: "#fff", border: "1px solid #e0e0e0", borderRadius: "16px", padding: "48px 40px", textAlign: "center", boxShadow: "0 2px 8px rgba(60,64,67,0.1)" },
-  successIcon: { width: "64px", height: "64px", borderRadius: "50%", background: "#e6f4ea", color: "#1e8e3e", display: "flex", alignItems: "center", justifyContent: "center", margin: "0 auto 24px" },
-  successTitle: { color: "#202124", fontSize: "24px", fontWeight: "700", margin: "0 0 12px" },
-  successSub: { color: "#5f6368", fontSize: "15px", lineHeight: "1.6", margin: "0 0 28px" },
+  // ── Success ──
+  successCard: { maxWidth: "480px", margin: "60px auto", background: "#ffffff", border: "1px solid #e3e3e3", borderRadius: "8px", padding: "48px 40px", textAlign: "center", boxShadow: "0 1px 3px 1px rgba(60,64,67,0.08)" },
+  successIcon: { width: "56px", height: "56px", borderRadius: "50%", background: "#e6f4ea", border: "1px solid #ceead6", display: "flex", alignItems: "center", justifyContent: "center", margin: "0 auto 24px" },
+  successTitle: { color: "#202124", fontSize: "22px", fontWeight: "600", margin: "0 0 12px", letterSpacing: "-0.3px" },
+  successSub: { color: "#5f6368", fontSize: "14px", lineHeight: "1.6", margin: "0 0 24px" },
   successActions: { display: "flex", gap: "12px", justifyContent: "center", flexWrap: "wrap" },
-  btnPrimary: { background: "#1a73e8", color: "#fff", border: "none", borderRadius: "8px", padding: "11px 24px", fontSize: "14px", fontWeight: "500", cursor: "pointer", fontFamily: "'Circular Std', sans-serif" },
-  btnOutline: { background: "#fff", border: "1px solid #dadce0", color: "#5f6368", borderRadius: "8px", padding: "11px 24px", fontSize: "14px", cursor: "pointer", fontFamily: "'Circular Std', sans-serif" },
+  btnPrimary: { background: "#1a73e8", color: "#ffffff", border: "none", borderRadius: "4px", padding: "10px 22px", fontSize: "13px", fontWeight: "600", cursor: "pointer", fontFamily: "inherit", boxShadow: "0 1px 2px rgba(0,0,0,0.1)" },
+  btnOutline: { background: "#ffffff", border: "1px solid #dadce0", color: "#5f6368", borderRadius: "4px", padding: "10px 22px", fontSize: "13px", fontWeight: "500", cursor: "pointer", fontFamily: "inherit" },
 
-  empty: { color: "#5f6368", textAlign: "center", padding: "80px", fontSize: "16px" },
-  footer: { background: "#202124", padding: "24px" },
+  empty: { color: "#5f6368", textAlign: "center", padding: "80px", fontSize: "14px" },
+
+  // ── Footer ──
+  footer: { background: "#202124", padding: "20px 24px" },
   footerInner: { maxWidth: "1200px", margin: "0 auto" },
-  footerBottom: { display: "flex", justifyContent: "space-between", color: "rgba(255,255,255,0.3)", fontSize: "12px", flexWrap: "wrap", gap: "8px" },
+  footerBottom: { display: "flex", justifyContent: "space-between", color: "rgba(255,255,255,0.35)", fontSize: "12px", flexWrap: "wrap", gap: "8px" },
   footerLink: { color: "rgba(255,255,255,0.4)", textDecoration: "none" },
 };
