@@ -1,9 +1,11 @@
+import React from "react";
 import { useState, useEffect } from "react";
 import { collection, query, where, getDocs, doc, updateDoc, deleteDoc, serverTimestamp } from "firebase/firestore";
 import { useNavigate, Link } from "react-router-dom";
 import { signOut } from "firebase/auth";
 import { db, auth } from "../../lib/firebase";
 import { useAuth } from "../../context/AuthContext";
+import NotificationDrawer from "../../components/NotificationDrawer";
 
 const JOB_PRICE = 450;
 
@@ -94,13 +96,13 @@ export default function Dashboard() {
   const filteredJobs = activeTab === "all" ? jobs : jobs.filter(j => j.status === activeTab);
 
   if (loading) return (
-    <Layout profile={employerProfile} onSignOut={handleSignOut}>
+    <Layout profile={employerProfile} onSignOut={handleSignOut} userId={user?.uid} jobs={[]} applications={[]}>
       <div style={s.empty}>Loading data...</div>
     </Layout>
   );
 
   return (
-    <Layout profile={employerProfile} onSignOut={handleSignOut}>
+    <Layout profile={employerProfile} onSignOut={handleSignOut} userId={user?.uid} jobs={jobs} applications={applications}>
 
       {/* Header */}
       <div style={s.topbar}>
@@ -126,6 +128,9 @@ export default function Dashboard() {
         <StatCard label="New Applications"  value={newApps.length}        color="#d93025" />
         <StatCard label="Top Location"      value={topLocation}           color="#1a73e8" small />
       </div>
+
+      {/* Performance Alerts */}
+      <PerformanceAlerts jobs={jobs} applications={applications} />
 
       {/* Usage & Billing */}
       <div style={s.section}>
@@ -295,13 +300,15 @@ export default function Dashboard() {
 }
 
 // ── Layout ────────────────────────────────────────────────────────────
-function Layout({ children, profile, onSignOut }) {
+function Layout({ children, profile, onSignOut, userId, jobs, applications }) {
   const navigate = useNavigate();
   const path = window.location.pathname;
   const navItems = [
     { label: "Project Overview",        to: "/employer/dashboard",    icon: "⌂" },
     { label: "Deploy Job",              to: "/employer/post-job",     icon: "+" },
     { label: "Database (Applications)", to: "/employer/applications", icon: "≡" },
+    { label: "Analytics",               to: "/employer/analytics",    icon: "📊" },
+    { label: "Billing",                 to: "/employer/billing",      icon: "💳" },
     { label: "Settings",                to: "/employer/profile",      icon: "⚙" },
   ];
   return (
@@ -344,6 +351,10 @@ function Layout({ children, profile, onSignOut }) {
               <div style={s.profileName}>{profile?.companyName || "Employer"}</div>
               <div style={s.profileEmail}>Admin Access</div>
             </div>
+          </div>
+          {/* Bell icon — sits between profile chip and sign out */}
+          <div style={s.bellRow}>
+            <NotificationDrawer userId={userId} jobs={jobs} applications={applications} />
           </div>
           <button onClick={onSignOut} style={s.signOutBtn}>Sign Out</button>
         </div>
@@ -392,6 +403,305 @@ function pillColor(status) {
   return map[status] || { background: "#f1f3f4", color: "#3c4043" };
 }
 
+// ── PerformanceAlerts ─────────────────────────────────────────────────
+// Drop this component into Dashboard.jsx
+// Then add this one line in the JSX, right after the </div> that closes the statsGrid:
+//
+//   <PerformanceAlerts jobs={jobs} applications={applications} />
+//
+// That's it. Nothing else changes.
+
+function PerformanceAlerts({ jobs, applications }) {
+  const [dismissed, setDismissed] = React.useState(() => {
+    try { return JSON.parse(localStorage.getItem("vt_alerts_dismissed") || "[]"); }
+    catch { return []; }
+  });
+
+  const dismiss = (id) => {
+    const updated = [...new Set([...dismissed, id])];
+    localStorage.setItem("vt_alerts_dismissed", JSON.stringify(updated));
+    setDismissed(updated);
+  };
+
+  const now = new Date();
+  const alerts = [];
+
+  // ── 1. Unreviewed applications ──────────────────────────────────────
+  const unreviewed = applications.filter(a => a.status === "new");
+  if (unreviewed.length >= 5) {
+    alerts.push({
+      id: "unreviewed-pile",
+      type: "warning",
+      icon: (
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+          <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/>
+          <line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/>
+        </svg>
+      ),
+      color: "#ea8600",
+      bg: "#fef7e0",
+      border: "#fde68a",
+      message: `You have ${unreviewed.length} unreviewed applications piling up.`,
+      sub: "Candidates may lose interest if they don't hear back. Review them now.",
+      action: "/employer/applications",
+      actionLabel: "Review applications",
+    });
+  }
+
+  // ── 2. Live job with zero applications ──────────────────────────────
+  const liveWithNoApps = jobs.filter(j => {
+    if (j.status !== "live") return false;
+    return applications.filter(a => a.jobId === j.id).length === 0;
+  });
+  liveWithNoApps.forEach(job => {
+    alerts.push({
+      id: `no-apps-${job.id}`,
+      type: "info",
+      icon: (
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+          <circle cx="12" cy="12" r="10"/>
+          <line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/>
+        </svg>
+      ),
+      color: "#1967d2",
+      bg: "#e3f2fd",
+      border: "#bdd7f5",
+      message: `"${job.title}" is live but has received no applications yet.`,
+      sub: "Check that the job description and requirements are clear and attractive.",
+      action: `/employer/post-job?edit=${job.id}`,
+      actionLabel: "Edit listing",
+    });
+  });
+
+  // ── 3. Job closing within 3 days ────────────────────────────────────
+  jobs.forEach(job => {
+    if (job.status !== "live" || !job.closes) return;
+    const closes = parseSADateAlert(job.closes);
+    if (!closes) return;
+    const diffDays = Math.ceil((closes - now) / (1000 * 60 * 60 * 24));
+    if (diffDays >= 0 && diffDays <= 3) {
+      const jobApps = applications.filter(a => a.jobId === job.id);
+      alerts.push({
+        id: `closing-alert-${job.id}`,
+        type: "warning",
+        icon: (
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+            <circle cx="12" cy="12" r="10"/>
+            <polyline points="12 6 12 12 16 14"/>
+          </svg>
+        ),
+        color: "#ea8600",
+        bg: "#fef7e0",
+        border: "#fde68a",
+        message: `"${job.title}" closes ${diffDays === 0 ? "today" : `in ${diffDays} day${diffDays !== 1 ? "s" : ""}`} with ${jobApps.length} application${jobApps.length !== 1 ? "s" : ""}.`,
+        sub: diffDays === 0
+          ? "Last chance — make sure you've reviewed all applications before it expires."
+          : "Review applications before the closing date to avoid missing good candidates.",
+        action: "/employer/applications",
+        actionLabel: "Review now",
+      });
+    }
+  });
+
+  // ── 4. Draft jobs sitting idle ───────────────────────────────────────
+  const drafts = jobs.filter(j => j.status === "draft");
+  if (drafts.length > 0) {
+    alerts.push({
+      id: "idle-drafts",
+      type: "tip",
+      icon: (
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+          <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/>
+        </svg>
+      ),
+      color: "#5f6368",
+      bg: "#f1f3f4",
+      border: "#e3e3e3",
+      message: `You have ${drafts.length} draft listing${drafts.length !== 1 ? "s" : ""} that ${drafts.length !== 1 ? "are" : "is"} not yet live.`,
+      sub: "Publish them when ready to start receiving applications.",
+      action: "/employer/dashboard",
+      actionLabel: "View drafts",
+    });
+  }
+
+  // ── 5. High performer — celebrate ───────────────────────────────────
+  const topJob = jobs
+    .map(j => ({ ...j, count: applications.filter(a => a.jobId === j.id).length }))
+    .sort((a, b) => b.count - a.count)[0];
+  if (topJob && topJob.count >= 10) {
+    alerts.push({
+      id: `top-performer-${topJob.id}`,
+      type: "success",
+      icon: (
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+          <polyline points="20 6 9 17 4 12"/>
+        </svg>
+      ),
+      color: "#0d652d",
+      bg: "#e6f4ea",
+      border: "#ceead6",
+      message: `"${topJob.title}" is performing great with ${topJob.count} applications.`,
+      sub: "This is your highest-performing listing. Keep the description updated.",
+      action: `/employer/applications`,
+      actionLabel: "View applicants",
+    });
+  }
+
+  // Filter out dismissed
+  const visible = alerts.filter(a => !dismissed.includes(a.id));
+
+  if (visible.length === 0) return null;
+
+  return (
+    <div style={pa.wrap}>
+      <div style={pa.header}>
+        <div style={pa.headerLeft}>
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#1967d2" strokeWidth="2">
+            <path d="M22 12h-4l-3 9L9 3l-3 9H2"/>
+          </svg>
+          <span style={pa.headerTitle}>Performance Alerts</span>
+          <span style={pa.headerCount}>{visible.length}</span>
+        </div>
+      </div>
+
+      <div style={pa.list}>
+        {visible.map(alert => (
+          <div key={alert.id} style={{ ...pa.alertRow, background: alert.bg, borderColor: alert.border }}>
+            {/* Icon */}
+            <div style={{ ...pa.alertIcon, color: alert.color }}>
+              {alert.icon}
+            </div>
+
+            {/* Text */}
+            <div style={pa.alertBody}>
+              <div style={{ ...pa.alertMessage, color: alert.color }}>{alert.message}</div>
+              <div style={pa.alertSub}>{alert.sub}</div>
+            </div>
+
+            {/* Action */}
+            <a href={alert.action} style={{ ...pa.alertAction, color: alert.color }}>
+              {alert.actionLabel} →
+            </a>
+
+            {/* Dismiss */}
+            <button
+              style={pa.dismissBtn}
+              onClick={() => dismiss(alert.id)}
+              title="Dismiss"
+            >
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                <line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/>
+              </svg>
+            </button>
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+}
+
+    // Used only inside PerformanceAlerts
+    // Used only inside PerformanceAlerts
+function parseSADateAlert(str) {
+    if (!str) return null;
+    if (str.includes("/")) {
+        const [d, m, y] = str.split("/");
+        return new Date(y, m - 1, d);
+    }
+    return new Date(str);
+    }
+
+    const pa = {
+    wrap: {
+        marginBottom: "32px",
+        background: "#ffffff",
+        borderRadius: "8px",
+        border: "1px solid #e3e3e3",
+        overflow: "hidden",
+        boxShadow: "0 1px 2px 0 rgba(60,64,67,0.06)",
+    },
+    header: {
+        display: "flex",
+        alignItems: "center",
+        justifyContent: "space-between",
+        padding: "12px 20px",
+        borderBottom: "1px solid #f1f3f4",
+        background: "#f8f9fa",
+    },
+    headerLeft: {
+        display: "flex",
+        alignItems: "center",
+        gap: "8px",
+    },
+    headerTitle: {
+        color: "#202124",
+        fontSize: "13px",
+        fontWeight: "600",
+    },
+    headerCount: {
+        background: "#e3f2fd",
+        color: "#1967d2",
+        borderRadius: "10px",
+        padding: "1px 7px",
+        fontSize: "11px",
+        fontWeight: "700",
+    },
+    list: {
+        display: "flex",
+        flexDirection: "column",
+        gap: "0",
+    },
+    alertRow: {
+        display: "flex",
+        alignItems: "flex-start",
+        gap: "12px",
+        padding: "14px 20px",
+        borderBottom: "1px solid",
+        transition: "opacity 0.2s",
+    },
+    alertIcon: {
+        flexShrink: 0,
+        marginTop: "2px",
+        display: "flex",
+        alignItems: "center",
+    },
+    alertBody: {
+        flex: 1,
+        minWidth: 0,
+    },
+    alertMessage: {
+        fontSize: "13px",
+        fontWeight: "600",
+        marginBottom: "2px",
+        lineHeight: "1.4",
+    },
+    alertSub: {
+        color: "#5f6368",
+        fontSize: "12px",
+        lineHeight: "1.5",
+    },
+    alertAction: {
+        fontSize: "12px",
+        fontWeight: "600",
+        textDecoration: "none",
+        whiteSpace: "nowrap",
+        flexShrink: 0,
+        alignSelf: "center",
+    },
+    dismissBtn: {
+        background: "none",
+        border: "none",
+        cursor: "pointer",
+        color: "#9aa0a6",
+        padding: "2px",
+        display: "flex",
+        alignItems: "center",
+        flexShrink: 0,
+        alignSelf: "flex-start",
+        marginTop: "2px",
+    },
+    };
+
 // ── Styles ────────────────────────────────────────────────────────────
 const s = {
   // ── Page Shell ──
@@ -422,7 +732,8 @@ const s = {
   navLabel: { flex: 1 },
 
   sidebarBottom: { borderTop: "1px solid #e3e3e3", padding: "16px", background: "#f8f9fa" },
-  profileChip: { display: "flex", alignItems: "center", gap: "10px", marginBottom: "16px" },
+  profileChip: { display: "flex", alignItems: "center", gap: "10px", marginBottom: "12px" },
+  bellRow: { marginBottom: "8px" },
   profileAvatarWrap: { width: "32px", height: "32px", borderRadius: "50%", overflow: "hidden", flexShrink: 0, border: "1px solid #dadce0" },
   profileAvatar: { width: "100%", height: "100%", background: "#1a73e8", color: "#ffffff", fontWeight: "600", fontSize: "14px", display: "flex", alignItems: "center", justifyContent: "center" },
   profileLogoImg: { width: "100%", height: "100%", objectFit: "cover", background: "#ffffff" },

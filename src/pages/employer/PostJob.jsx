@@ -3,6 +3,7 @@ import { collection, addDoc, doc, getDoc, updateDoc, serverTimestamp } from "fir
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { db } from "../../lib/firebase";
 import { useAuth } from "../../context/AuthContext";
+import NotificationDrawer from "../../components/NotificationDrawer";
 
 const PROVINCES = [
   "Eastern Cape", "Free State", "Gauteng", "KwaZulu-Natal",
@@ -156,7 +157,7 @@ export default function PostJob() {
 
   if (fetching) return (
     <div style={s.page}>
-      <Sidebar profile={employerProfile} />
+      <Sidebar profile={employerProfile} userId={user?.uid} />
       <div style={s.mainWrapper}>
         <div style={s.mainInner}>
           <div style={s.empty}>Fetching document...</div>
@@ -167,7 +168,7 @@ export default function PostJob() {
 
   return (
     <div style={s.page}>
-      <Sidebar profile={employerProfile} />
+      <Sidebar profile={employerProfile} userId={user?.uid} />
 
       <div style={s.mainWrapper}>
         <div style={s.mainInner}>
@@ -408,15 +409,17 @@ export default function PostJob() {
 }
 
 // ── Sidebar ──────────────────────────────────────────────────────────
-function Sidebar({ profile }) {
+function Sidebar({ profile, userId }) {
   const navigate = useNavigate();
   const path = window.location.pathname;
   const navItems = [
-    { label: "Project Overview", to: "/employer/dashboard", icon: "⌂" },
-    { label: "Deploy Job", to: "/employer/post-job", icon: "+" },
+    { label: "Project Overview",        to: "/employer/dashboard",    icon: "⌂" },
+    { label: "Deploy Job",              to: "/employer/post-job",     icon: "+" },
     { label: "Database (Applications)", to: "/employer/applications", icon: "≡" },
-    { label: "Settings", to: "/employer/profile", icon: "⚙" },
-  ];
+    { label: "Analytics",               to: "/employer/analytics",    icon: "📊" },
+    { label: "Billing",                 to: "/employer/billing",      icon: "💳" },
+    { label: "Settings",                to: "/employer/profile",      icon: "⚙" },
+    ];
   return (
     <div style={s.sidebar}>
       <div style={s.sidebarHeader}>
@@ -452,6 +455,9 @@ function Sidebar({ profile }) {
               : <div style={s.profileAvatar}>{profile?.companyName?.[0] || "E"}</div>
             }
           </div>
+          <div style={{ marginBottom: "8px" }}>
+            <NotificationDrawer userId={userId} />
+            </div>
           <div style={{ overflow: "hidden" }}>
             <div style={s.profileName}>{profile?.companyName || "Employer"}</div>
             <div style={s.profileEmail}>Admin Access</div>

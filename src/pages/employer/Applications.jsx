@@ -3,6 +3,7 @@ import { collection, query, where, getDocs, doc, updateDoc, deleteDoc, serverTim
 import { useNavigate } from "react-router-dom";
 import { db } from "../../lib/firebase";
 import { useAuth } from "../../context/AuthContext";
+import NotificationDrawer from "../../components/NotificationDrawer";
 
 const STATUSES = ["all", "new", "reviewed", "shortlisted", "rejected", "hired"];
 
@@ -75,7 +76,7 @@ export default function Applications() {
 
   return (
     <div style={s.page}>
-      <Sidebar profile={employerProfile} />
+      <Sidebar profile={employerProfile} userId={user?.uid} />
 
       <div style={s.mainWrapper}>
         <div style={s.mainInner}>
@@ -411,15 +412,17 @@ function DrawerContent({ app, onStatusChange, onSaveNotes, onDelete }) {
 }
 
 // ── Sidebar ────────────────────────────────────────────────────────────
-function Sidebar({ profile }) {
+function Sidebar({ profile, userId }) {
   const navigate = useNavigate();
   const path = window.location.pathname;
   const navItems = [
     { label: "Project Overview",        to: "/employer/dashboard",    icon: "⌂" },
     { label: "Deploy Job",              to: "/employer/post-job",     icon: "+" },
     { label: "Database (Applications)", to: "/employer/applications", icon: "≡" },
+    { label: "Analytics",               to: "/employer/analytics",    icon: "📊" },
+    { label: "Billing",                 to: "/employer/billing",      icon: "💳" },
     { label: "Settings",                to: "/employer/profile",      icon: "⚙" },
-  ];
+    ];
   return (
     <div style={s.sidebar}>
       <div style={s.sidebarHeader}>
@@ -453,6 +456,9 @@ function Sidebar({ profile }) {
               : <div style={s.profileAvatar}>{profile?.companyName?.[0] || "E"}</div>
             }
           </div>
+          <div style={{ marginBottom: "8px" }}>
+            <NotificationDrawer userId={userId} />
+            </div>
           <div style={{ overflow: "hidden" }}>
             <div style={s.profileName}>{profile?.companyName || "Employer"}</div>
             <div style={s.profileEmail}>Admin Access</div>

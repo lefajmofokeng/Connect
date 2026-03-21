@@ -21,6 +21,9 @@ import AdminLogin from "./pages/admin/AdminLogin";
 import JobSeekerRegister from "./pages/jobseeker/Register";
 import JobSeekerLogin from "./pages/jobseeker/Login";
 import JobSeekerDashboard from "./pages/jobseeker/Dashboard";
+import Analytics from "./pages/employer/Analytics";
+import Billing   from "./pages/employer/Billing";
+import Notifications from "./pages/employer/Notifications";
 
 function ProtectedRoute({ children }) {
   const { user, loading } = useAuth();
@@ -60,6 +63,9 @@ export default function App() {
         <Route path="/employer/post-job" element={<ProtectedRoute><PostJob /></ProtectedRoute>} />
         <Route path="/employer/applications" element={<ProtectedRoute><Applications /></ProtectedRoute>} />
         <Route path="/employer/profile" element={<ProtectedRoute><Profile /></ProtectedRoute>} />
+        <Route path="/employer/analytics" element={<ProtectedRoute><Analytics /></ProtectedRoute>} />
+        <Route path="/employer/billing"   element={<ProtectedRoute><Billing /></ProtectedRoute>} />
+        <Route path="/employer/notifications" element={<ProtectedRoute><Notifications /></ProtectedRoute>} />
 
         {/* Admin */}
         <Route path="/admin/login" element={<AdminLogin />} />

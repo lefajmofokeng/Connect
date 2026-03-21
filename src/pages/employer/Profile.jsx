@@ -4,6 +4,7 @@ import { ref, uploadBytes, getDownloadURL } from "firebase/storage";
 import { useNavigate } from "react-router-dom";
 import { db, storage } from "../../lib/firebase";
 import { useAuth } from "../../context/AuthContext";
+import NotificationDrawer from "../../components/NotificationDrawer";
 
 const PROVINCES = [
   "Eastern Cape", "Free State", "Gauteng", "KwaZulu-Natal",
@@ -107,7 +108,7 @@ export default function Profile() {
 
   return (
     <div style={s.page}>
-      <Sidebar profile={employerProfile} />
+      <Sidebar profile={employerProfile} userId={user?.uid} />
 
       <div style={s.mainWrapper}>
         <div style={s.mainInner}>
@@ -331,15 +332,17 @@ export default function Profile() {
 }
 
 // ── Sidebar ──────────────────────────────────────────────────────────
-function Sidebar({ profile }) {
+function Sidebar({ profile, userId }) {
   const navigate = useNavigate();
   const path = window.location.pathname;
   const navItems = [
-    { label: "Project Overview", to: "/employer/dashboard", icon: "⌂" },
-    { label: "Deploy Job", to: "/employer/post-job", icon: "+" },
+    { label: "Project Overview",        to: "/employer/dashboard",    icon: "⌂" },
+    { label: "Deploy Job",              to: "/employer/post-job",     icon: "+" },
     { label: "Database (Applications)", to: "/employer/applications", icon: "≡" },
-    { label: "Settings", to: "/employer/profile", icon: "⚙" },
-  ];
+    { label: "Analytics",               to: "/employer/analytics",    icon: "📊" },
+    { label: "Billing",                 to: "/employer/billing",      icon: "💳" },
+    { label: "Settings",                to: "/employer/profile",      icon: "⚙" },
+    ];
   return (
     <div style={s.sidebar}>
       <div style={s.sidebarHeader}>
@@ -375,6 +378,9 @@ function Sidebar({ profile }) {
               : <div style={s.profileAvatar}>{profile?.companyName?.[0] || "E"}</div>
             }
           </div>
+          <div style={{ marginBottom: "8px" }}>
+            <NotificationDrawer userId={userId} />
+            </div>
           <div style={{ overflow: "hidden" }}>
             <div style={s.profileName}>{profile?.companyName || "Employer"}</div>
             <div style={s.profileEmail}>Admin Access</div>
