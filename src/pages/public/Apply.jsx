@@ -30,8 +30,15 @@ export default function Apply() {
 
   const [form, setForm] = useState({
     firstName: "", lastName: "", email: "", phone: "",
-    city: "", notice: "", experience: "", salaryExpectation: "", coverNote: "",
+    address: "", city: "", province: "",
+    experience: "", coverNote: "",
+    dateOfBirth: "", gender: "",
+    qualification: "", employmentStatus: "",
+    hasSimilarExperience: "", similarExperienceYears: "", similarExperienceCompany: "",
+    skills: [],
   });
+
+  const [skillInput, setSkillInput] = useState("");
 
   const [cvFile, setCvFile] = useState(null);
   const [idFile, setIdFile] = useState(null);
@@ -47,10 +54,12 @@ export default function Apply() {
       setForm(prev => ({
         ...prev,
         firstName: prev.firstName || jobSeekerProfile.firstName || "",
-        lastName: prev.lastName || jobSeekerProfile.lastName || "",
-        email: prev.email || user?.email || "",
-        phone: prev.phone || jobSeekerProfile.phone || "",
-        city: prev.city || jobSeekerProfile.city || "",
+        lastName:  prev.lastName  || jobSeekerProfile.lastName  || "",
+        email:     prev.email     || user?.email                 || "",
+        phone:     prev.phone     || jobSeekerProfile.phone      || "",
+        city:      prev.city      || jobSeekerProfile.city       || "",
+        province:  prev.province  || jobSeekerProfile.province   || "",
+        skills:    prev.skills?.length > 0 ? prev.skills : (jobSeekerProfile.skills || []),
       }));
     } else if (user?.email) {
       setForm(prev => ({ ...prev, email: prev.email || user.email }));
@@ -86,8 +95,20 @@ export default function Apply() {
 
   const validateStep = () => {
     if (step === 0) {
-      if (!form.firstName || !form.lastName || !form.email || !form.phone || !form.city)
+      if (!form.firstName || !form.lastName || !form.email || !form.phone)
         return "Please fill in all required fields.";
+      if (!form.address || !form.city || !form.province)
+        return "Please enter your full address, city and province.";
+      if (!form.dateOfBirth)
+        return "Please enter your date of birth.";
+      if (!form.gender)
+        return "Please select your gender.";
+      if (!form.qualification)
+        return "Please select your highest qualification.";
+      if (!form.employmentStatus)
+        return "Please select your current employment status.";
+      if (!form.hasSimilarExperience)
+        return "Please indicate whether you have similar experience.";
     }
     if (step === 1) {
       if (!cvFile) return "CV / Resume is required.";
@@ -131,11 +152,23 @@ export default function Apply() {
           }
         })
       );
+      // Compute age from date of birth
+      let age = null;
+      if (form.dateOfBirth) {
+        const dob = new Date(form.dateOfBirth);
+        const today = new Date();
+        age = today.getFullYear() - dob.getFullYear();
+        const m = today.getMonth() - dob.getMonth();
+        if (m < 0 || (m === 0 && today.getDate() < dob.getDate())) age--;
+      }
+
       await addDoc(collection(db, "applications"), {
         jobId: id, jobTitle: job.title, jobDepartment: job.department || "",
         employerId: job.employerId, employerName: job.employerName,
         applyEmail: job.applyEmail || "",
-        ...form, cvPath, cvMime: cvFile.type, cvFilename: cvFile.name,
+        ...form, age,
+        skills: form.skills || [],
+        cvPath, cvMime: cvFile.type, cvFilename: cvFile.name,
         idPath, idFilename: idFile.name, optionalDocs: optionalPaths,
         jobSeekerId: user?.uid || null,
         status: "new", notes: "",
@@ -262,22 +295,193 @@ export default function Apply() {
                         Some fields have been pre-filled from your profile. Review and update as needed.
                       </div>
                     )}
+
+                    {/* Name */}
                     <div style={s.row}>
                       <Field label="First Name *"><input style={s.input} value={form.firstName} onChange={set("firstName")} placeholder="Jane" /></Field>
                       <Field label="Last Name *"><input style={s.input} value={form.lastName} onChange={set("lastName")} placeholder="Smith" /></Field>
                     </div>
+
+                    {/* Contact */}
                     <div style={s.row}>
                       <Field label="Email Address *"><input style={s.input} type="email" value={form.email} onChange={set("email")} placeholder="jane@email.com" /></Field>
                       <Field label="Phone Number *"><input style={s.input} type="tel" value={form.phone} onChange={set("phone")} placeholder="071 000 0000" /></Field>
                     </div>
+
+                    {/* DOB + Gender */}
                     <div style={s.row}>
-                      <Field label="City *"><input style={s.input} value={form.city} onChange={set("city")} placeholder="Cape Town" /></Field>
-                      <Field label="Notice Period"><input style={s.input} value={form.notice} onChange={set("notice")} placeholder="e.g. 1 month" /></Field>
+                      <Field label="Date of Birth *">
+                        <input style={s.input} type="date" value={form.dateOfBirth} onChange={set("dateOfBirth")} max={new Date().toISOString().split("T")[0]} />
+                      </Field>
+                      <Field label="Gender *">
+                        <select style={s.input} value={form.gender} onChange={set("gender")}>
+                          <option value="">Select gender</option>
+                          <option value="Male">Male</option>
+                          <option value="Female">Female</option>
+                          <option value="Non-binary">Non-binary</option>
+                          <option value="Prefer not to say">Prefer not to say</option>
+                        </select>
+                      </Field>
                     </div>
+
+                    {/* Address */}
+                    <Field label="Street Address *">
+                      <input style={s.input} value={form.address} onChange={set("address")} placeholder="e.g. 123 Riverside Drive, Witsieshoek 9870" />
+                    </Field>
                     <div style={s.row}>
-                      <Field label="Years of Experience"><input style={s.input} value={form.experience} onChange={set("experience")} placeholder="e.g. 3 years" /></Field>
-                      <Field label="Salary Expectation"><input style={s.input} value={form.salaryExpectation} onChange={set("salaryExpectation")} placeholder="e.g. R25 000 pm" /></Field>
+                      <Field label="City *">
+                        <input style={s.input} value={form.city} onChange={set("city")} placeholder="e.g. Cape Town" />
+                      </Field>
+                      <Field label="Province *">
+                        <select style={s.input} value={form.province} onChange={set("province")}>
+                          <option value="">Select province</option>
+                          {["Eastern Cape","Free State","Gauteng","KwaZulu-Natal","Limpopo","Mpumalanga","Northern Cape","North West","Western Cape"].map(p => (
+                            <option key={p}>{p}</option>
+                          ))}
+                        </select>
+                      </Field>
                     </div>
+
+                    {/* Qualification + Employment status */}
+                    <div style={s.row}>
+                      <Field label="Highest Qualification *">
+                        <select style={s.input} value={form.qualification} onChange={set("qualification")}>
+                          <option value="">Select qualification</option>
+                          <option value="Below Matric">Below Matric</option>
+                          <option value="Matric / Grade 12">Matric / Grade 12</option>
+                          <option value="Certificate">Certificate</option>
+                          <option value="Diploma">Diploma</option>
+                          <option value="Bachelor's Degree">Bachelor's Degree</option>
+                          <option value="Honours Degree">Honours Degree</option>
+                          <option value="Master's Degree">Master's Degree</option>
+                          <option value="Doctorate (PhD)">Doctorate (PhD)</option>
+                        </select>
+                      </Field>
+                      <Field label="Employment Status *">
+                        <select style={s.input} value={form.employmentStatus} onChange={set("employmentStatus")}>
+                          <option value="">Select status</option>
+                          <option value="Employed">Currently Employed</option>
+                          <option value="Unemployed">Unemployed</option>
+                          <option value="Student">Student</option>
+                          <option value="Freelancing">Freelancing / Self-employed</option>
+                        </select>
+                      </Field>
+                    </div>
+
+                    {/* Similar experience section */}
+                    <div style={s.expSection}>
+                      <div style={s.expSectionTitle}>
+                        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" style={{ flexShrink: 0 }}>
+                          <rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"/>
+                        </svg>
+                        Similar Experience
+                      </div>
+                      <Field label="Do you have similar experience for this position? *">
+                        <div style={s.radioGroup}>
+                          {["Yes", "No"].map(opt => (
+                            <label key={opt} style={s.radioLabel}>
+                              <div
+                                style={{ ...s.radioBtn, ...(form.hasSimilarExperience === opt ? s.radioBtnActive : {}) }}
+                                onClick={() => setForm(prev => ({
+                                  ...prev,
+                                  hasSimilarExperience: opt,
+                                  similarExperienceYears: opt === "No" ? "" : prev.similarExperienceYears,
+                                  similarExperienceCompany: opt === "No" ? "" : prev.similarExperienceCompany,
+                                }))}
+                              >
+                                {form.hasSimilarExperience === opt && <div style={s.radioDot} />}
+                              </div>
+                              <span style={s.radioText}>{opt}</span>
+                            </label>
+                          ))}
+                        </div>
+                      </Field>
+                      {form.hasSimilarExperience === "Yes" && (
+                        <div style={s.row}>
+                          <Field label="Years of Similar Experience">
+                            <input style={s.input} value={form.similarExperienceYears} onChange={set("similarExperienceYears")} placeholder="e.g. 3 years" />
+                          </Field>
+                          <Field label="Company Where Gained">
+                            <input style={s.input} value={form.similarExperienceCompany} onChange={set("similarExperienceCompany")} placeholder="e.g. Acme Corp" />
+                          </Field>
+                        </div>
+                      )}
+                    </div>
+
+                    {/* Skills — interactive, works with and without account */}
+                    <div style={s.skillsSection}>
+                      <div style={s.skillsSectionHeader}>
+                        <div style={s.skillsSectionTitle}>
+                          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" style={{ flexShrink: 0 }}>
+                            <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
+                          </svg>
+                          Skills
+                        </div>
+                        <span style={s.skillsVisibleBadge}>
+                          <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+                          Visible to employer
+                        </span>
+                      </div>
+                      <p style={s.skillsSectionHint}>
+                        {jobSeekerProfile
+                          ? "Your profile skills have been pre-filled. Add or remove as needed — the employer will see these."
+                          : "Add your relevant skills below. The employer will see these alongside your application."
+                        }
+                      </p>
+                      {/* Skill input */}
+                      <div style={s.skillInputRow}>
+                        <input
+                          style={{ ...s.input, flex: 1 }}
+                          value={skillInput}
+                          onChange={e => setSkillInput(e.target.value)}
+                          onKeyDown={e => {
+                            if (e.key === "Enter") {
+                              e.preventDefault();
+                              const val = skillInput.trim();
+                              if (val && !form.skills.includes(val)) {
+                                setForm(prev => ({ ...prev, skills: [...prev.skills, val] }));
+                                setSkillInput("");
+                              }
+                            }
+                          }}
+                          placeholder="e.g. Microsoft Excel, Customer Service..."
+                        />
+                        <button
+                          type="button"
+                          style={s.skillAddBtn}
+                          onClick={() => {
+                            const val = skillInput.trim();
+                            if (val && !form.skills.includes(val)) {
+                              setForm(prev => ({ ...prev, skills: [...prev.skills, val] }));
+                              setSkillInput("");
+                            }
+                          }}
+                        >
+                          + Add
+                        </button>
+                      </div>
+                      {/* Skill tags */}
+                      {form.skills.length > 0 ? (
+                        <div style={s.skillTags}>
+                          {form.skills.map(skill => (
+                            <div key={skill} style={s.skillTag}>
+                              {skill}
+                              <button
+                                type="button"
+                                style={s.skillRemoveBtn}
+                                onClick={() => setForm(prev => ({ ...prev, skills: prev.skills.filter(s => s !== skill) }))}
+                              >
+                                ×
+                              </button>
+                            </div>
+                          ))}
+                        </div>
+                      ) : (
+                        <p style={s.skillsEmpty}>No skills added yet. Type a skill above and press Enter or + Add.</p>
+                      )}
+                    </div>
+
+                    {/* Cover Note */}
                     <Field label="Cover Note">
                       <textarea
                         style={{ ...s.input, minHeight: "120px", resize: "vertical", lineHeight: "1.6" }}
@@ -410,13 +614,36 @@ export default function Apply() {
                 {step === 2 && (
                   <div style={s.form}>
                     <ReviewSection title="Personal Information">
-                      <ReviewRow label="Name"               value={`${form.firstName} ${form.lastName}`} />
-                      <ReviewRow label="Email"              value={form.email} />
-                      <ReviewRow label="Phone"              value={form.phone} />
-                      <ReviewRow label="City"               value={form.city} />
-                      <ReviewRow label="Notice Period"      value={form.notice} />
-                      <ReviewRow label="Experience"         value={form.experience} />
-                      <ReviewRow label="Salary Expectation" value={form.salaryExpectation} />
+                      <ReviewRow label="Name"                value={`${form.firstName} ${form.lastName}`} />
+                      <ReviewRow label="Email"               value={form.email} />
+                      <ReviewRow label="Phone"               value={form.phone} />
+                      <ReviewRow label="Date of Birth"       value={form.dateOfBirth} />
+                      <ReviewRow label="Gender"              value={form.gender} />
+                      <ReviewRow label="Street Address"      value={form.address} />
+                      <ReviewRow label="City"                value={form.city} />
+                      <ReviewRow label="Province"            value={form.province} />
+                      <ReviewRow label="Qualification"       value={form.qualification} />
+                      <ReviewRow label="Employment Status"   value={form.employmentStatus} />
+                    </ReviewSection>
+
+                    <ReviewSection title="Experience">
+                      <ReviewRow label="Similar Experience"         value={form.hasSimilarExperience} />
+                      {form.hasSimilarExperience === "Yes" && <>
+                        <ReviewRow label="Years of Similar Exp."   value={form.similarExperienceYears} />
+                        <ReviewRow label="Company"                  value={form.similarExperienceCompany} />
+                      </>}
+                      {form.skills?.length > 0 && (
+                        <div style={{ padding: "6px 0", borderBottom: "1px solid #f8f9fa" }}>
+                          <div style={{ color: "#5f6368", fontSize: "13px", marginBottom: "6px" }}>Skills</div>
+                          <div style={{ display: "flex", flexWrap: "wrap", gap: "5px" }}>
+                            {form.skills.map(skill => (
+                              <span key={skill} style={{ background: "#e3f2fd", border: "1px solid #bdd7f5", color: "#1967d2", borderRadius: "4px", padding: "2px 8px", fontSize: "12px", fontWeight: "500" }}>
+                                {skill}
+                              </span>
+                            ))}
+                          </div>
+                        </div>
+                      )}
                     </ReviewSection>
 
                     {form.coverNote && (
@@ -684,6 +911,31 @@ const s = {
   reviewLabel: { color: "#5f6368" },
   reviewValue: { color: "#202124", textAlign: "right", maxWidth: "60%", wordBreak: "break-word", fontWeight: "500" },
   reviewNote: { background: "#fef7e0", border: "1px solid #fde68a", borderRadius: "4px", padding: "12px 14px", color: "#ea8600", fontSize: "12px", lineHeight: "1.6" },
+
+  // ── Similar experience section ──
+  expSection: { background: "#f8f9fa", border: "1px solid #e3e3e3", borderRadius: "8px", padding: "16px 18px", display: "flex", flexDirection: "column", gap: "14px" },
+  expSectionTitle: { display: "flex", alignItems: "center", gap: "8px", color: "#202124", fontSize: "13px", fontWeight: "600" },
+
+  // ── Radio buttons ──
+  radioGroup: { display: "flex", gap: "16px", alignItems: "center", paddingTop: "4px" },
+  radioLabel: { display: "flex", alignItems: "center", gap: "8px", cursor: "pointer" },
+  radioBtn: { width: "18px", height: "18px", borderRadius: "50%", border: "2px solid #dadce0", background: "#ffffff", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0, transition: "border-color 0.15s", cursor: "pointer" },
+  radioBtnActive: { borderColor: "#1a73e8" },
+  radioDot: { width: "8px", height: "8px", borderRadius: "50%", background: "#1a73e8" },
+  radioText: { color: "#202124", fontSize: "13px", fontWeight: "500", userSelect: "none" },
+
+  // ── Skills section ──
+  skillsSection: { background: "#f8f9fa", border: "1px solid #e3e3e3", borderRadius: "8px", padding: "16px 18px", display: "flex", flexDirection: "column", gap: "12px" },
+  skillsSectionHeader: { display: "flex", alignItems: "center", justifyContent: "space-between" },
+  skillsSectionTitle: { display: "flex", alignItems: "center", gap: "8px", color: "#202124", fontSize: "13px", fontWeight: "600" },
+  skillsVisibleBadge: { display: "inline-flex", alignItems: "center", gap: "5px", background: "#e3f2fd", border: "1px solid #bdd7f5", color: "#1967d2", borderRadius: "4px", padding: "3px 8px", fontSize: "11px", fontWeight: "600" },
+  skillsSectionHint: { color: "#5f6368", fontSize: "12px", lineHeight: "1.5", margin: 0 },
+  skillInputRow: { display: "flex", gap: "8px" },
+  skillAddBtn: { background: "#ffffff", border: "1px solid #dadce0", color: "#1a73e8", borderRadius: "4px", padding: "9px 14px", fontSize: "13px", fontWeight: "600", cursor: "pointer", whiteSpace: "nowrap", fontFamily: '"Circular", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif' },
+  skillTags: { display: "flex", flexWrap: "wrap", gap: "6px" },
+  skillTag: { display: "inline-flex", alignItems: "center", gap: "6px", background: "#ffffff", border: "1px solid #bdd7f5", color: "#1967d2", borderRadius: "4px", padding: "4px 10px", fontSize: "12px", fontWeight: "500" },
+  skillRemoveBtn: { background: "none", border: "none", color: "#9aa0a6", cursor: "pointer", fontSize: "14px", padding: "0", lineHeight: 1, fontWeight: "600" },
+  skillsEmpty: { color: "#9aa0a6", fontSize: "12px", margin: 0 },
 
   // ── Job sidebar card ──
   jobCard: { background: "#ffffff", border: "1px solid #e3e3e3", borderRadius: "8px", padding: "20px", boxShadow: "0 1px 2px 0 rgba(60,64,67,0.06)" },

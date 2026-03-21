@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { doc, updateDoc, serverTimestamp } from "firebase/firestore";
 import { ref, uploadBytes, getDownloadURL } from "firebase/storage";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, Link } from "react-router-dom";
 import { db, storage } from "../../lib/firebase";
 import { useAuth } from "../../context/AuthContext";
 import NotificationDrawer from "../../components/NotificationDrawer";
@@ -105,6 +105,34 @@ export default function Profile() {
     }
     setLoading(false);
   };
+
+  // ── Verification guard ──
+  if (employerProfile?.verificationStatus !== "approved") {
+    return (
+      <div style={s.page}>
+        <Sidebar profile={employerProfile} userId={user?.uid} />
+        <div style={s.mainWrapper}>
+          <div style={s.mainInner}>
+            <div style={{ maxWidth: "480px", margin: "80px auto", background: "#ffffff", border: "1px solid #e3e3e3", borderRadius: "8px", padding: "40px 36px", textAlign: "center", boxShadow: "0 1px 2px 0 rgba(60,64,67,0.1)" }}>
+              <div style={{ width: "56px", height: "56px", borderRadius: "50%", background: "#fef7e0", display: "flex", alignItems: "center", justifyContent: "center", margin: "0 auto 20px" }}>
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#ea8600" strokeWidth="1.5"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+              </div>
+              <h2 style={{ color: "#202124", fontSize: "18px", fontWeight: "600", marginBottom: "10px" }}>Profile locked until approved</h2>
+              <p style={{ color: "#5f6368", fontSize: "13px", lineHeight: "1.7", marginBottom: "20px" }}>
+                Your company profile can only be edited after your account has been verified and approved by Vetted.
+                {employerProfile?.verificationStatus === "submitted" && " Your verification is currently under review."}
+              </p>
+              {(!employerProfile?.verificationStatus || employerProfile?.verificationStatus === "pending") && (
+                <Link to="/employer/verify" style={{ display: "inline-block", background: "#1a73e8", color: "#ffffff", borderRadius: "4px", padding: "9px 20px", fontSize: "13px", fontWeight: "600", textDecoration: "none" }}>
+                  Complete Verification
+                </Link>
+              )}
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div style={s.page}>

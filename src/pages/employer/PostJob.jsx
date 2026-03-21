@@ -166,6 +166,36 @@ export default function PostJob() {
     </div>
   );
 
+  // ── Disabled account guard ──
+  if (employerProfile?.disabled) return (
+    <div style={s.page}>
+      <Sidebar profile={employerProfile} userId={user?.uid} />
+      <div style={s.mainWrapper}>
+        <div style={s.mainInner}>
+          <div style={s.disabledGuard}>
+            <div style={s.disabledIcon}>
+              <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#c5221f" strokeWidth="1.5">
+                <circle cx="12" cy="12" r="10"/>
+                <line x1="4.93" y1="4.93" x2="19.07" y2="19.07"/>
+              </svg>
+            </div>
+            <h2 style={s.disabledTitle}>Account Suspended</h2>
+            <p style={s.disabledText}>
+              Your account has been temporarily suspended by Vetted. You cannot post new jobs at this time.
+              Your existing data, applications and billing history are fully intact.
+            </p>
+            <p style={s.disabledContact}>
+              To resolve this, please contact us at{" "}
+              <a href="mailto:support@vetted.co.za" style={{ color: "#1a73e8", fontWeight: "600" }}>
+                support@vetted.co.za
+              </a>
+            </p>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+
   return (
     <div style={s.page}>
       <Sidebar profile={employerProfile} userId={user?.uid} />
@@ -242,7 +272,21 @@ export default function PostJob() {
                     <input style={s.input} value={form.salary} onChange={set("salary")} placeholder="e.g. R25 000 – R35 000 pm" />
                   </Field>
                   <Field label="Closing Date *">
-                    <input style={s.input} type="date" value={form.closes} onChange={set("closes")} />
+                    <div style={{ display: "flex", gap: "8px" }}>
+                      <input
+                        style={{ ...s.input, flex: 2 }}
+                        type="date"
+                        value={form.closes}
+                        onChange={set("closes")}
+                      />
+                      <input
+                        style={{ ...s.input, flex: 1, minWidth: 0 }}
+                        type="time"
+                        value={form.closesTime}
+                        onChange={set("closesTime")}
+                      />
+                    </div>
+                    <div style={s.closesHint}>Applications after this date and time will not be accepted.</div>
                   </Field>
                 </Row>
                 <label style={s.checkRow}>
@@ -356,7 +400,7 @@ export default function PostJob() {
                     {form.department && <PreviewTag icon="🏢" value={form.department} />}
                     {form.salary && <PreviewTag icon="💰" value={form.salary} />}
                     {form.remote && <PreviewTag icon="🌐" value="Remote / Hybrid" />}
-                    {form.closes && <PreviewTag icon="📅" value={`Closes ${form.closes}`} />}
+                    {form.closes && <PreviewTag icon="📅" value={`Closes ${form.closes}${form.closesTime ? ` at ${form.closesTime}` : ""}`} />}
                   </div>
 
                   {form.description && (
@@ -455,13 +499,13 @@ function Sidebar({ profile, userId }) {
               : <div style={s.profileAvatar}>{profile?.companyName?.[0] || "E"}</div>
             }
           </div>
-          <div style={{ marginBottom: "8px" }}>
-            <NotificationDrawer userId={userId} />
-            </div>
           <div style={{ overflow: "hidden" }}>
             <div style={s.profileName}>{profile?.companyName || "Employer"}</div>
             <div style={s.profileEmail}>Admin Access</div>
           </div>
+        </div>
+        <div style={{ marginBottom: "8px" }}>
+          <NotificationDrawer userId={userId} />
         </div>
       </div>
     </div>
@@ -612,6 +656,7 @@ const s = {
   },
   checkRow: { display: "flex", alignItems: "center", gap: "8px", cursor: "pointer" },
   checkLabel: { color: "#3c4043", fontSize: "13px", fontWeight: "500" },
+  closesHint: { color: "#9aa0a6", fontSize: "11px", marginTop: "4px" },
 
   // ── Bullet Input ──
   bulletInputRow: { display: "flex", gap: "10px" },
@@ -647,4 +692,11 @@ const s = {
 
   // ── Empty ──
   empty: { color: "#5f6368", padding: "48px", textAlign: "center", fontSize: "14px", fontWeight: "500" },
+
+  // ── Disabled account guard ──
+  disabledGuard: { maxWidth: "480px", margin: "80px auto", background: "#ffffff", border: "1px solid #f5c6c2", borderRadius: "8px", padding: "40px 36px", textAlign: "center", boxShadow: "0 1px 2px 0 rgba(60,64,67,0.1)" },
+  disabledIcon: { width: "56px", height: "56px", background: "#fce8e6", borderRadius: "50%", display: "flex", alignItems: "center", justifyContent: "center", margin: "0 auto 20px" },
+  disabledTitle: { color: "#202124", fontSize: "18px", fontWeight: "600", marginBottom: "12px", letterSpacing: "-0.3px" },
+  disabledText: { color: "#5f6368", fontSize: "14px", lineHeight: "1.7", marginBottom: "16px" },
+  disabledContact: { color: "#5f6368", fontSize: "13px", lineHeight: "1.6" },
 };

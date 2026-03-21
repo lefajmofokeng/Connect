@@ -22,6 +22,7 @@ export default function Admin() {
   const [selectedEmployer, setSelectedEmployer] = useState(null);
   const [editingJob, setEditingJob] = useState(null);
   const [confirmDelete, setConfirmDelete] = useState(null);
+  const [confirmDisable, setConfirmDisable] = useState(null);
   const [jobSearch, setJobSearch] = useState("");
   const [empSearch, setEmpSearch] = useState("");
 
@@ -73,11 +74,62 @@ export default function Admin() {
   };
 
   // ── Employer actions ──
-  const approveEmployer = async (id) => {
+  const approveEmployer = async (emp) => {
     try {
-      await updateDoc(doc(db, "employers", id), { verificationStatus: "approved", updatedAt: new Date() });
-      notify("Employer approved.");
-      setSelectedEmployer(prev => prev?.id === id ? { ...prev, verificationStatus: "approved" } : prev);
+      await updateDoc(doc(db, "employers", emp.id), {
+        verificationStatus: "approved",
+        approvedAt: new Date(),
+        updatedAt: new Date(),
+      });
+
+      // Write confirmation email to the `emails` collection.
+      // If you have Firebase Extensions "Trigger Email" installed, this sends automatically.
+      // Otherwise the admin can manually send using the mailto fallback below.
+      try {
+        await import("firebase/firestore").then(async ({ addDoc, collection: col }) => {
+          await addDoc(col(db, "emails"), {
+            to: emp.email,
+            message: {
+              subject: "Your Vetted employer account has been approved",
+              html: `
+                <div style="font-family: Arial, sans-serif; max-width: 520px; margin: 0 auto; padding: 32px 24px; color: #202124;">
+                  <div style="margin-bottom: 24px;">
+                    <span style="background: #ffca28; color: #d84315; font-weight: 700; font-size: 18px; padding: 6px 12px; border-radius: 6px;">V</span>
+                    <span style="font-size: 18px; font-weight: 700; margin-left: 10px;">Vetted</span>
+                  </div>
+                  <h1 style="font-size: 22px; font-weight: 700; margin-bottom: 12px;">Your account has been approved ✓</h1>
+                  <p style="color: #5f6368; font-size: 15px; line-height: 1.7; margin-bottom: 20px;">
+                    Congratulations! <strong>${emp.companyName}</strong> has been verified and approved on Vetted.
+                    You now have full access to your employer dashboard.
+                  </p>
+                  <p style="font-size: 15px; line-height: 1.7; margin-bottom: 28px; color: #5f6368;">
+                    You can now post jobs, manage applications, review candidates, and access all platform features.
+                  </p>
+                  <a href="https://jobs-42a5d.web.app/employer/dashboard"
+                     style="display: inline-block; background: #1a73e8; color: #ffffff; text-decoration: none; padding: 12px 28px; border-radius: 4px; font-weight: 700; font-size: 14px;">
+                    Go to your Dashboard
+                  </a>
+                  <p style="color: #9aa0a6; font-size: 12px; margin-top: 32px; border-top: 1px solid #e3e3e3; padding-top: 16px;">
+                    Vetted (Pty) Ltd · vetted.co.za · support@vetted.co.za
+                  </p>
+                </div>
+              `,
+            },
+            createdAt: new Date(),
+          });
+        });
+      } catch (emailErr) {
+        // Email collection write failed — fallback: open mailto for admin to send manually
+        console.warn("Email collection write failed, opening mailto fallback:", emailErr);
+        const subject = encodeURIComponent("Your Vetted employer account has been approved");
+        const body = encodeURIComponent(
+          `Hi ${emp.companyName},\n\nGreat news! Your Vetted employer account has been approved.\n\nYou now have full access to your dashboard at:\nhttps://jobs-42a5d.web.app/employer/dashboard\n\nYou can now post jobs, manage applications, and access all features.\n\nWelcome to Vetted!\n\nThe Vetted Team\nsupport@vetted.co.za`
+        );
+        window.open(`mailto:${emp.email}?subject=${subject}&body=${body}`);
+      }
+
+      notify(`${emp.companyName} approved. Confirmation email sent to ${emp.email}.`);
+      setSelectedEmployer(prev => prev?.id === emp.id ? { ...prev, verificationStatus: "approved" } : prev);
       fetchAll();
     } catch (err) { notify("Update failed: " + err.message, "error"); }
   };
@@ -94,10 +146,22 @@ export default function Admin() {
   const toggleEmployerDisabled = async (emp) => {
     const disabled = !emp.disabled;
     try {
-      await updateDoc(doc(db, "employers", emp.id), { disabled, updatedAt: new Date() });
-      notify(disabled ? `${emp.companyName} has been disabled.` : `${emp.companyName} has been re-enabled.`);
+      // Only sets the disabled flag — all data, jobs, and applications are fully preserved.
+      // A disabled employer cannot post new jobs but can still view their dashboard.
+      await updateDoc(doc(db, "employers", emp.id), {
+        disabled,
+        disabledAt: disabled ? new Date() : null,
+        updatedAt: new Date(),
+      });
+      notify(
+        disabled
+          ? `${emp.companyName} has been disabled. Their data is preserved — they can no longer post jobs.`
+          : `${emp.companyName} has been re-enabled and can now post jobs again.`,
+        disabled ? "warning" : "success"
+      );
       setSelectedEmployer(prev => prev?.id === emp.id ? { ...prev, disabled } : prev);
       setEmployers(prev => prev.map(e => e.id === emp.id ? { ...e, disabled } : e));
+      setConfirmDisable(null);
     } catch (err) { notify("Update failed: " + err.message, "error"); }
   };
 
@@ -399,7 +463,7 @@ export default function Admin() {
                         <div style={s.drawerActions}>
                           {selectedEmployer.verificationStatus === "submitted" && (
                             <>
-                              <button style={s.btnGreen} onClick={() => approveEmployer(selectedEmployer.id)}>✓ Approve</button>
+                              <button style={s.btnGreen} onClick={() => approveEmployer(selectedEmployer)}>✓ Approve</button>
                               <button style={s.btnRed}   onClick={() => rejectEmployer(selectedEmployer.id)}>✕ Reject</button>
                             </>
                           )}
@@ -458,8 +522,8 @@ export default function Admin() {
                                       : <button style={s.btnSmallGreen} onClick={() => markEmployerPaid(emp)}>✓ Paid</button>
                                     }
                                     {emp.disabled
-                                      ? <button style={s.btnSmallBlue}  onClick={() => toggleEmployerDisabled(emp)}>Enable</button>
-                                      : <button style={s.btnSmallAmber} onClick={() => toggleEmployerDisabled(emp)}>Disable</button>
+                                      ? <button style={s.btnSmallBlue}  onClick={() => setConfirmDisable(emp)}>Enable</button>
+                                      : <button style={s.btnSmallAmber} onClick={() => setConfirmDisable(emp)}>Disable</button>
                                     }
                                     <button style={s.btnSmallRed} onClick={() => setConfirmDelete({ type: "employer", id: emp.id, name: emp.companyName })}>Delete</button>
                                   </div>
@@ -623,6 +687,62 @@ export default function Admin() {
         </>
       )}
 
+      {/* ── Confirm Disable / Enable Modal ── */}
+      {confirmDisable && (
+        <>
+          <div style={s.modalOverlay} onClick={() => setConfirmDisable(null)} />
+          <div style={{ ...s.modal, maxWidth: "440px" }}>
+            <div style={s.modalHeader}>
+              <div style={s.modalTitle}>
+                {confirmDisable.disabled ? "Enable Employer Account" : "Disable Employer Account"}
+              </div>
+              <button style={s.modalClose} onClick={() => setConfirmDisable(null)}>✕</button>
+            </div>
+            <div style={s.modalBody}>
+              {confirmDisable.disabled ? (
+                <>
+                  <div style={{ background: "#e6f4ea", border: "1px solid #ceead6", borderRadius: "6px", padding: "12px 14px", marginBottom: "16px", display: "flex", gap: "10px", alignItems: "flex-start" }}>
+                    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#0d652d" strokeWidth="2" style={{ flexShrink: 0, marginTop: 1 }}><polyline points="20 6 9 17 4 12"/></svg>
+                    <div style={{ color: "#0d652d", fontSize: "13px", lineHeight: "1.5" }}>
+                      <strong>Re-enabling</strong> this account will restore full access. The employer will be able to post jobs again immediately.
+                    </div>
+                  </div>
+                  <p style={{ color: "#5f6368", fontSize: "13px", lineHeight: "1.6", marginBottom: "20px" }}>
+                    Enable <strong style={{ color: "#202124" }}>{confirmDisable.companyName}</strong>? Their data, jobs, applications and billing history are all intact and untouched.
+                  </p>
+                  <div style={{ display: "flex", gap: "10px", justifyContent: "flex-end" }}>
+                    <button style={s.btnGhost} onClick={() => setConfirmDisable(null)}>Cancel</button>
+                    <button style={s.btnGreen} onClick={() => toggleEmployerDisabled(confirmDisable)}>Enable Account</button>
+                  </div>
+                </>
+              ) : (
+                <>
+                  <div style={{ background: "#fef7e0", border: "1px solid #fde68a", borderRadius: "6px", padding: "12px 14px", marginBottom: "16px", display: "flex", gap: "10px", alignItems: "flex-start" }}>
+                    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#ea8600" strokeWidth="2" style={{ flexShrink: 0, marginTop: 1 }}><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+                    <div style={{ color: "#92400e", fontSize: "13px", lineHeight: "1.5" }}>
+                      <strong>This does not delete any data.</strong> The employer's account, jobs, applications, and billing history are fully preserved.
+                    </div>
+                  </div>
+                  <p style={{ color: "#5f6368", fontSize: "13px", lineHeight: "1.6", marginBottom: "8px" }}>
+                    Disabling <strong style={{ color: "#202124" }}>{confirmDisable.companyName}</strong> will:
+                  </p>
+                  <ul style={{ color: "#5f6368", fontSize: "13px", lineHeight: "1.9", marginBottom: "20px", paddingLeft: "18px" }}>
+                    <li>Block them from posting new jobs</li>
+                    <li>Keep their dashboard, applications and billing accessible</li>
+                    <li>Preserve all their data exactly as-is</li>
+                    <li>Allow you to re-enable them at any time</li>
+                  </ul>
+                  <div style={{ display: "flex", gap: "10px", justifyContent: "flex-end" }}>
+                    <button style={s.btnGhost} onClick={() => setConfirmDisable(null)}>Cancel</button>
+                    <button style={s.btnAmber} onClick={() => toggleEmployerDisabled(confirmDisable)}>Disable Account</button>
+                  </div>
+                </>
+              )}
+            </div>
+          </div>
+        </>
+      )}
+
       {/* ── Confirm Delete Modal ── */}
       {confirmDelete && (
         <>
@@ -780,6 +900,7 @@ const s = {
   btnGreen:  { background: "#e6f4ea", color: "#0d652d", border: "1px solid #ceead6", borderRadius: "4px", padding: "8px 14px", fontSize: "13px", fontWeight: "600", cursor: "pointer" },
   btnRed:    { background: "#fce8e6", color: "#c5221f", border: "1px solid #f5c6c2", borderRadius: "4px", padding: "8px 14px", fontSize: "13px", fontWeight: "600", cursor: "pointer" },
   btnBlue:   { background: "#e3f2fd", color: "#1967d2", border: "1px solid #bdd7f5", borderRadius: "4px", padding: "8px 14px", fontSize: "13px", fontWeight: "600", cursor: "pointer" },
+  btnAmber:  { background: "#fef7e0", color: "#92400e", border: "1px solid #fde68a", borderRadius: "4px", padding: "8px 14px", fontSize: "13px", fontWeight: "600", cursor: "pointer" },
   btnGhost:  { background: "transparent", color: "#5f6368", border: "1px solid #dadce0", borderRadius: "4px", padding: "8px 14px", fontSize: "13px", fontWeight: "600", cursor: "pointer" },
 
   btnSmallGreen:  { background: "#e6f4ea", color: "#0d652d", border: "1px solid #ceead6", borderRadius: "4px", padding: "4px 10px", fontSize: "11px", fontWeight: "600", cursor: "pointer", whiteSpace: "nowrap" },

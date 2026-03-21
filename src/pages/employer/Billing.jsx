@@ -26,6 +26,219 @@ export default function Billing() {
     setLoading(false);
   };
 
+  // ── Generate Invoice PDF ───────────────────────────────────────────
+  const generateInvoicePDF = ({ monthLabel, monthAmount, monthLiveCount, monthDueStr, status, monthJobs }) => {
+    const company     = employerProfile?.companyName || "Employer";
+    const email       = user?.email || "";
+    const genDate     = new Date().toLocaleDateString("en-ZA", { day: "numeric", month: "long", year: "numeric" });
+    const invoiceNo   = `VTD-${new Date().getFullYear()}-${String(now.getMonth() + 1).padStart(2, "0")}-${String(user?.uid || "000000").slice(-6).toUpperCase()}`;
+    const statusLabel = status === "paid" ? "PAID" : status === "outstanding" ? "OUTSTANDING" : "NO CHARGE";
+    const statusColor = status === "paid" ? "#0d652d" : status === "outstanding" ? "#ea8600" : "#9aa0a6";
+    const statusBg    = status === "paid" ? "#e6f4ea" : status === "outstanding" ? "#fef7e0" : "#f1f3f4";
+
+    const listingRows = (monthJobs || liveJobs).map((job, i) => `
+      <tr class="${i % 2 === 0 ? "even" : "odd"}">
+        <td>${i + 1}</td>
+        <td><strong>${job.title || "—"}</strong><br><span class="sub">${job.city || ""}${job.province ? `, ${job.province}` : ""}</span></td>
+        <td>${job.department || "—"}</td>
+        <td>${job.type || "—"}</td>
+        <td class="status-live">Live</td>
+        <td class="amount">R ${JOB_PRICE.toLocaleString("en-ZA")}</td>
+      </tr>`).join("");
+
+    const html = `<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>Invoice ${invoiceNo} — Vetted</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { font-family: Arial, Helvetica, sans-serif; font-size: 11px; color: #202124; background: #fff; }
+  .page { padding: 40px 48px; max-width: 800px; margin: 0 auto; }
+
+  /* ── Header ── */
+  .header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 32px; }
+  .brand { display: flex; align-items: center; gap: 12px; }
+  .brand-mark { width: 38px; height: 38px; background: #ffca28; border-radius: 6px; display: flex; align-items: center; justify-content: center; font-size: 20px; font-weight: 700; color: #d84315; }
+  .brand-name { font-size: 22px; font-weight: 700; color: #202124; letter-spacing: -0.5px; }
+  .brand-sub  { font-size: 11px; color: #9aa0a6; margin-top: 1px; }
+  .invoice-meta { text-align: right; }
+  .invoice-title { font-size: 28px; font-weight: 700; color: #202124; letter-spacing: -1px; margin-bottom: 6px; }
+  .invoice-no    { font-size: 12px; color: #5f6368; margin-bottom: 3px; }
+  .invoice-date  { font-size: 11px; color: #9aa0a6; }
+
+  /* ── Divider ── */
+  .divider { border: none; border-top: 2px solid #202124; margin: 0 0 28px; }
+
+  /* ── Bill to / from grid ── */
+  .parties { display: grid; grid-template-columns: 1fr 1fr; gap: 32px; margin-bottom: 28px; }
+  .party-label { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; color: #9aa0a6; margin-bottom: 6px; }
+  .party-name  { font-size: 14px; font-weight: 700; color: #202124; margin-bottom: 2px; }
+  .party-sub   { font-size: 11px; color: #5f6368; line-height: 1.6; }
+
+  /* ── Summary box ── */
+  .summary { display: grid; grid-template-columns: repeat(4, 1fr); gap: 0; border: 1px solid #e3e3e3; border-radius: 6px; overflow: hidden; margin-bottom: 28px; }
+  .summary-item { padding: 14px 18px; border-right: 1px solid #e3e3e3; }
+  .summary-item:last-child { border-right: none; }
+  .summary-label { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.4px; color: #9aa0a6; margin-bottom: 4px; }
+  .summary-value { font-size: 15px; font-weight: 700; color: #202124; }
+  .status-badge  { display: inline-block; padding: 3px 10px; border-radius: 4px; font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.4px; background: ${statusBg}; color: ${statusColor}; }
+
+  /* ── Line items table ── */
+  .section-title { font-size: 12px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.4px; color: #5f6368; margin-bottom: 10px; }
+  table { width: 100%; border-collapse: collapse; margin-bottom: 28px; }
+  thead tr { background: #202124; }
+  thead th { padding: 9px 12px; text-align: left; font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.4px; color: #ffffff; white-space: nowrap; }
+  th.amount, td.amount { text-align: right; }
+  tbody tr.even { background: #ffffff; }
+  tbody tr.odd  { background: #f8f9fa; }
+  tbody td { padding: 10px 12px; vertical-align: top; border-bottom: 1px solid #f1f3f4; font-size: 11px; line-height: 1.4; }
+  tbody tr:last-child td { border-bottom: none; }
+  td .sub { color: #9aa0a6; font-size: 10px; }
+  td.status-live { color: #0d652d; font-weight: 600; }
+  td.amount { font-weight: 600; color: #202124; text-align: right; }
+
+  /* ── Total row ── */
+  .total-row { border-top: 2px solid #202124; }
+  .total-row td { padding: 12px; font-weight: 700; font-size: 13px; color: #202124; }
+  .total-label { text-align: right; }
+  .total-amount { text-align: right; font-size: 16px; }
+
+  /* ── Bank details ── */
+  .bank-section { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; margin-bottom: 28px; }
+  .bank-box { background: #f8f9fa; border: 1px solid #e3e3e3; border-radius: 6px; padding: 16px 18px; }
+  .bank-row { display: flex; justify-content: space-between; padding: 5px 0; font-size: 11px; border-bottom: 1px solid #e3e3e3; }
+  .bank-row:last-child { border-bottom: none; }
+  .bank-key   { color: #5f6368; }
+  .bank-val   { color: #202124; font-weight: 600; text-align: right; }
+  .ref-val    { color: #1967d2; font-weight: 700; font-family: "Courier New", monospace; text-align: right; }
+  .ref-note   { background: #e3f2fd; border: 1px solid #bdd7f5; border-radius: 6px; padding: 12px 14px; color: #1967d2; font-size: 11px; line-height: 1.6; }
+
+  /* ── Footer ── */
+  .footer { border-top: 1px solid #e3e3e3; padding-top: 14px; display: flex; justify-content: space-between; font-size: 10px; color: #9aa0a6; }
+
+  /* ── No listings ── */
+  .no-listings { text-align: center; padding: 32px; color: #9aa0a6; font-size: 12px; background: #f8f9fa; border-radius: 6px; margin-bottom: 28px; }
+
+  @media print {
+    body { font-size: 10px; }
+    .page { padding: 24px 28px; }
+    @page { margin: 1.5cm; size: A4 portrait; }
+  }
+</style>
+</head>
+<body>
+<div class="page">
+
+  <!-- Header -->
+  <div class="header">
+    <div class="brand">
+      <div class="brand-mark">V</div>
+      <div>
+        <div class="brand-name">Vetted</div>
+        <div class="brand-sub">vetted.co.za</div>
+      </div>
+    </div>
+    <div class="invoice-meta">
+      <div class="invoice-title">INVOICE</div>
+      <div class="invoice-no">${invoiceNo}</div>
+      <div class="invoice-date">Generated ${genDate}</div>
+    </div>
+  </div>
+
+  <hr class="divider">
+
+  <!-- Bill From / To -->
+  <div class="parties">
+    <div>
+      <div class="party-label">From</div>
+      <div class="party-name">Vetted (Pty) Ltd</div>
+      <div class="party-sub">vetted.co.za<br>support@vetted.co.za<br>South Africa</div>
+    </div>
+    <div>
+      <div class="party-label">Bill To</div>
+      <div class="party-name">${company}</div>
+      <div class="party-sub">${email}<br>Billing Period: ${monthLabel}<br>Due: ${monthDueStr}</div>
+    </div>
+  </div>
+
+  <!-- Summary -->
+  <div class="summary">
+    <div class="summary-item">
+      <div class="summary-label">Invoice No.</div>
+      <div class="summary-value" style="font-size:12px;">${invoiceNo}</div>
+    </div>
+    <div class="summary-item">
+      <div class="summary-label">Billing Period</div>
+      <div class="summary-value" style="font-size:12px;">${monthLabel}</div>
+    </div>
+    <div class="summary-item">
+      <div class="summary-label">Amount Due</div>
+      <div class="summary-value">R ${monthAmount.toLocaleString("en-ZA")}</div>
+    </div>
+    <div class="summary-item">
+      <div class="summary-label">Status</div>
+      <div class="summary-value"><span class="status-badge">${statusLabel}</span></div>
+    </div>
+  </div>
+
+  <!-- Line Items -->
+  <div class="section-title">Line Items — Active Listings</div>
+  ${monthLiveCount === 0
+    ? `<div class="no-listings">No active listings this period — no charge applies.</div>`
+    : `<table>
+    <thead>
+      <tr>
+        <th style="width:28px">#</th>
+        <th>Job Title</th>
+        <th>Department</th>
+        <th>Type</th>
+        <th>Status</th>
+        <th class="amount">Charge</th>
+      </tr>
+    </thead>
+    <tbody>
+      ${listingRows}
+      <tr class="total-row">
+        <td colspan="5" class="total-label">Total Monthly Charge</td>
+        <td class="total-amount">R ${monthAmount.toLocaleString("en-ZA")}</td>
+      </tr>
+    </tbody>
+  </table>`}
+
+  <!-- Bank Details -->
+  <div class="section-title">Payment Details</div>
+  <div class="bank-section">
+    <div class="bank-box">
+      <div class="bank-row"><span class="bank-key">Bank</span><span class="bank-val">First National Bank (FNB)</span></div>
+      <div class="bank-row"><span class="bank-key">Account Name</span><span class="bank-val">Vetted (Pty) Ltd</span></div>
+      <div class="bank-row"><span class="bank-key">Account No.</span><span class="bank-val">62000000000</span></div>
+      <div class="bank-row"><span class="bank-key">Branch Code</span><span class="bank-val">250655</span></div>
+      <div class="bank-row"><span class="bank-key">Account Type</span><span class="bank-val">Cheque / Current</span></div>
+      <div class="bank-row"><span class="bank-key">Reference</span><span class="ref-val">${email}</span></div>
+    </div>
+    <div class="ref-note">
+      <strong>Important:</strong> Use your registered email address (<strong>${email}</strong>) as the payment reference. This allows us to match your payment to your account. Proof of payment will be sent within 24 hours of clearance.
+    </div>
+  </div>
+
+  <!-- Footer -->
+  <div class="footer">
+    <span>Vetted (Pty) Ltd · vetted.co.za</span>
+    <span>Confidential · For internal use only</span>
+    <span>${invoiceNo} · ${monthLabel}</span>
+  </div>
+
+</div>
+<script>window.onload = () => window.print();</script>
+</body>
+</html>`;
+
+    const win = window.open("", "_blank");
+    win.document.write(html);
+    win.document.close();
+  };
+
   // ── Derived billing data ───────────────────────────────────────────
 
   const liveJobs    = jobs.filter(j => j.status === "live");
@@ -101,6 +314,26 @@ export default function Billing() {
               <h1 style={s.pageTitle}>Billing & Invoices</h1>
               <p style={s.pageSub}>Usage-based billing · R{JOB_PRICE} per live listing per month</p>
             </div>
+            {currentCost > 0 && (
+              <button
+                style={s.downloadInvoiceBtn}
+                onClick={() => generateInvoicePDF({
+                  monthLabel:     now.toLocaleDateString("en-ZA", { month: "long", year: "numeric" }),
+                  monthAmount:    currentCost,
+                  monthLiveCount: liveJobs.length,
+                  monthDueStr:    dueDateStr,
+                  status:         isPaid ? "paid" : "outstanding",
+                  monthJobs:      liveJobs,
+                })}
+              >
+                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                  <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+                  <polyline points="7 10 12 15 17 10"/>
+                  <line x1="12" y1="15" x2="12" y2="3"/>
+                </svg>
+                Download Current Invoice
+              </button>
+            )}
           </div>
 
           {/* ── Current invoice card ── */}
@@ -226,13 +459,20 @@ export default function Billing() {
                           <StatusBadge status={status} isPaid={isPaid && isCurrentMonth} />
                         </td>
                         <td style={s.td}>
-                          {isCurrentMonth && m.amount > 0 && (
+                          {m.amount > 0 && (
                             <button
                               style={s.printBtn}
-                              onClick={() => window.print()}
+                              onClick={() => generateInvoicePDF({
+                                monthLabel:     m.label,
+                                monthAmount:    m.amount,
+                                monthLiveCount: m.liveCount,
+                                monthDueStr:    monthDueStr,
+                                status:         status,
+                                monthJobs:      isCurrentMonth ? liveJobs : [],
+                              })}
                             >
-                              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><polyline points="6 9 6 2 18 2 18 9"/><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/><rect x="6" y="14" width="12" height="8"/></svg>
-                              Print
+                              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+                              Download PDF
                             </button>
                           )}
                         </td>
@@ -443,6 +683,7 @@ const s = {
   topbar: { display: "flex", alignItems: "flex-start", justifyContent: "space-between", marginBottom: "32px", gap: "16px" },
   pageTitle: { color: "#202124", fontSize: "24px", fontWeight: "600", margin: "0 0 4px", letterSpacing: "-0.5px" },
   pageSub: { color: "#5f6368", fontSize: "14px", margin: 0 },
+  downloadInvoiceBtn: { display: "inline-flex", alignItems: "center", gap: "7px", background: "#1a73e8", border: "none", color: "#ffffff", borderRadius: "4px", padding: "9px 18px", fontSize: "13px", fontWeight: "600", cursor: "pointer", whiteSpace: "nowrap", flexShrink: 0, fontFamily: '"Circular", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif' },
   empty: { color: "#5f6368", padding: "48px", textAlign: "center", fontSize: "14px", fontWeight: "500" },
 
   // ── Invoice hero card ──

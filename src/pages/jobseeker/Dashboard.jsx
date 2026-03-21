@@ -37,20 +37,24 @@ export default function JobSeekerDashboard() {
 
   const [form, setForm] = useState({
     firstName: "", lastName: "", phone: "", city: "",
-    province: "", bio: "", skills: [],
+    province: "", address: "", qualification: "", employmentStatus: "",
+    bio: "", skills: [],
   });
 
   // Load profile into form whenever profile changes
   useEffect(() => {
     if (jobSeekerProfile) {
       setForm({
-        firstName: jobSeekerProfile.firstName || "",
-        lastName: jobSeekerProfile.lastName || "",
-        phone: jobSeekerProfile.phone || "",
-        city: jobSeekerProfile.city || "",
-        province: jobSeekerProfile.province || "",
-        bio: jobSeekerProfile.bio || "",
-        skills: jobSeekerProfile.skills || [],
+        firstName:        jobSeekerProfile.firstName        || "",
+        lastName:         jobSeekerProfile.lastName         || "",
+        phone:            jobSeekerProfile.phone            || "",
+        city:             jobSeekerProfile.city             || "",
+        province:         jobSeekerProfile.province         || "",
+        address:          jobSeekerProfile.address          || "",
+        qualification:    jobSeekerProfile.qualification    || "",
+        employmentStatus: jobSeekerProfile.employmentStatus || "",
+        bio:              jobSeekerProfile.bio              || "",
+        skills:           jobSeekerProfile.skills           || [],
       });
       if (jobSeekerProfile.photoUrl) setPhotoPreview(jobSeekerProfile.photoUrl);
     }
@@ -141,14 +145,17 @@ export default function JobSeekerDashboard() {
 
       // Use setDoc with merge:true so it works whether doc exists or not
       await setDoc(doc(db, "jobseekers", user.uid), {
-        email: user.email,
-        firstName: form.firstName,
-        lastName: form.lastName,
-        phone: form.phone,
-        city: form.city,
-        province: form.province,
-        bio: form.bio,
-        skills: form.skills,
+        email:            user.email,
+        firstName:        form.firstName,
+        lastName:         form.lastName,
+        phone:            form.phone,
+        city:             form.city,
+        province:         form.province,
+        address:          form.address,
+        qualification:    form.qualification,
+        employmentStatus: form.employmentStatus,
+        bio:              form.bio,
+        skills:           form.skills,
         photoUrl,
         cvUrl,
         cvFilename,
@@ -360,6 +367,9 @@ export default function JobSeekerDashboard() {
                       <Field label="Phone Number">
                         <input style={s.input} type="tel" value={form.phone} onChange={set("phone")} placeholder="071 000 0000" />
                       </Field>
+                      <Field label="Street Address">
+                        <input style={s.input} value={form.address} onChange={set("address")} placeholder="e.g. 123 Riverside Drive, Witsieshoek 9870" />
+                      </Field>
                       <div style={s.row}>
                         <Field label="City">
                           <input style={s.input} value={form.city} onChange={set("city")} placeholder="Cape Town" />
@@ -368,6 +378,30 @@ export default function JobSeekerDashboard() {
                           <select style={s.input} value={form.province} onChange={set("province")}>
                             <option value="">Select province</option>
                             {PROVINCES.map(p => <option key={p}>{p}</option>)}
+                          </select>
+                        </Field>
+                      </div>
+                      <div style={s.row}>
+                        <Field label="Highest Qualification">
+                          <select style={s.input} value={form.qualification} onChange={set("qualification")}>
+                            <option value="">Select qualification</option>
+                            <option value="Below Matric">Below Matric</option>
+                            <option value="Matric / Grade 12">Matric / Grade 12</option>
+                            <option value="Certificate">Certificate</option>
+                            <option value="Diploma">Diploma</option>
+                            <option value="Bachelor's Degree">Bachelor's Degree</option>
+                            <option value="Honours Degree">Honours Degree</option>
+                            <option value="Master's Degree">Master's Degree</option>
+                            <option value="Doctorate (PhD)">Doctorate (PhD)</option>
+                          </select>
+                        </Field>
+                        <Field label="Employment Status">
+                          <select style={s.input} value={form.employmentStatus} onChange={set("employmentStatus")}>
+                            <option value="">Select status</option>
+                            <option value="Employed">Currently Employed</option>
+                            <option value="Unemployed">Unemployed</option>
+                            <option value="Student">Student</option>
+                            <option value="Freelancing">Freelancing / Self-employed</option>
                           </select>
                         </Field>
                       </div>

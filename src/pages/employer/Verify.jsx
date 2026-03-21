@@ -31,6 +31,7 @@ export default function Verify() {
   const [step, setStep] = useState(0);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
+  const [submitted, setSubmitted] = useState(false);
 
   const [form, setForm] = useState({
     companyName: "", industry: "", companySize: "", province: "", city: "",
@@ -124,13 +125,70 @@ export default function Verify() {
         updatedAt: serverTimestamp(),
       });
       await refreshProfile();
-      navigate("/employer/dashboard");
+      setSubmitted(true);
     } catch (err) {
       console.error(err);
       setError("Upload failed. Please check your files and try again.");
     }
     setLoading(false);
   };
+
+  // ── Submitted — waiting for approval ──
+  if (submitted) return (
+    <div style={s.page}>
+      <div style={s.leftPanel}>
+        <div style={s.brandWrap}>
+          <div style={s.logoMark}>V</div>
+          <div style={s.brandName}>Vetted</div>
+        </div>
+        <div style={s.brandBody}>
+          <h2 style={s.brandHeading}>Verification Submitted</h2>
+          <p style={s.brandSub}>Our team will review your documents and respond within 1–2 business days.</p>
+        </div>
+        <div style={s.brandFooter}>vetted.co.za</div>
+      </div>
+      <div style={s.rightPanel}>
+        <div style={s.formWrap}>
+          <div style={s.pendingCard}>
+            <div style={s.pendingIconWrap}>
+              <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#1967d2" strokeWidth="1.5">
+                <circle cx="12" cy="12" r="10"/>
+                <polyline points="12 6 12 12 16 14"/>
+              </svg>
+            </div>
+            <h1 style={s.pendingTitle}>Application under review</h1>
+            <p style={s.pendingText}>
+              Your verification documents have been submitted successfully. The Vetted team will review your application and send a confirmation to <strong>{user?.email}</strong> once approved.
+            </p>
+            <div style={s.pendingSteps}>
+              {[
+                { label: "Documents submitted", done: true },
+                { label: "Admin review (1–2 business days)", done: false },
+                { label: "Confirmation email sent to you", done: false },
+                { label: "Full dashboard access unlocked", done: false },
+              ].map((item, i) => (
+                <div key={i} style={s.pendingStep}>
+                  <div style={{ ...s.pendingStepDot, ...(item.done ? s.pendingStepDotDone : {}) }}>
+                    {item.done
+                      ? <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3"><polyline points="20 6 9 17 4 12"/></svg>
+                      : <div style={s.pendingStepNum}>{i + 1}</div>
+                    }
+                  </div>
+                  <span style={{ ...s.pendingStepLabel, ...(item.done ? { color: "#0d652d", fontWeight: "600" } : {}) }}>
+                    {item.label}
+                  </span>
+                </div>
+              ))}
+            </div>
+            <p style={s.pendingNote}>
+              You'll receive an email once your account is approved. If you haven't heard back in 2 business days, contact us at{" "}
+              <a href="mailto:support@vetted.co.za" style={{ color: "#1a73e8", fontWeight: "600" }}>support@vetted.co.za</a>.
+            </p>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
 
   return (
     <div style={s.page}>
@@ -721,6 +779,19 @@ const s = {
     fontSize: "13px",
     lineHeight: "1.6",
   },
+
+  // ── Pending / submitted card ──
+  pendingCard: { background: "#ffffff", border: "1px solid #e3e3e3", borderRadius: "8px", padding: "40px 36px", textAlign: "center", boxShadow: "0 1px 2px 0 rgba(60,64,67,0.1)" },
+  pendingIconWrap: { width: "60px", height: "60px", background: "#e3f2fd", borderRadius: "50%", display: "flex", alignItems: "center", justifyContent: "center", margin: "0 auto 20px" },
+  pendingTitle: { color: "#202124", fontSize: "20px", fontWeight: "600", marginBottom: "12px", letterSpacing: "-0.3px" },
+  pendingText: { color: "#5f6368", fontSize: "14px", lineHeight: "1.7", marginBottom: "28px" },
+  pendingSteps: { display: "flex", flexDirection: "column", gap: "12px", textAlign: "left", marginBottom: "28px", background: "#f8f9fa", border: "1px solid #e3e3e3", borderRadius: "6px", padding: "16px 20px" },
+  pendingStep: { display: "flex", alignItems: "center", gap: "12px" },
+  pendingStepDot: { width: "24px", height: "24px", borderRadius: "50%", background: "#f1f3f4", border: "2px solid #e3e3e3", color: "#9aa0a6", fontSize: "11px", fontWeight: "700", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 },
+  pendingStepDotDone: { background: "#e6f4ea", border: "2px solid #34a853", color: "#0d652d" },
+  pendingStepNum: { fontSize: "11px", fontWeight: "700", color: "#9aa0a6" },
+  pendingStepLabel: { color: "#5f6368", fontSize: "13px" },
+  pendingNote: { color: "#9aa0a6", fontSize: "12px", lineHeight: "1.6" },
 
   // ── Navigation buttons ──
   navRow: { display: "flex", alignItems: "center", gap: "12px", paddingBottom: "48px" },

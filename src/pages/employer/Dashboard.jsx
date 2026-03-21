@@ -1,4 +1,3 @@
-import React from "react";
 import { useState, useEffect } from "react";
 import { collection, query, where, getDocs, doc, updateDoc, deleteDoc, serverTimestamp } from "firebase/firestore";
 import { useNavigate, Link } from "react-router-dom";
@@ -101,6 +100,101 @@ export default function Dashboard() {
     </Layout>
   );
 
+  // ── Verification guard — only approved employers see the full dashboard ──
+  const verStatus = employerProfile?.verificationStatus;
+  if (verStatus !== "approved") {
+    return (
+      <div style={s.page}>
+        <div style={s.sidebar}>
+          <div style={s.sidebarHeader}>
+            <div style={s.projectSelector}>
+              <div style={s.logoMark}>V</div>
+              <div style={s.projectInfo}>
+                <div style={s.logoText}>Vetted</div>
+                <div style={s.logoSub}>Employer Portal</div>
+              </div>
+            </div>
+          </div>
+          <div style={{ flex: 1 }} />
+          <div style={s.sidebarBottom}>
+            <div style={s.profileChip}>
+              <div style={s.profileAvatarWrap}>
+                <div style={s.profileAvatar}>{employerProfile?.companyName?.[0] || "E"}</div>
+              </div>
+              <div style={{ overflow: "hidden" }}>
+                <div style={s.profileName}>{employerProfile?.companyName || "Employer"}</div>
+                <div style={s.profileEmail}>{user?.email}</div>
+              </div>
+            </div>
+            <button onClick={handleSignOut} style={s.signOutBtn}>Sign Out</button>
+          </div>
+        </div>
+        <div style={s.mainWrapper}>
+          <div style={s.mainInner}>
+            <div style={{
+              maxWidth: "520px", margin: "80px auto", background: "#ffffff",
+              border: "1px solid #e3e3e3", borderRadius: "8px", padding: "44px 40px",
+              textAlign: "center", boxShadow: "0 1px 2px 0 rgba(60,64,67,0.1)",
+            }}>
+              {/* Icon */}
+              <div style={{ width: "60px", height: "60px", borderRadius: "50%", background: verStatus === "submitted" ? "#e3f2fd" : "#fef7e0", display: "flex", alignItems: "center", justifyContent: "center", margin: "0 auto 20px" }}>
+                {verStatus === "submitted"
+                  ? <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#1967d2" strokeWidth="1.5"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+                  : <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#ea8600" strokeWidth="1.5"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+                }
+              </div>
+
+              {/* Title */}
+              <h1 style={{ color: "#202124", fontSize: "20px", fontWeight: "600", marginBottom: "12px", letterSpacing: "-0.3px" }}>
+                {verStatus === "submitted" ? "Verification pending" : verStatus === "rejected" ? "Verification rejected" : "Verification required"}
+              </h1>
+
+              {/* Message */}
+              <p style={{ color: "#5f6368", fontSize: "14px", lineHeight: "1.7", marginBottom: "24px" }}>
+                {verStatus === "submitted"
+                  ? <>Your verification documents have been submitted and are under review. You'll receive a confirmation email at <strong>{user?.email}</strong> once approved. This typically takes 1–2 business days.</>
+                  : verStatus === "rejected"
+                  ? <>Your verification was not approved. Please contact <a href="mailto:support@vetted.co.za" style={{ color: "#1a73e8", fontWeight: "600" }}>support@vetted.co.za</a> for more information.</>
+                  : <>To access your employer dashboard, you need to complete the verification process first. This helps us ensure all employers on Vetted are legitimate businesses.</>
+                }
+              </p>
+
+              {/* Steps (only for submitted) */}
+              {verStatus === "submitted" && (
+                <div style={{ background: "#f8f9fa", border: "1px solid #e3e3e3", borderRadius: "6px", padding: "16px 20px", textAlign: "left", marginBottom: "24px" }}>
+                  {[
+                    { label: "Documents submitted", done: true },
+                    { label: "Admin review (1–2 business days)", done: false },
+                    { label: "Confirmation email sent to you", done: false },
+                    { label: "Full dashboard access unlocked", done: false },
+                  ].map((item, i) => (
+                    <div key={i} style={{ display: "flex", alignItems: "center", gap: "12px", marginBottom: i < 3 ? "10px" : "0" }}>
+                      <div style={{ width: "22px", height: "22px", borderRadius: "50%", flexShrink: 0, display: "flex", alignItems: "center", justifyContent: "center", background: item.done ? "#e6f4ea" : "#f1f3f4", border: `2px solid ${item.done ? "#34a853" : "#e3e3e3"}`, color: item.done ? "#0d652d" : "#9aa0a6", fontSize: "10px", fontWeight: "700" }}>
+                        {item.done ? <svg width="9" height="9" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3"><polyline points="20 6 9 17 4 12"/></svg> : i + 1}
+                      </div>
+                      <span style={{ fontSize: "13px", color: item.done ? "#0d652d" : "#5f6368", fontWeight: item.done ? "600" : "400" }}>{item.label}</span>
+                    </div>
+                  ))}
+                </div>
+              )}
+
+              {/* CTA */}
+              {(!verStatus || verStatus === "pending") && (
+                <Link to="/employer/verify" style={{ display: "inline-block", background: "#1a73e8", color: "#ffffff", borderRadius: "4px", padding: "10px 24px", fontSize: "13px", fontWeight: "600", textDecoration: "none" }}>
+                  Start Verification
+                </Link>
+              )}
+
+              <p style={{ color: "#9aa0a6", fontSize: "12px", marginTop: "20px" }}>
+                Questions? <a href="mailto:support@vetted.co.za" style={{ color: "#1a73e8" }}>support@vetted.co.za</a>
+              </p>
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <Layout profile={employerProfile} onSignOut={handleSignOut} userId={user?.uid} jobs={jobs} applications={applications}>
 
@@ -128,9 +222,6 @@ export default function Dashboard() {
         <StatCard label="New Applications"  value={newApps.length}        color="#d93025" />
         <StatCard label="Top Location"      value={topLocation}           color="#1a73e8" small />
       </div>
-
-      {/* Performance Alerts */}
-      <PerformanceAlerts jobs={jobs} applications={applications} />
 
       {/* Usage & Billing */}
       <div style={s.section}>
@@ -402,305 +493,6 @@ function pillColor(status) {
   };
   return map[status] || { background: "#f1f3f4", color: "#3c4043" };
 }
-
-// ── PerformanceAlerts ─────────────────────────────────────────────────
-// Drop this component into Dashboard.jsx
-// Then add this one line in the JSX, right after the </div> that closes the statsGrid:
-//
-//   <PerformanceAlerts jobs={jobs} applications={applications} />
-//
-// That's it. Nothing else changes.
-
-function PerformanceAlerts({ jobs, applications }) {
-  const [dismissed, setDismissed] = React.useState(() => {
-    try { return JSON.parse(localStorage.getItem("vt_alerts_dismissed") || "[]"); }
-    catch { return []; }
-  });
-
-  const dismiss = (id) => {
-    const updated = [...new Set([...dismissed, id])];
-    localStorage.setItem("vt_alerts_dismissed", JSON.stringify(updated));
-    setDismissed(updated);
-  };
-
-  const now = new Date();
-  const alerts = [];
-
-  // ── 1. Unreviewed applications ──────────────────────────────────────
-  const unreviewed = applications.filter(a => a.status === "new");
-  if (unreviewed.length >= 5) {
-    alerts.push({
-      id: "unreviewed-pile",
-      type: "warning",
-      icon: (
-        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-          <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/>
-          <line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/>
-        </svg>
-      ),
-      color: "#ea8600",
-      bg: "#fef7e0",
-      border: "#fde68a",
-      message: `You have ${unreviewed.length} unreviewed applications piling up.`,
-      sub: "Candidates may lose interest if they don't hear back. Review them now.",
-      action: "/employer/applications",
-      actionLabel: "Review applications",
-    });
-  }
-
-  // ── 2. Live job with zero applications ──────────────────────────────
-  const liveWithNoApps = jobs.filter(j => {
-    if (j.status !== "live") return false;
-    return applications.filter(a => a.jobId === j.id).length === 0;
-  });
-  liveWithNoApps.forEach(job => {
-    alerts.push({
-      id: `no-apps-${job.id}`,
-      type: "info",
-      icon: (
-        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-          <circle cx="12" cy="12" r="10"/>
-          <line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/>
-        </svg>
-      ),
-      color: "#1967d2",
-      bg: "#e3f2fd",
-      border: "#bdd7f5",
-      message: `"${job.title}" is live but has received no applications yet.`,
-      sub: "Check that the job description and requirements are clear and attractive.",
-      action: `/employer/post-job?edit=${job.id}`,
-      actionLabel: "Edit listing",
-    });
-  });
-
-  // ── 3. Job closing within 3 days ────────────────────────────────────
-  jobs.forEach(job => {
-    if (job.status !== "live" || !job.closes) return;
-    const closes = parseSADateAlert(job.closes);
-    if (!closes) return;
-    const diffDays = Math.ceil((closes - now) / (1000 * 60 * 60 * 24));
-    if (diffDays >= 0 && diffDays <= 3) {
-      const jobApps = applications.filter(a => a.jobId === job.id);
-      alerts.push({
-        id: `closing-alert-${job.id}`,
-        type: "warning",
-        icon: (
-          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-            <circle cx="12" cy="12" r="10"/>
-            <polyline points="12 6 12 12 16 14"/>
-          </svg>
-        ),
-        color: "#ea8600",
-        bg: "#fef7e0",
-        border: "#fde68a",
-        message: `"${job.title}" closes ${diffDays === 0 ? "today" : `in ${diffDays} day${diffDays !== 1 ? "s" : ""}`} with ${jobApps.length} application${jobApps.length !== 1 ? "s" : ""}.`,
-        sub: diffDays === 0
-          ? "Last chance — make sure you've reviewed all applications before it expires."
-          : "Review applications before the closing date to avoid missing good candidates.",
-        action: "/employer/applications",
-        actionLabel: "Review now",
-      });
-    }
-  });
-
-  // ── 4. Draft jobs sitting idle ───────────────────────────────────────
-  const drafts = jobs.filter(j => j.status === "draft");
-  if (drafts.length > 0) {
-    alerts.push({
-      id: "idle-drafts",
-      type: "tip",
-      icon: (
-        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-          <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/>
-        </svg>
-      ),
-      color: "#5f6368",
-      bg: "#f1f3f4",
-      border: "#e3e3e3",
-      message: `You have ${drafts.length} draft listing${drafts.length !== 1 ? "s" : ""} that ${drafts.length !== 1 ? "are" : "is"} not yet live.`,
-      sub: "Publish them when ready to start receiving applications.",
-      action: "/employer/dashboard",
-      actionLabel: "View drafts",
-    });
-  }
-
-  // ── 5. High performer — celebrate ───────────────────────────────────
-  const topJob = jobs
-    .map(j => ({ ...j, count: applications.filter(a => a.jobId === j.id).length }))
-    .sort((a, b) => b.count - a.count)[0];
-  if (topJob && topJob.count >= 10) {
-    alerts.push({
-      id: `top-performer-${topJob.id}`,
-      type: "success",
-      icon: (
-        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-          <polyline points="20 6 9 17 4 12"/>
-        </svg>
-      ),
-      color: "#0d652d",
-      bg: "#e6f4ea",
-      border: "#ceead6",
-      message: `"${topJob.title}" is performing great with ${topJob.count} applications.`,
-      sub: "This is your highest-performing listing. Keep the description updated.",
-      action: `/employer/applications`,
-      actionLabel: "View applicants",
-    });
-  }
-
-  // Filter out dismissed
-  const visible = alerts.filter(a => !dismissed.includes(a.id));
-
-  if (visible.length === 0) return null;
-
-  return (
-    <div style={pa.wrap}>
-      <div style={pa.header}>
-        <div style={pa.headerLeft}>
-          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#1967d2" strokeWidth="2">
-            <path d="M22 12h-4l-3 9L9 3l-3 9H2"/>
-          </svg>
-          <span style={pa.headerTitle}>Performance Alerts</span>
-          <span style={pa.headerCount}>{visible.length}</span>
-        </div>
-      </div>
-
-      <div style={pa.list}>
-        {visible.map(alert => (
-          <div key={alert.id} style={{ ...pa.alertRow, background: alert.bg, borderColor: alert.border }}>
-            {/* Icon */}
-            <div style={{ ...pa.alertIcon, color: alert.color }}>
-              {alert.icon}
-            </div>
-
-            {/* Text */}
-            <div style={pa.alertBody}>
-              <div style={{ ...pa.alertMessage, color: alert.color }}>{alert.message}</div>
-              <div style={pa.alertSub}>{alert.sub}</div>
-            </div>
-
-            {/* Action */}
-            <a href={alert.action} style={{ ...pa.alertAction, color: alert.color }}>
-              {alert.actionLabel} →
-            </a>
-
-            {/* Dismiss */}
-            <button
-              style={pa.dismissBtn}
-              onClick={() => dismiss(alert.id)}
-              title="Dismiss"
-            >
-              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                <line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/>
-              </svg>
-            </button>
-          </div>
-        ))}
-      </div>
-    </div>
-  );
-}
-
-    // Used only inside PerformanceAlerts
-    // Used only inside PerformanceAlerts
-function parseSADateAlert(str) {
-    if (!str) return null;
-    if (str.includes("/")) {
-        const [d, m, y] = str.split("/");
-        return new Date(y, m - 1, d);
-    }
-    return new Date(str);
-    }
-
-    const pa = {
-    wrap: {
-        marginBottom: "32px",
-        background: "#ffffff",
-        borderRadius: "8px",
-        border: "1px solid #e3e3e3",
-        overflow: "hidden",
-        boxShadow: "0 1px 2px 0 rgba(60,64,67,0.06)",
-    },
-    header: {
-        display: "flex",
-        alignItems: "center",
-        justifyContent: "space-between",
-        padding: "12px 20px",
-        borderBottom: "1px solid #f1f3f4",
-        background: "#f8f9fa",
-    },
-    headerLeft: {
-        display: "flex",
-        alignItems: "center",
-        gap: "8px",
-    },
-    headerTitle: {
-        color: "#202124",
-        fontSize: "13px",
-        fontWeight: "600",
-    },
-    headerCount: {
-        background: "#e3f2fd",
-        color: "#1967d2",
-        borderRadius: "10px",
-        padding: "1px 7px",
-        fontSize: "11px",
-        fontWeight: "700",
-    },
-    list: {
-        display: "flex",
-        flexDirection: "column",
-        gap: "0",
-    },
-    alertRow: {
-        display: "flex",
-        alignItems: "flex-start",
-        gap: "12px",
-        padding: "14px 20px",
-        borderBottom: "1px solid",
-        transition: "opacity 0.2s",
-    },
-    alertIcon: {
-        flexShrink: 0,
-        marginTop: "2px",
-        display: "flex",
-        alignItems: "center",
-    },
-    alertBody: {
-        flex: 1,
-        minWidth: 0,
-    },
-    alertMessage: {
-        fontSize: "13px",
-        fontWeight: "600",
-        marginBottom: "2px",
-        lineHeight: "1.4",
-    },
-    alertSub: {
-        color: "#5f6368",
-        fontSize: "12px",
-        lineHeight: "1.5",
-    },
-    alertAction: {
-        fontSize: "12px",
-        fontWeight: "600",
-        textDecoration: "none",
-        whiteSpace: "nowrap",
-        flexShrink: 0,
-        alignSelf: "center",
-    },
-    dismissBtn: {
-        background: "none",
-        border: "none",
-        cursor: "pointer",
-        color: "#9aa0a6",
-        padding: "2px",
-        display: "flex",
-        alignItems: "center",
-        flexShrink: 0,
-        alignSelf: "flex-start",
-        marginTop: "2px",
-    },
-    };
 
 // ── Styles ────────────────────────────────────────────────────────────
 const s = {
