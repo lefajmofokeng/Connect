@@ -3,6 +3,8 @@ import { collection, query, where, getDocs, doc, getDoc } from "firebase/firesto
 import { useParams, useNavigate, Link } from "react-router-dom";
 import { db } from "../../lib/firebase";
 import { useAuth } from "../../context/AuthContext";
+import Navbar from "../../components/Navbar";
+import Footer from "../../components/Footer";
 
 export default function CompanyPage() {
   const { slug } = useParams();
@@ -11,7 +13,6 @@ export default function CompanyPage() {
   const [employer, setEmployer] = useState(null);
   const [jobs, setJobs] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [menuOpen, setMenuOpen] = useState(false);
 
   useEffect(() => { fetchData(); }, [slug]);
 
@@ -40,15 +41,12 @@ export default function CompanyPage() {
     setLoading(false);
   };
 
-  const isJobSeeker = user && jobSeekerProfile;
-  const jsPhoto    = jobSeekerProfile?.photoUrl || null;
-  const jsInitials = jobSeekerProfile?.firstName?.[0]?.toUpperCase() || user?.email?.[0]?.toUpperCase() || null;
-  const accent     = employer?.brandColour || "#1a73e8";
+  const accent = employer?.brandColour || "#1a73e8";
 
   // ── Loading skeleton ──
   if (loading) return (
     <div style={s.page}>
-      <Navbar menuOpen={menuOpen} setMenuOpen={setMenuOpen} navigate={navigate} isJobSeeker={isJobSeeker} jsPhoto={jsPhoto} jsInitials={jsInitials} />
+      <Navbar />
       <div style={s.loadingWrap}>
         <div style={{ ...s.skeleton, height: 160 }} />
         <div style={s.loadingBody}>
@@ -67,7 +65,7 @@ export default function CompanyPage() {
   // ── Not found ──
   if (!employer) return (
     <div style={s.page}>
-      <Navbar menuOpen={menuOpen} setMenuOpen={setMenuOpen} navigate={navigate} isJobSeeker={isJobSeeker} jsPhoto={jsPhoto} jsInitials={jsInitials} />
+      <Navbar />
       <div style={s.emptyWrap}>
         <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="#dadce0" strokeWidth="1.5" style={{ marginBottom: 16 }}>
           <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/>
@@ -81,7 +79,7 @@ export default function CompanyPage() {
 
   return (
     <div style={s.page}>
-      <Navbar menuOpen={menuOpen} setMenuOpen={setMenuOpen} navigate={navigate} isJobSeeker={isJobSeeker} jsPhoto={jsPhoto} jsInitials={jsInitials} />
+      <Navbar />
 
       {/* ── Hero banner ── */}
       <div style={{ ...s.hero, background: `${accent}0d`, borderBottom: `3px solid ${accent}` }}>
@@ -281,23 +279,12 @@ export default function CompanyPage() {
       </div>
 
       {/* Footer */}
-      <footer style={s.footer}>
-        <div style={s.footerInner}>
-          <span>© {new Date().getFullYear()} Vetted. All rights reserved.</span>
-          <div style={{ display: "flex", gap: "24px" }}>
-            <Link to="/" style={s.footerLink}>Home</Link>
-            <Link to="/jobs" style={s.footerLink}>Browse Jobs</Link>
-            <Link to="/terms" style={s.footerLink}>Terms</Link>
-            <Link to="/privacy" style={s.footerLink}>Privacy</Link>
-          </div>
-        </div>
-      </footer>
+      <Footer />
 
       <style>{`
         @keyframes shimmer { 0%{background-position:200% 0} 100%{background-position:-200% 0} }
         @media (max-width: 900px) { .cp-layout{grid-template-columns:1fr!important} .cp-side{position:static!important} }
         @media (max-width: 768px) {
-          .cp-nav-links{display:none!important} .cp-menu-toggle{display:flex!important}
           .cp-hero-inner{flex-direction:column!important;align-items:flex-start!important;gap:16px!important}
           .cp-job-row{flex-direction:column!important;align-items:flex-start!important;gap:12px!important}
           .cp-job-row-right{width:100%!important;flex-direction:row!important;justify-content:space-between!important;align-items:center!important}
@@ -305,51 +292,6 @@ export default function CompanyPage() {
         .cp-job-row:hover{border-color:#1a73e8!important;background:#f8fbff!important}
       `}</style>
     </div>
-  );
-}
-
-// ── Navbar ────────────────────────────────────────────────────────────
-function Navbar({ menuOpen, setMenuOpen, navigate, isJobSeeker, jsPhoto, jsInitials }) {
-  return (
-    <nav style={s.navbar}>
-      <div style={s.navInner}>
-        <div onClick={() => navigate("/")} style={s.navLogo}>
-          <img src="/logo.png" alt="Vetted" style={s.navLogoImg} />
-        </div>
-        <div style={s.navLinks} className="cp-nav-links">
-          <Link to="/jobs" style={s.navLink}>Browse Jobs</Link>
-          <Link to="/employer/join" style={s.navLink}>For Employers</Link>
-          {isJobSeeker ? (
-            <div style={s.navAvatar} onClick={() => navigate("/jobseeker/dashboard")} title="My Profile">
-              {jsPhoto
-                ? <img src={jsPhoto} alt="" style={s.navAvatarImg} />
-                : <div style={s.navAvatarInitials}>{jsInitials}</div>
-              }
-            </div>
-          ) : (
-            <Link to="/jobseeker/login" style={s.navLink}>Sign In</Link>
-          )}
-          <Link to="/employer/login" style={s.navBtn}>Employer Login</Link>
-        </div>
-        <button style={s.menuToggle} className="cp-menu-toggle" onClick={() => setMenuOpen(o => !o)}>
-          {menuOpen
-            ? <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#202124" strokeWidth="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
-            : <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#202124" strokeWidth="2"><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
-          }
-        </button>
-      </div>
-      {menuOpen && (
-        <div style={s.mobileMenu}>
-          <Link to="/jobs" style={s.mobileLink} onClick={() => setMenuOpen(false)}>Browse Jobs</Link>
-          <Link to="/employer/join" style={s.mobileLink} onClick={() => setMenuOpen(false)}>For Employers</Link>
-          {isJobSeeker
-            ? <Link to="/jobseeker/dashboard" style={s.mobileLink} onClick={() => setMenuOpen(false)}>My Profile</Link>
-            : <Link to="/jobseeker/login" style={s.mobileLink} onClick={() => setMenuOpen(false)}>Sign In</Link>
-          }
-          <Link to="/employer/login" style={s.mobileLinkBtn} onClick={() => setMenuOpen(false)}>Employer Login</Link>
-        </div>
-      )}
-    </nav>
   );
 }
 
@@ -375,24 +317,8 @@ const s = {
     flexDirection: "column",
   },
 
-  // ── Navbar ── white, clean, consistent with public pages
-  navbar: { background: "#ffffff", borderBottom: "1px solid #e3e3e3", position: "sticky", top: 0, zIndex: 100, boxShadow: "0 1px 2px rgba(60,64,67,0.06)" },
-  navInner: { maxWidth: "1200px", margin: "0 auto", padding: "0 24px", height: "60px", display: "flex", alignItems: "center", justifyContent: "space-between", gap: "16px" },
-  navLogo: { cursor: "pointer", display: "flex", alignItems: "center", flexShrink: 0 },
-  navLogoImg: { height: "26px", objectFit: "contain" },
-  navLinks: { display: "flex", alignItems: "center", gap: "4px" },
-  navLink: { color: "#5f6368", fontSize: "13px", fontWeight: "500", textDecoration: "none", padding: "7px 12px", borderRadius: "4px", transition: "background 0.15s" },
-  navBtn: { background: "#1a73e8", color: "#ffffff", padding: "7px 14px", borderRadius: "4px", fontSize: "13px", fontWeight: "600", textDecoration: "none", marginLeft: "4px" },
-  navAvatar: { width: "32px", height: "32px", borderRadius: "50%", overflow: "hidden", cursor: "pointer", border: "2px solid #e3e3e3", flexShrink: 0, marginLeft: "8px" },
-  navAvatarImg: { width: "100%", height: "100%", objectFit: "cover" },
-  navAvatarInitials: { width: "100%", height: "100%", background: "#1a73e8", color: "#fff", display: "flex", alignItems: "center", justifyContent: "center", fontSize: "12px", fontWeight: "700" },
-  menuToggle: { display: "none", background: "none", border: "none", cursor: "pointer", padding: "4px", alignItems: "center" },
-  mobileMenu: { background: "#ffffff", borderTop: "1px solid #e3e3e3", padding: "8px 16px 16px", display: "flex", flexDirection: "column", gap: "2px" },
-  mobileLink: { color: "#202124", fontSize: "14px", fontWeight: "500", padding: "12px 16px", borderRadius: "4px", textDecoration: "none", display: "block" },
-  mobileLinkBtn: { color: "#ffffff", background: "#1a73e8", fontSize: "14px", fontWeight: "600", padding: "12px 16px", borderRadius: "4px", textDecoration: "none", display: "block", textAlign: "center", marginTop: "8px" },
-
   // ── Hero ── brand-colour top border, very light tint bg
-  hero: { padding: "40px 24px", borderBottom: "1px solid #e3e3e3" },
+  hero: { padding: "40px 24px", paddingTop: "104px", borderBottom: "1px solid #e3e3e3" },
   heroInner: { maxWidth: "1200px", margin: "0 auto", display: "flex", alignItems: "center", gap: "24px", flexWrap: "wrap" },
   heroLogo: { width: "88px", height: "88px", borderRadius: "12px", overflow: "hidden", border: "1px solid #e3e3e3", background: "#ffffff", flexShrink: 0, boxShadow: "0 1px 3px rgba(60,64,67,0.1)" },
   logoImg: { width: "100%", height: "100%", objectFit: "contain" },
@@ -408,11 +334,11 @@ const s = {
   jobCountLabel: { color: "#5f6368", fontSize: "12px", fontWeight: "500", marginTop: "4px" },
 
   // ── Body ──
-  body: { flex: 1, padding: "28px 24px 64px" },
+  body: { flex: 1, padding: "28px 24px 64px", paddingTop: "92px" },
   inner: { maxWidth: "1200px", margin: "0 auto" },
   layout: { display: "grid", gridTemplateColumns: "1fr 272px", gap: "20px", alignItems: "start" },
   mainCol: { display: "flex", flexDirection: "column", gap: "16px" },
-  sideCol: { position: "sticky", top: "76px", display: "flex", flexDirection: "column", gap: "12px" },
+  sideCol: { position: "sticky", top: "80px", display: "flex", flexDirection: "column", gap: "12px" },
 
   // ── Main cards ──
   card: { background: "#ffffff", border: "1px solid #e3e3e3", borderRadius: "8px", padding: "24px", boxShadow: "0 1px 2px 0 rgba(60,64,67,0.06)" },
@@ -462,7 +388,4 @@ const s = {
   emptyBtn: { background: "#1a73e8", color: "#ffffff", border: "none", borderRadius: "4px", padding: "10px 24px", fontSize: "13px", fontWeight: "600", cursor: "pointer", fontFamily: "inherit" },
 
   // ── Footer ──
-  footer: { background: "#202124", padding: "20px 24px" },
-  footerInner: { maxWidth: "1200px", margin: "0 auto", display: "flex", justifyContent: "space-between", alignItems: "center", flexWrap: "wrap", gap: "8px", color: "rgba(255,255,255,0.35)", fontSize: "12px" },
-  footerLink: { color: "rgba(255,255,255,0.4)", textDecoration: "none", fontSize: "12px" },
 };

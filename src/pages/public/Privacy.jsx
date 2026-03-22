@@ -1,5 +1,7 @@
 import { useState, useEffect, useRef } from "react";
 import { useNavigate, Link } from "react-router-dom";
+import Navbar from "../../components/Navbar";
+import Footer from "../../components/Footer";
 
 // Prioritizing Circular as requested to match Terms.jsx
 const FONT = '"Circular Std", "Circular", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif';
@@ -129,7 +131,7 @@ export default function Privacy() {
         </div>
 
         {/* Page Header */}
-        <div className="legal-header" style={{ background: "#ffffff", borderBottom: "1px solid #dadce0", padding: "64px 40px 48px" }}>
+        <div className="legal-header" style={{ background: "#ffffff", borderBottom: "1px solid #dadce0", padding: "104px 40px 48px" }}>
           <div style={{ maxWidth: "1000px", margin: "0 auto" }}>
             <div style={{ display: "flex", alignItems: "center", gap: "12px", marginBottom: "20px", flexWrap: "wrap" }}>
               <span style={{ color: "#1a73e8", fontSize: "13px", fontWeight: "600", textTransform: "uppercase", letterSpacing: "0.8px" }}>Legal Policies</span>
@@ -155,7 +157,7 @@ export default function Privacy() {
 
           {/* Sidebar TOC */}
           <div className="legal-sidebar" style={{ width: "260px", flexShrink: 0, paddingTop: "48px" }}>
-            <div style={{ position: "sticky", top: "112px" }}>
+            <div style={{ position: "sticky", top: "80px", maxHeight: "calc(100vh - 100px)", overflowY: "auto", paddingRight: "4px" }}>
               <div style={{ color: "#5f6368", fontSize: "12px", fontWeight: "600", textTransform: "uppercase", letterSpacing: "1px", marginBottom: "16px", paddingLeft: "16px" }}>Contents</div>
               <nav style={{ display: "flex", flexDirection: "column" }}>
                 {TOC.map(item => (
@@ -243,51 +245,5 @@ function Section({ id, number, title, children }) {
         </p>
       </div>
     </div>
-  );
-}
-
-// Navbar Component
-function Navbar() {
-  const navigate = useNavigate();
-  return (
-    <nav style={{ background: "#ffffff", borderBottom: "1px solid #dadce0", position: "sticky", top: 0, zIndex: 100, height: "64px" }}>
-      <div style={{ maxWidth: "1200px", margin: "0 auto", padding: "0 24px", height: "100%", display: "flex", alignItems: "center", justifyContent: "space-between" }}>
-        <div onClick={() => navigate("/")} style={{ display: "flex", alignItems: "center", gap: "12px", cursor: "pointer" }}>
-          <div style={{ width: "32px", height: "32px", borderRadius: "6px", background: "#fbbc04", color: "#d93025", fontWeight: "700", fontSize: "18px", display: "flex", alignItems: "center", justifyContent: "center" }}>V</div>
-          <span style={{ color: "#3c4043", fontWeight: "600", fontSize: "18px", letterSpacing: "-0.2px" }}>Vetted</span>
-        </div>
-        <div style={{ display: "flex", alignItems: "center", gap: "24px" }}>
-          <Link to="/jobs" style={{ color: "#5f6368", fontSize: "14px", textDecoration: "none", fontWeight: "500" }}>
-            Browse Jobs
-          </Link>
-          <Link to="/employer/login" style={{ background: "#1a73e8", color: "#ffffff", borderRadius: "4px", padding: "8px 20px", fontSize: "14px", fontWeight: "500", textDecoration: "none" }}>
-            Employer Login
-          </Link>
-        </div>
-      </div>
-    </nav>
-  );
-}
-
-// Footer Component
-function Footer() {
-  return (
-    <footer style={{ background: "#ffffff", borderTop: "1px solid #dadce0", padding: "32px 24px" }}>
-      <div style={{ maxWidth: "1200px", margin: "0 auto", display: "flex", justifyContent: "space-between", alignItems: "center", flexWrap: "wrap", gap: "24px" }}>
-        <div style={{ display: "flex", flexDirection: "column", gap: "8px" }}>
-          <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
-            <div style={{ width: "20px", height: "20px", borderRadius: "4px", background: "#fbbc04", color: "#d93025", fontWeight: "700", fontSize: "11px", display: "flex", alignItems: "center", justifyContent: "center" }}>V</div>
-            <span style={{ color: "#5f6368", fontWeight: "600", fontSize: "14px" }}>Vetted</span>
-          </div>
-          <span style={{ color: "#5f6368", fontSize: "12px" }}>© {new Date().getFullYear()} Vetted (Pty) Ltd. All rights reserved.</span>
-          <span style={{ color: "#5f6368", fontSize: "12px" }}>Designed & Developed by Lefa Mofokeng</span>
-        </div>
-        <div style={{ display: "flex", gap: "24px" }}>
-          <Link to="/terms"   style={{ color: "#5f6368", fontSize: "13px", textDecoration: "none", fontWeight: "500" }}>Terms of Service</Link>
-          <Link to="/privacy" style={{ color: "#5f6368", fontSize: "13px", textDecoration: "none", fontWeight: "500" }}>Privacy Policy</Link>
-          <a href="mailto:privacy@vetted.co.za" style={{ color: "#5f6368", fontSize: "13px", textDecoration: "none", fontWeight: "500" }}>privacy@vetted.co.za</a>
-        </div>
-      </div>
-    </footer>
   );
 }

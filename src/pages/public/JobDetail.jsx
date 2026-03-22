@@ -4,6 +4,8 @@ import { useParams, useNavigate, Link } from "react-router-dom";
 import { db } from "../../lib/firebase";
 import { useAuth } from "../../context/AuthContext";
 import { toggleSavedJob, getLocalSavedJobs } from "../../lib/savedJobs";
+import Navbar from "../../components/Navbar";
+import Footer from "../../components/Footer";
 
 export default function JobDetail() {
   const { id } = useParams();
@@ -12,7 +14,6 @@ export default function JobDetail() {
   const [job, setJob] = useState(null);
   const [loading, setLoading] = useState(true);
   const [savedJobs, setSavedJobs] = useState(getLocalSavedJobs);
-  const [menuOpen, setMenuOpen] = useState(false);
 
   useEffect(() => { fetchJob(); }, [id]);
 
@@ -29,14 +30,11 @@ export default function JobDetail() {
     setSavedJobs(getLocalSavedJobs());
   };
 
-  const isSaved    = savedJobs.includes(id);
-  const isJobSeeker = user && jobSeekerProfile;
-  const jsPhoto    = jobSeekerProfile?.photoUrl || null;
-  const jsInitials = jobSeekerProfile?.firstName?.[0]?.toUpperCase() || user?.email?.[0]?.toUpperCase() || null;
+  const isSaved = savedJobs.includes(id);
 
   if (loading) return (
-    <div style={s.page}>
-      <Navbar menuOpen={menuOpen} setMenuOpen={setMenuOpen} navigate={navigate} isJobSeeker={isJobSeeker} jsPhoto={jsPhoto} jsInitials={jsInitials} />
+    <div className="jd-page" style={s.page}>
+      <Navbar />
       <div style={s.loadingWrap}>
         <div style={s.skeleton} />
         <div style={{ ...s.skeleton, height: 200 }} />
@@ -46,8 +44,8 @@ export default function JobDetail() {
   );
 
   if (!job) return (
-    <div style={s.page}>
-      <Navbar menuOpen={menuOpen} setMenuOpen={setMenuOpen} navigate={navigate} isJobSeeker={isJobSeeker} jsPhoto={jsPhoto} jsInitials={jsInitials} />
+    <div className="jd-page" style={s.page}>
+      <Navbar />
       <div style={s.emptyWrap}>
         <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="#dadce0" strokeWidth="1.5" style={{ marginBottom: 16 }}>
           <rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"/>
@@ -60,28 +58,28 @@ export default function JobDetail() {
   );
 
   return (
-    <div style={s.page}>
-      <Navbar menuOpen={menuOpen} setMenuOpen={setMenuOpen} navigate={navigate} isJobSeeker={isJobSeeker} jsPhoto={jsPhoto} jsInitials={jsInitials} />
+    <div className="jd-page" style={s.page}>
+      <Navbar />
 
-      <div style={s.body}>
+      <div className="jd-body" style={s.body}>
         <div style={s.inner}>
 
           {/* Back */}
-          <button onClick={() => navigate("/jobs")} style={s.backBtn}>
+          <button onClick={() => navigate("/")} style={s.backBtn}>
             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" style={{ marginRight: 6 }}>
               <line x1="19" y1="12" x2="5" y2="12"/><polyline points="12 19 5 12 12 5"/>
             </svg>
-            Back to Jobs
+            Back to Home
           </button>
 
-          <div style={s.layout}>
+          <div className="jd-layout" style={s.layout}>
 
             {/* ── Main Column ── */}
             <div style={s.mainCol}>
 
               {/* Header card */}
               <div style={s.headerCard}>
-                <div style={s.headerTop}>
+                <div className="jd-header-top" style={s.headerTop}>
                   <div style={s.headerLogo}>
                     {job.logoUrl
                       ? <img src={job.logoUrl} alt={job.employerName} style={s.logoImg} />
@@ -89,7 +87,7 @@ export default function JobDetail() {
                     }
                   </div>
                   <div style={s.headerInfo}>
-                    <h1 style={s.jobTitle}>{job.title}</h1>
+                    <h1 className="jd-title" style={s.jobTitle}>{job.title}</h1>
                     <div style={s.jobCompany}>{job.employerName}</div>
                   </div>
                   <button onClick={handleToggleSave} style={{ ...s.saveBtn, ...(isSaved ? s.saveBtnActive : {}) }}>
@@ -101,7 +99,7 @@ export default function JobDetail() {
                 </div>
 
                 {/* Tags */}
-                <div style={s.tagRow}>
+                <div className="jd-tag-row" style={s.tagRow}>
                   <Tag icon={<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>} value={`${job.city}, ${job.province}`} />
                   <Tag icon={<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"/></svg>} value={job.type} />
                   {job.department && <Tag icon={<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/></svg>} value={job.department} />}
@@ -111,7 +109,7 @@ export default function JobDetail() {
                 </div>
 
                 {/* Mobile Apply */}
-                <div style={s.mobileApplyWrap}>
+                <div className="jd-mobile-apply" style={s.mobileApplyWrap}>
                   <button style={s.applyBtn} onClick={() => navigate(`/apply/${job.id}`)}>Apply Now</button>
                 </div>
               </div>
@@ -158,7 +156,7 @@ export default function JobDetail() {
             </div>
 
             {/* ── Sidebar ── */}
-            <div style={s.sideCol}>
+            <div className="jd-side" style={s.sideCol}>
 
               {/* Apply card */}
               <div style={s.applyCard}>
@@ -213,65 +211,34 @@ export default function JobDetail() {
         </div>
       </div>
 
-      <footer style={s.footer}>
-        <div style={s.footerInner}>
-          <span>© {new Date().getFullYear()} Vetted. All rights reserved.</span>
-          <div style={{ display: "flex", gap: "24px" }}>
-            <Link to="/" style={s.footerLink}>Home</Link>
-            <Link to="/terms" style={s.footerLink}>Terms</Link>
-            <Link to="/privacy" style={s.footerLink}>Privacy</Link>
-          </div>
-        </div>
-      </footer>
+      <Footer />
 
       <style>{`
+        * { box-sizing: border-box; }
+        .jd-page * { font-family: ${FONT} !important; }
         @keyframes shimmer { 0%{background-position:200% 0} 100%{background-position:-200% 0} }
-        @media (max-width: 900px) { .jd-layout{grid-template-columns:1fr!important} .jd-side{position:static!important} .jd-apply-card{display:none!important} .jd-mobile-apply{display:block!important} }
-        @media (max-width: 768px) { .jd-nav-links{display:none!important} .jd-menu-toggle{display:flex!important} .jd-body{padding:16px!important} }
+
+        /* Sidebar hidden on mobile, apply card hidden, mobile apply shown */
+        @media (max-width: 900px) {
+          .jd-layout  { grid-template-columns: 1fr !important; }
+          .jd-side    { display: none !important; }
+          .jd-mobile-apply { display: block !important; }
+        }
+
+        /* Body and font tightening on small screens */
+        @media (max-width: 768px) {
+          .jd-body    { padding: 80px 16px 40px !important; }
+          .jd-title   { font-size: 18px !important; }
+          .jd-tag-row { gap: 4px !important; }
+        }
+
+        /* Stack apply button full-width on very small screens */
+        @media (max-width: 480px) {
+          .jd-header-top  { flex-wrap: wrap !important; }
+          .jd-save-btn    { width: 100% !important; justify-content: center !important; margin-top: 8px; }
+        }
       `}</style>
     </div>
-  );
-}
-
-// ── Navbar ────────────────────────────────────────────────────────────
-function Navbar({ menuOpen, setMenuOpen, navigate, isJobSeeker, jsPhoto, jsInitials }) {
-  return (
-    <nav style={s.navbar}>
-      <div style={s.navInner}>
-        <div onClick={() => navigate("/")} style={s.navLogo}>
-          <img src="/logo.png" alt="Vetted" style={s.navLogoImg} />
-        </div>
-        <div style={s.navLinks} className="jd-nav-links">
-          <Link to="/jobs" style={s.navLink}>Browse Jobs</Link>
-          <Link to="/employer/join" style={s.navLink}>For Employers</Link>
-          {isJobSeeker ? (
-            <div style={s.navAvatar} onClick={() => navigate("/jobseeker/dashboard")} title="My Profile">
-              {jsPhoto ? <img src={jsPhoto} alt="" style={s.navAvatarImg} /> : <div style={s.navAvatarInitials}>{jsInitials}</div>}
-            </div>
-          ) : (
-            <Link to="/jobseeker/login" style={s.navLink}>Sign In</Link>
-          )}
-          <Link to="/employer/login" style={s.navBtn}>Employer Login</Link>
-        </div>
-        <button style={s.menuToggle} className="jd-menu-toggle" onClick={() => setMenuOpen(o => !o)}>
-          {menuOpen
-            ? <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#202124" strokeWidth="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
-            : <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#202124" strokeWidth="2"><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
-          }
-        </button>
-      </div>
-      {menuOpen && (
-        <div style={s.mobileMenu}>
-          <Link to="/jobs" style={s.mobileLink} onClick={() => setMenuOpen(false)}>Browse Jobs</Link>
-          <Link to="/employer/join" style={s.mobileLink} onClick={() => setMenuOpen(false)}>For Employers</Link>
-          {isJobSeeker
-            ? <Link to="/jobseeker/dashboard" style={s.mobileLink} onClick={() => setMenuOpen(false)}>My Profile</Link>
-            : <Link to="/jobseeker/login" style={s.mobileLink} onClick={() => setMenuOpen(false)}>Sign In</Link>
-          }
-          <Link to="/employer/login" style={s.mobileLinkBtn} onClick={() => setMenuOpen(false)}>Employer Login</Link>
-        </div>
-      )}
-    </nav>
   );
 }
 
@@ -320,42 +287,27 @@ function InfoRow({ label, value, highlight }) {
   );
 }
 
-// ── Styles ────────────────────────────────────────────────────────────
+const FONT = '"Circular Std", "Circular", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif';
+
 const s = {
   page: {
     background: "#f4f5f7",
     minHeight: "100vh",
-    fontFamily: '"Circular", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif',
+    fontFamily: FONT,
     color: "#202124",
     display: "flex",
     flexDirection: "column",
   },
 
-  // ── Navbar ──
-  navbar: { background: "#ffffff", borderBottom: "1px solid #e3e3e3", position: "sticky", top: 0, zIndex: 100, boxShadow: "0 1px 2px rgba(60,64,67,0.06)" },
-  navInner: { maxWidth: "1200px", margin: "0 auto", padding: "0 24px", height: "60px", display: "flex", alignItems: "center", justifyContent: "space-between", gap: "16px" },
-  navLogo: { cursor: "pointer", display: "flex", alignItems: "center", flexShrink: 0 },
-  navLogoImg: { height: "26px", objectFit: "contain" },
-  navLinks: { display: "flex", alignItems: "center", gap: "4px" },
-  navLink: { color: "#5f6368", fontSize: "13px", fontWeight: "500", textDecoration: "none", padding: "7px 12px", borderRadius: "4px", transition: "background 0.15s" },
-  navBtn: { background: "#1a73e8", color: "#ffffff", padding: "7px 14px", borderRadius: "4px", fontSize: "13px", fontWeight: "600", textDecoration: "none", marginLeft: "4px" },
-  navAvatar: { width: "32px", height: "32px", borderRadius: "50%", overflow: "hidden", cursor: "pointer", border: "2px solid #e3e3e3", flexShrink: 0, marginLeft: "8px" },
-  navAvatarImg: { width: "100%", height: "100%", objectFit: "cover" },
-  navAvatarInitials: { width: "100%", height: "100%", background: "#1a73e8", color: "#fff", display: "flex", alignItems: "center", justifyContent: "center", fontSize: "12px", fontWeight: "700" },
-  menuToggle: { display: "none", background: "none", border: "none", cursor: "pointer", padding: "4px", alignItems: "center" },
-  mobileMenu: { background: "#ffffff", borderTop: "1px solid #e3e3e3", padding: "8px 16px 16px", display: "flex", flexDirection: "column", gap: "2px" },
-  mobileLink: { color: "#202124", fontSize: "14px", fontWeight: "500", padding: "12px 16px", borderRadius: "4px", textDecoration: "none", display: "block" },
-  mobileLinkBtn: { color: "#ffffff", background: "#1a73e8", fontSize: "14px", fontWeight: "600", padding: "12px 16px", borderRadius: "4px", textDecoration: "none", display: "block", textAlign: "center", marginTop: "8px" },
-
   // ── Body ──
-  body: { flex: 1, padding: "28px 24px" },
+  body: { flex: 1, padding: "92px 24px 48px" },
   inner: { maxWidth: "1200px", margin: "0 auto" },
-  backBtn: { display: "inline-flex", alignItems: "center", background: "none", border: "none", color: "#5f6368", fontSize: "13px", fontWeight: "500", cursor: "pointer", padding: "0 0 20px", fontFamily: "inherit" },
+  backBtn: { display: "inline-flex", alignItems: "center", background: "none", border: "none", color: "#5f6368", fontSize: "13px", fontWeight: "500", cursor: "pointer", padding: "0 0 20px", fontFamily: FONT },
 
   // ── Layout ──
   layout: { display: "grid", gridTemplateColumns: "1fr 300px", gap: "24px", alignItems: "start" },
   mainCol: { display: "flex", flexDirection: "column", gap: "14px" },
-  sideCol: { position: "sticky", top: "76px", display: "flex", flexDirection: "column", gap: "12px" },
+  sideCol: { position: "sticky", top: "80px", display: "flex", flexDirection: "column", gap: "12px" },
 
   // ── Header card ──
   headerCard: { background: "#ffffff", border: "1px solid #e3e3e3", borderRadius: "8px", overflow: "hidden", boxShadow: "0 1px 2px 0 rgba(60,64,67,0.08)" },
@@ -404,15 +356,10 @@ const s = {
   viewCompanyBtn: { display: "inline-flex", alignItems: "center", color: "#1a73e8", fontSize: "13px", fontWeight: "600", textDecoration: "none" },
 
   // ── Loading / empty ──
-  loadingWrap: { maxWidth: "1200px", margin: "28px auto", padding: "0 24px", display: "flex", flexDirection: "column", gap: "14px" },
+  loadingWrap: { maxWidth: "1200px", margin: "92px auto 28px", padding: "0 24px", display: "flex", flexDirection: "column", gap: "14px" },
   skeleton: { background: "linear-gradient(90deg,#f1f3f4 25%,#e8eaed 50%,#f1f3f4 75%)", backgroundSize: "200%", animation: "shimmer 1.5s infinite", borderRadius: "8px", height: "120px" },
   emptyWrap: { flex: 1, display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", padding: "80px 24px", textAlign: "center" },
-  emptyTitle: { color: "#202124", fontSize: "20px", fontWeight: "600", marginBottom: "8px", letterSpacing: "-0.3px" },
-  emptySub: { color: "#5f6368", fontSize: "14px", marginBottom: "24px" },
-  emptyBtn: { background: "#1a73e8", color: "#ffffff", border: "none", borderRadius: "4px", padding: "10px 24px", fontSize: "13px", fontWeight: "600", cursor: "pointer", fontFamily: "inherit" },
-
-  // ── Footer ──
-  footer: { background: "#202124", padding: "20px 24px" },
-  footerInner: { maxWidth: "1200px", margin: "0 auto", display: "flex", justifyContent: "space-between", alignItems: "center", flexWrap: "wrap", gap: "8px", color: "rgba(255,255,255,0.35)", fontSize: "12px" },
-  footerLink: { color: "rgba(255,255,255,0.4)", textDecoration: "none", fontSize: "12px" },
+  emptyTitle: { color: "#202124", fontSize: "20px", fontWeight: "600", marginBottom: "8px", letterSpacing: "-0.3px", fontFamily: FONT },
+  emptySub: { color: "#5f6368", fontSize: "14px", marginBottom: "24px", fontFamily: FONT },
+  emptyBtn: { background: "#1a73e8", color: "#ffffff", border: "none", borderRadius: "4px", padding: "10px 24px", fontSize: "13px", fontWeight: "600", cursor: "pointer", fontFamily: FONT },
 };

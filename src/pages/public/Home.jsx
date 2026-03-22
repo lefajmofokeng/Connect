@@ -18,14 +18,6 @@ const INDUSTRIES = [
   "Legal","Logistics & Transport","Manufacturing","Media & Marketing",
   "Mining","NGO & Non-Profit","Real Estate","Retail","Telecommunications","Other"
 ];
-const DISCLAIMERS = [
-  { text: "Vetted is an advertising platform, not a recruitment agency. We publish job opportunities on behalf of verified South African employers. We are not involved in any part of the hiring process — including shortlisting, interviewing, or making employment decisions. Any such decisions rest entirely with the employer who posted the listing." },
-  { text: "All job applications submitted through this platform are sent directly to the relevant employer. Vetted does not receive, review, store, forward, or influence any application at any stage. Once you submit your application, your information is shared solely with the employer associated with that specific listing." },
-  { text: "Vetted does not use artificial intelligence, automated scoring systems, or algorithmic ranking to evaluate, filter, or prioritise any candidate's application at any point. Every application you submit reaches the employer exactly as you submitted it — no modifications, no scoring, no filtering by our platform." },
-  { text: "Vetted verifies employer registrations through CIPC documentation and supporting identity records before granting platform access. While we take reasonable steps to confirm that employers are legitimate registered entities, we cannot guarantee the accuracy of job descriptions, advertised salaries, or employment outcomes. We encourage all applicants to conduct their own due diligence." },
-  { text: "Vetted will never ask job seekers for any form of payment, fee, or deposit at any stage of the application process. Browsing jobs and applying is completely free. If any employer or individual using this platform requests payment from you — whether for training, uniforms, background checks, or any other reason — do not pay and report it to us immediately at support@vetted.co.za." },
-];
-
 export default function Home() {
   const navigate = useNavigate();
   const { user, jobSeekerProfile } = useAuth();
@@ -38,7 +30,6 @@ export default function Home() {
   const [sortBy, setSortBy] = useState("newest");
   const [selectedJob, setSelectedJob] = useState(null);
   const [savedJobs, setSavedJobs] = useState(getLocalSavedJobs);
-  const [menuOpen, setMenuOpen] = useState(false);
   const [mobileView, setMobileView] = useState("list");
   const detailRef = useRef(null);
 
@@ -89,50 +80,12 @@ export default function Home() {
 
   const clearFilters = () => { setSearch(""); setFilterProvince(""); setFilterType(""); setFilterIndustry(""); };
   const hasFilters = search || filterProvince || filterType || filterIndustry;
-  const isJobSeeker = user && jobSeekerProfile;
-  const jsPhoto = jobSeekerProfile?.photoUrl || null;
-  const jsInitials = jobSeekerProfile?.firstName?.[0]?.toUpperCase() || user?.email?.[0]?.toUpperCase() || null;
 
   return (
     <div className="page-wrapper" style={s.page}>
 
       {/* ── Navbar ── */}
-      <nav style={s.navbar}>
-        <div style={s.navInner}>
-          <div style={s.navLogo} onClick={() => navigate("/")}>
-            <img src="/logo.png" alt="Vetted" style={s.navLogoImg} />
-          </div>
-          <div className="nav-links-desktop" style={s.navLinks}>
-            <Link to="/jobs" style={s.navLink}>Browse Jobs</Link>
-            <Link to="/employer/join" style={s.navLink}>For Employers</Link>
-            {isJobSeeker ? (
-              <div style={s.navAvatar} onClick={() => navigate("/jobseeker/dashboard")} title="My Profile">
-                {jsPhoto ? <img src={jsPhoto} alt="" style={s.navAvatarImg} /> : <div style={s.navAvatarInitials}>{jsInitials}</div>}
-              </div>
-            ) : (
-              <Link to="/jobseeker/login" style={s.navSignIn}>Sign In</Link>
-            )}
-            <Link to="/employer/login" style={s.navBtn}>Employer Login</Link>
-          </div>
-          <button className="menu-toggle-btn" style={s.menuToggle} onClick={() => setMenuOpen(o => !o)}>
-            {menuOpen
-              ? <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#5f6368" strokeWidth="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
-              : <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#5f6368" strokeWidth="2"><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
-            }
-          </button>
-        </div>
-        {menuOpen && (
-          <div style={s.mobileMenu}>
-            <Link to="/jobs" style={s.mobileLink} onClick={() => setMenuOpen(false)}>Browse Jobs</Link>
-            <Link to="/employer/join" style={s.mobileLink} onClick={() => setMenuOpen(false)}>For Employers</Link>
-            {isJobSeeker
-              ? <Link to="/jobseeker/dashboard" style={s.mobileLink} onClick={() => setMenuOpen(false)}>My Profile</Link>
-              : <Link to="/jobseeker/login" style={s.mobileLink} onClick={() => setMenuOpen(false)}>Sign In</Link>
-            }
-            <Link to="/employer/login" style={s.mobileLinkBtn} onClick={() => setMenuOpen(false)}>Employer Login</Link>
-          </div>
-        )}
-      </nav>
+      <Navbar />
 
       {/* ── Hero Section ── */}
       <div style={s.heroSection}>
@@ -449,72 +402,21 @@ export default function Home() {
       </div>
 
       {/* ── Footer ── */}
-      <footer style={s.footer}>
-        <div style={s.footerInner}>
-          <div style={s.disclaimerSection}>
-            <div style={s.disclaimerTitle}>Important Notice for Candidates</div>
-            <div style={s.disclaimerList}>
-              {DISCLAIMERS.map((d, i) => (
-                <div key={i} style={s.disclaimerRow}>
-                  <span style={s.disclaimerNum}>{i + 1}.</span>
-                  <p style={s.disclaimerText}>{d.text}</p>
-                </div>
-              ))}
-            </div>
-          </div>
-          <div className="footer-top-mobile" style={s.footerTop}>
-            <div style={{ maxWidth: '250px' }}>
-              <img src="/logo.png" alt="Vetted" style={{ height: "24px", marginBottom: "12px", opacity: 0.8 }} />
-              <p style={{ color: "#5f6368", fontSize: "14px", margin: 0 }}>Verified Professional Network.</p>
-            </div>
-            <div className="footer-links-grid" style={s.footerLinksGrid}>
-              <div style={s.footerCol}>
-                <div style={s.footerColTitle}>Job Seekers</div>
-                <Link to="/jobs" style={s.footerLink}>Browse Jobs</Link>
-                <Link to="/jobseeker/login" style={s.footerLink}>Sign In</Link>
-                <Link to="/jobseeker/register" style={s.footerLink}>Register</Link>
-              </div>
-              <div style={s.footerCol}>
-                <div style={s.footerColTitle}>Employers</div>
-                <Link to="/employer/join" style={s.footerLink}>Apply for Access</Link>
-                <Link to="/employer/login" style={s.footerLink}>Portal Login</Link>
-              </div>
-              <div style={s.footerCol}>
-                <div style={s.footerColTitle}>Legal Protocol</div>
-                <Link to="/terms" style={s.footerLink}>Terms of Service</Link>
-                <Link to="/privacy" style={s.footerLink}>Privacy Policy</Link>
-              </div>
-            </div>
-          </div>
-          <div className="footer-bottom-mobile" style={s.footerBottom}>
-            <span>© {new Date().getFullYear()} Vetted. All rights reserved.</span>
-            <span>Developed for South Africa 🇿🇦</span>
-          </div>
-        </div>
-      </footer>
+      <Footer />
 
-      {/* ── Mobile Responsive CSS ── */}
+      {/* ── Page-specific CSS ── */}
       <style>{`
-        /* Global & Scrollbars */
-        .page-wrapper {
-          -webkit-font-smoothing: antialiased;
-        }
+        .page-wrapper { -webkit-font-smoothing: antialiased; }
         ::-webkit-scrollbar { width: 6px; height: 6px; }
         ::-webkit-scrollbar-track { background: transparent; }
         ::-webkit-scrollbar-thumb { background: #dadce0; border-radius: 4px; }
-        
-        /* Interactive States */
+
         .job-card-hover { transition: box-shadow 0.2s ease, border-color 0.2s ease; }
         .job-card-hover:hover { box-shadow: 0 1px 3px 0 rgba(60,64,67,0.3), 0 4px 8px 3px rgba(60,64,67,0.15); border-color: transparent !important; z-index: 2; }
 
-        /* Hide elements dynamically on mobile */
         @media (max-width: 900px) {
-          .nav-links-desktop { display: none !important; }
-          .menu-toggle-btn { display: flex !important; }
-          
           .split-layout { grid-template-columns: 1fr !important; gap: 0 !important; }
           .hide-on-mobile { display: none !important; }
-          
           .results-header-mobile { background: #fff; padding: 12px 0; margin-bottom: 0 !important; position: sticky; top: 64px; z-index: 10; border-bottom: 1px solid #f1f3f4; }
         }
 
@@ -522,34 +424,18 @@ export default function Home() {
           .hero-title { font-size: 32px !important; }
           .hero-subtitle { font-size: 16px !important; }
           .employer-title { font-size: 28px !important; }
-          
           .search-bar-inner { flex-direction: column !important; padding: 8px !important; border-radius: 16px !important; }
           .search-divider { width: 100% !important; height: 1px !important; margin: 4px 0 !important; }
           .search-bar-inner button { width: 100%; border-radius: 8px !important; margin-top: 8px; }
-
-          .filter-scroll-container { 
-            flex-wrap: nowrap !important; 
-            overflow-x: auto !important;
-            justify-content: flex-start !important;
-            padding-bottom: 4px; 
-            -webkit-overflow-scrolling: touch; 
-            gap: 8px !important;
-          }
+          .filter-scroll-container { flex-wrap: nowrap !important; overflow-x: auto !important; justify-content: flex-start !important; padding-bottom: 4px; -webkit-overflow-scrolling: touch; gap: 8px !important; }
           .filter-scroll-container::-webkit-scrollbar { display: none; }
-          
           .main-inner { padding: 16px !important; }
-          
           .employer-grid-mobile { grid-template-columns: 1fr !important; gap: 32px !important; }
-          
-          .footer-top-mobile { flex-direction: column !important; gap: 32px !important; }
-          .footer-links-grid { grid-template-columns: 1fr 1fr !important; width: 100%; gap: 32px !important; }
-          .footer-bottom-mobile { flex-direction: column !important; text-align: center; gap: 8px; }
         }
 
         @media (max-width: 480px) {
           .detail-actions-mobile { flex-direction: column; width: 100%; }
           .detail-actions-mobile button { width: 100%; justify-content: center; }
-          .footer-links-grid { grid-template-columns: 1fr !important; }
         }
       `}</style>
     </div>
@@ -557,22 +443,7 @@ export default function Home() {
 }
 
 const s = {
-  page: { background: "#ffffff", minHeight: "100vh", fontFamily: "'Google Sans', 'Inter', 'Circular Std', 'Bricolage Grotesque', sans-serif", color: "#202124" },
-
-  navbar: { background: "#fff", borderBottom: "1px solid #dadce0", position: "fixed", top: 0, left: 0, right: 0, zIndex: 100 },
-  navInner: { maxWidth: "1200px", margin: "0 auto", padding: "0 24px", height: "64px", display: "flex", alignItems: "center", justifyContent: "space-between" },
-  navLogo: { cursor: "pointer", display: "flex", alignItems: "center", flexShrink: 0 },
-  navLogoImg: { height: "24px", objectFit: "contain" },
-  navLinks: { display: "flex", alignItems: "center", gap: "16px" },
-  navLink: { color: "#3c4043", fontSize: "14px", fontWeight: "500", textDecoration: "none", padding: "8px 12px", borderRadius: "4px", transition: "color 0.2s ease" },
-  navBtn: { background: "#fff", color: "#1a73e8", border: "1px solid #dadce0", padding: "8px 20px", borderRadius: "24px", fontSize: "14px", fontWeight: "500", textDecoration: "none", marginLeft: "8px" },
-  navAvatar: { width: "36px", height: "36px", borderRadius: "50%", overflow: "hidden", cursor: "pointer", border: "1px solid #dadce0", flexShrink: 0, marginLeft: "12px" },
-  navAvatarImg: { width: "100%", height: "100%", objectFit: "cover" },
-  navAvatarInitials: { width: "100%", height: "100%", background: "#1a73e8", color: "#fff", display: "flex", alignItems: "center", justifyContent: "center", fontSize: "14px", fontWeight: "600" },
-  menuToggle: { display: "none", background: "none", border: "none", cursor: "pointer", padding: "4px", alignItems: "center" },
-  mobileMenu: { background: "#fff", borderTop: "1px solid #dadce0", padding: "16px", display: "flex", flexDirection: "column", gap: "8px" },
-  mobileLink: { color: "#202124", fontSize: "15px", padding: "12px 16px", textDecoration: "none", display: "block" },
-  mobileLinkBtn: { color: "#1a73e8", background: "#fff", border: "1px solid #dadce0", fontSize: "15px", padding: "12px 16px", borderRadius: "24px", textDecoration: "none", display: "block", textAlign: "center", marginTop: "12px", fontWeight: "500" },
+  page: { background: "#ffffff", minHeight: "100vh", fontFamily: '"Circular Std", "Circular", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif', color: "#202124" },
 
   heroSection: { background: "#fff", padding: "128px 24px 40px", textAlign: "center" },
   heroInner: { maxWidth: "800px", margin: "0 auto" },
@@ -615,8 +486,6 @@ const s = {
   emptyTitle: { color: "#202124", fontSize: "20px", fontWeight: "400", marginBottom: "8px" },
   emptySub: { color: "#5f6368", fontSize: "15px", marginBottom: "24px" },
 
-  navSignIn: { color: "#1a73e8", border: "1px solid #dadce0", background: "#fff", padding: "7px 16px", borderRadius: "20px", fontSize: "14px", fontWeight: "500", textDecoration: "none" },
-
   jobCard: { background: "#fff", border: "1px solid #dadce0", borderRadius: "8px", padding: "16px", cursor: "pointer", position: "relative" },
   jobCardActive: { borderColor: "#1a73e8", boxShadow: "0 0 0 1px #1a73e8" },
 
@@ -637,13 +506,6 @@ const s = {
   remoteBadge: { background: "#e8f0fe", color: "#1967d2", borderRadius: "4px", padding: "4px 8px", fontSize: "12px", fontWeight: "500" },
   jobCloses: { color: "#80868b", fontSize: "12px", marginLeft: "auto" },
   viewMoreBtn: { display: "block", textAlign: "center", color: "#1a73e8", fontSize: "14px", textDecoration: "none", fontWeight: "500", padding: "16px", border: "1px solid #dadce0", background: "#fff", borderRadius: "24px" },
-
-  disclaimerSection: { padding: "40px 0", borderTop: "1px solid #dadce0" },
-  disclaimerTitle: { color: "#5f6368", fontSize: "12px", fontWeight: "500", textTransform: "uppercase", letterSpacing: "1px", marginBottom: "20px" },
-  disclaimerList: { display: "flex", flexDirection: "column", gap: "16px" },
-  disclaimerRow: { display: "flex", alignItems: "flex-start", gap: "12px" },
-  disclaimerNum: { color: "#9aa0a6", fontSize: "13px", fontWeight: "600", flexShrink: 0, minWidth: "18px", paddingTop: "1px" },
-  disclaimerText: { color: "#80868b", fontSize: "13px", lineHeight: "1.7", margin: 0 },
 
   detailEmpty: { display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", height: "500px", textAlign: "center", background: "#f8f9fa" },
   detailContent: { padding: "0" },
@@ -682,15 +544,4 @@ const s = {
   featureCard: { background: "#fff", border: "1px solid #dadce0", borderRadius: "8px", padding: "24px", boxShadow: "0 1px 2px 0 rgba(60,64,67,0.1)" },
   featureCardTitle: { color: "#202124", fontSize: "16px", fontWeight: "500", marginBottom: "6px" },
   featureCardDesc: { color: "#5f6368", fontSize: "14px", lineHeight: "1.6" },
-
-  footer: { background: "#fff", padding: "0" },
-  footerInner: { maxWidth: "1200px", margin: "0 auto", padding: "0 24px" },
-  disclaimerSection: { padding: "40px 0", borderTop: "1px solid #dadce0" },
-  disclaimerTitle: { color: "#5f6368", fontSize: "12px", fontWeight: "500", textTransform: "uppercase", letterSpacing: "1px", marginBottom: "20px" },
-  footerTop: { display: "flex", justifyContent: "space-between", gap: "48px", padding: "48px 0", borderTop: "1px solid #dadce0", borderBottom: "1px solid #dadce0" },
-  footerLinksGrid: { display: "flex", gap: "64px" },
-  footerCol: { display: "flex", flexDirection: "column", gap: "16px" },
-  footerColTitle: { color: "#5f6368", fontSize: "14px", fontWeight: "500" },
-  footerLink: { color: "#3c4043", fontSize: "14px", textDecoration: "none" },
-  footerBottom: { padding: "24px 0 48px", display: "flex", justifyContent: "space-between", color: "#5f6368", fontSize: "13px" },
 };

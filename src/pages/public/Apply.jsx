@@ -4,6 +4,8 @@ import { doc, getDoc, addDoc, collection, serverTimestamp } from "firebase/fires
 import { ref, uploadBytes, getDownloadURL } from "firebase/storage";
 import { useParams, useNavigate, Link } from "react-router-dom";
 import { db, storage } from "../../lib/firebase";
+import Navbar from "../../components/Navbar";
+import Footer from "../../components/Footer";
 
 const STEPS = ["Personal Info", "Documents", "Review & Submit"];
 
@@ -784,47 +786,6 @@ export default function Apply() {
   );
 }
 
-// ── Navbar ────────────────────────────────────────────────────────────
-function Navbar() {
-  const navigate = useNavigate();
-  return (
-    <nav style={s.navbar}>
-      <div style={s.navInner}>
-        <div onClick={() => navigate("/")} style={s.navLogo}>
-          <div style={s.logoMark}>V</div>
-          <span style={s.logoText}>Vetted</span>
-        </div>
-        <div className="apply-nav-links" style={s.navLinks}>
-          <Link to="/jobs" style={s.navLink}>Browse Jobs</Link>
-          <Link to="/jobseeker/login" style={s.navSignIn}>Sign In</Link>
-          <Link to="/employer/login" style={s.navBtn}>Employer Login</Link>
-        </div>
-        {/* Mobile — just logo */}
-      </div>
-    </nav>
-  );
-}
-
-// ── Footer ────────────────────────────────────────────────────────────
-function Footer() {
-  return (
-    <footer style={s.footer}>
-      <div style={s.footerInner}>
-        <div style={s.footerBottom}>
-          <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
-            <div style={s.footerLogoMark}>V</div>
-            <span>© {new Date().getFullYear()} Vetted (Pty) Ltd. All rights reserved.</span>
-          </div>
-          <div style={{ display: "flex", gap: "20px" }}>
-            <Link to="/terms"   style={s.footerLink}>Terms</Link>
-            <Link to="/privacy" style={s.footerLink}>Privacy</Link>
-          </div>
-        </div>
-      </div>
-    </footer>
-  );
-}
-
 // ── Helpers ───────────────────────────────────────────────────────────
 function Field({ label, children }) {
   return (
@@ -866,17 +827,6 @@ const s = {
     display: "flex",
     flexDirection: "column",
   },
-
-  // ── Navbar ──
-  navbar: { background: "#ffffff", borderBottom: "1px solid #dadce0", position: "fixed", top: 0, left: 0, right: 0, zIndex: 100 },
-  navInner: { maxWidth: "1200px", margin: "0 auto", padding: "0 24px", height: "60px", display: "flex", alignItems: "center", justifyContent: "space-between" },
-  navLogo: { display: "flex", alignItems: "center", gap: "10px", cursor: "pointer" },
-  logoMark: { width: "28px", height: "28px", borderRadius: "5px", background: "#ffca28", color: "#d84315", fontWeight: "700", fontSize: "15px", display: "flex", alignItems: "center", justifyContent: "center", fontFamily: FONT },
-  logoText: { color: "#202124", fontWeight: "600", fontSize: "15px", fontFamily: FONT },
-  navLinks: { display: "flex", alignItems: "center", gap: "8px" },
-  navLink: { color: "#3c4043", fontSize: "13px", fontWeight: "500", textDecoration: "none", padding: "7px 10px", fontFamily: FONT },
-  navSignIn: { color: "#1a73e8", border: "1px solid #dadce0", background: "#fff", padding: "7px 14px", borderRadius: "20px", fontSize: "13px", fontWeight: "500", textDecoration: "none", fontFamily: FONT },
-  navBtn: { background: "#1a73e8", color: "#ffffff", padding: "7px 14px", borderRadius: "4px", fontSize: "13px", fontWeight: "600", textDecoration: "none", fontFamily: FONT },
 
   // ── Body ──
   body: { flex: 1, padding: "92px 24px 48px" },
@@ -999,10 +949,4 @@ const s = {
 
   empty: { color: "#5f6368", textAlign: "center", padding: "80px", fontSize: "14px", fontFamily: FONT },
 
-  // ── Footer ──
-  footer: { background: "#ffffff", borderTop: "1px solid #dadce0", padding: "20px 24px" },
-  footerInner: { maxWidth: "1200px", margin: "0 auto" },
-  footerBottom: { display: "flex", justifyContent: "space-between", alignItems: "center", color: "#9aa0a6", fontSize: "12px", flexWrap: "wrap", gap: "8px", fontFamily: FONT },
-  footerLogoMark: { width: "20px", height: "20px", borderRadius: "4px", background: "#ffca28", color: "#d84315", fontWeight: "700", fontSize: "11px", display: "flex", alignItems: "center", justifyContent: "center", fontFamily: FONT },
-  footerLink: { color: "#9aa0a6", textDecoration: "none", fontFamily: FONT },
 };

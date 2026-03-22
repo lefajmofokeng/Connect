@@ -3,7 +3,6 @@ import { collection, query, where, getDocs, doc, updateDoc, deleteDoc, serverTim
 import { useNavigate } from "react-router-dom";
 import { db } from "../../lib/firebase";
 import { useAuth } from "../../context/AuthContext";
-import NotificationDrawer from "../../components/NotificationDrawer";
 
 const FONT = '"Circular Std", "Circular", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif';
 
@@ -293,7 +292,9 @@ export default function Applications() {
   );
 
   return (
-    <div style={s.page}>
+    <>
+      <style>{`* { font-family: ${FONT} !important; } body { font-family: ${FONT} !important; }`}</style>
+      <div style={s.page}>
       <Sidebar profile={employerProfile} userId={user?.uid} />
       <div style={s.mainWrapper}>
 
@@ -445,6 +446,7 @@ export default function Applications() {
         </>
       )}
     </div>
+    </>
   );
 }
 
@@ -584,6 +586,20 @@ function DrawerContent({ app, onStatusChange, onSaveNotes, onDelete }) {
 function Sidebar({ profile, userId }) {
   const navigate = useNavigate();
   const path = window.location.pathname;
+  const [unreadCount, setUnreadCount] = useState(0);
+
+  useEffect(() => {
+    const handler = () => {
+      try {
+        const count = parseInt(localStorage.getItem("vt_notif_unread_count") || "0", 10);
+        setUnreadCount(isNaN(count) ? 0 : count);
+      } catch { setUnreadCount(0); }
+    };
+    window.addEventListener("vt_notif_update", handler);
+    handler();
+    return () => window.removeEventListener("vt_notif_update", handler);
+  }, []);
+
   const navItems = [
     { label: "Project Overview",        to: "/employer/dashboard",    icon: "home" },
     { label: "Deploy Job",              to: "/employer/post-job",     icon: "plus" },
@@ -593,13 +609,15 @@ function Sidebar({ profile, userId }) {
     { label: "Settings",                to: "/employer/profile",      icon: "gear" },
   ];
   const ICONS = {
-    home: <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>,
-    plus: <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>,
-    list: <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/><line x1="3" y1="6" x2="3.01" y2="6"/><line x1="3" y1="12" x2="3.01" y2="12"/><line x1="3" y1="18" x2="3.01" y2="18"/></svg>,
+    home:  <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>,
+    plus:  <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>,
+    list:  <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/><line x1="3" y1="6" x2="3.01" y2="6"/><line x1="3" y1="12" x2="3.01" y2="12"/><line x1="3" y1="18" x2="3.01" y2="18"/></svg>,
     chart: <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>,
-    card: <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><rect x="1" y="4" width="22" height="16" rx="2" ry="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg>,
-    gear: <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>,
+    card:  <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><rect x="1" y="4" width="22" height="16" rx="2" ry="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg>,
+    gear:  <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>,
+    bell:  <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>,
   };
+
   return (
     <div style={s.sidebar}>
       <div style={s.sidebarHeader}>
@@ -619,6 +637,21 @@ function Sidebar({ profile, userId }) {
             <span style={s.navLabel}>{item.label}</span>
           </button>
         ))}
+        {/* Notifications — separated with border-top */}
+        <div style={{ borderTop: "1px solid #e3e3e3", marginTop: "8px", paddingTop: "8px" }}>
+          <button
+            onClick={() => navigate("/employer/notifications")}
+            style={{ ...s.navBtn, ...(path === "/employer/notifications" ? s.navBtnActive : {}) }}
+          >
+            <span style={{ ...s.navIcon, ...(path === "/employer/notifications" ? s.navIconActive : {}) }}>
+              {ICONS.bell}
+            </span>
+            <span style={s.navLabel}>Notifications</span>
+            {unreadCount > 0 && (
+              <span style={s.navBadge}>{unreadCount > 9 ? "9+" : unreadCount}</span>
+            )}
+          </button>
+        </div>
       </nav>
       <div style={s.sidebarBottom}>
         <div style={s.profileChip}>
@@ -630,7 +663,6 @@ function Sidebar({ profile, userId }) {
             <div style={s.profileEmail}>Admin Access</div>
           </div>
         </div>
-        <div style={{ marginBottom: "8px" }}><NotificationDrawer userId={userId} /></div>
       </div>
     </div>
   );
@@ -696,6 +728,7 @@ const s = {
   navIcon: { color: "#5f6368", display: "flex", alignItems: "center", justifyContent: "center", width: "20px", flexShrink: 0 },
   navIconActive: { color: "#1967d2" },
   navLabel: { flex: 1 },
+  navBadge: { background: "#1a73e8", color: "#ffffff", borderRadius: "10px", padding: "1px 7px", fontSize: "11px", fontWeight: "600", flexShrink: 0, fontFamily: FONT },
   sidebarBottom: { borderTop: "1px solid #e3e3e3", padding: "16px", background: "#f8f9fa" },
   profileChip: { display: "flex", alignItems: "center", gap: "10px", marginBottom: "12px" },
   profileAvatarWrap: { width: "32px", height: "32px", borderRadius: "50%", overflow: "hidden", flexShrink: 0, border: "1px solid #dadce0" },

@@ -1,6 +1,8 @@
 import { useNavigate, Link } from "react-router-dom";
+import Navbar from "../../components/Navbar";
+import Footer from "../../components/Footer";
 
-const FONT = '"Circular", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif';
+const FONT = '"Circular Std", "Circular", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif';
 
 export default function NotFound() {
   const navigate = useNavigate();
@@ -8,18 +10,7 @@ export default function NotFound() {
     <div style={s.page}>
 
       {/* Navbar */}
-      <nav style={s.navbar}>
-        <div style={s.navInner}>
-          <div onClick={() => navigate("/")} style={s.navLogo}>
-            <div style={s.logoMark}>V</div>
-            <span style={s.logoText}>Vetted</span>
-          </div>
-          <div style={s.navLinks}>
-            <Link to="/jobs" style={s.navLink}>Browse Jobs</Link>
-            <Link to="/employer/login" style={s.navBtn}>Employer Login</Link>
-          </div>
-        </div>
-      </nav>
+      <Navbar />
 
       {/* Body */}
       <div style={s.body}>
@@ -80,15 +71,7 @@ export default function NotFound() {
       </div>
 
       {/* Footer */}
-      <footer style={s.footer}>
-        <div style={s.footerInner}>
-          <span style={s.footerCopy}>© {new Date().getFullYear()} Vetted (Pty) Ltd</span>
-          <div style={s.footerLinks}>
-            <Link to="/terms"   style={s.footerLink}>Terms</Link>
-            <Link to="/privacy" style={s.footerLink}>Privacy</Link>
-          </div>
-        </div>
-      </footer>
+      <Footer />
 
     </div>
   );
@@ -105,18 +88,8 @@ const s = {
     flexDirection: "column",
   },
 
-  // ── Navbar ──
-  navbar: { background: "#ffffff", borderBottom: "1px solid #e3e3e3" },
-  navInner: { maxWidth: "1100px", margin: "0 auto", padding: "0 32px", height: "60px", display: "flex", alignItems: "center", justifyContent: "space-between" },
-  navLogo: { display: "flex", alignItems: "center", gap: "10px", cursor: "pointer" },
-  logoMark: { width: "28px", height: "28px", borderRadius: "5px", background: "#ffca28", color: "#d84315", fontWeight: "700", fontSize: "15px", display: "flex", alignItems: "center", justifyContent: "center" },
-  logoText: { color: "#202124", fontWeight: "600", fontSize: "15px" },
-  navLinks: { display: "flex", alignItems: "center", gap: "20px" },
-  navLink: { color: "#5f6368", fontSize: "13px", textDecoration: "none", fontWeight: "500" },
-  navBtn: { background: "#1a73e8", color: "#ffffff", borderRadius: "4px", padding: "7px 14px", fontSize: "13px", fontWeight: "600", textDecoration: "none" },
-
   // ── Body ──
-  body: { flex: 1, display: "flex", alignItems: "center", justifyContent: "center", padding: "48px 32px" },
+  body: { flex: 1, display: "flex", alignItems: "center", justifyContent: "center", padding: "92px 32px 48px" },
   card: { background: "#ffffff", border: "1px solid #e3e3e3", borderRadius: "12px", padding: "48px 40px", maxWidth: "540px", width: "100%", textAlign: "center", boxShadow: "0 1px 3px rgba(60,64,67,0.1)" },
 
   // ── 404 display ──
@@ -141,11 +114,4 @@ const s = {
   btnOutline: { display: "inline-flex", alignItems: "center", background: "#ffffff", border: "1px solid #dadce0", color: "#3c4043", borderRadius: "4px", padding: "10px 18px", fontSize: "13px", fontWeight: "600", cursor: "pointer", fontFamily: FONT },
 
   helpNote: { color: "#9aa0a6", fontSize: "12px", margin: 0 },
-
-  // ── Footer ──
-  footer: { background: "#ffffff", borderTop: "1px solid #e3e3e3", padding: "16px 32px" },
-  footerInner: { maxWidth: "1100px", margin: "0 auto", display: "flex", justifyContent: "space-between", alignItems: "center" },
-  footerCopy: { color: "#9aa0a6", fontSize: "12px" },
-  footerLinks: { display: "flex", gap: "20px" },
-  footerLink: { color: "#9aa0a6", fontSize: "12px", textDecoration: "none" },
 };

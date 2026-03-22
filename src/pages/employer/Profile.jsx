@@ -4,7 +4,8 @@ import { ref, uploadBytes, getDownloadURL } from "firebase/storage";
 import { useNavigate, Link } from "react-router-dom";
 import { db, storage } from "../../lib/firebase";
 import { useAuth } from "../../context/AuthContext";
-import NotificationDrawer from "../../components/NotificationDrawer";
+
+const FONT = '"Circular Std", "Circular", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif';
 
 const PROVINCES = [
   "Eastern Cape", "Free State", "Gauteng", "KwaZulu-Natal",
@@ -109,7 +110,9 @@ export default function Profile() {
   // ── Verification guard ──
   if (employerProfile?.verificationStatus !== "approved") {
     return (
-      <div style={s.page}>
+      <>
+        <style>{`* { font-family: ${FONT} !important; } body { font-family: ${FONT} !important; }`}</style>
+        <div style={s.page}>
         <Sidebar profile={employerProfile} userId={user?.uid} />
         <div style={s.mainWrapper}>
           <div style={s.mainInner}>
@@ -131,11 +134,14 @@ export default function Profile() {
           </div>
         </div>
       </div>
+      </>
     );
   }
 
   return (
-    <div style={s.page}>
+    <>
+      <style>{`* { font-family: ${FONT} !important; } body { font-family: ${FONT} !important; }`}</style>
+      <div style={s.page}>
       <Sidebar profile={employerProfile} userId={user?.uid} />
 
       <div style={s.mainWrapper}>
@@ -356,6 +362,7 @@ export default function Profile() {
         </div>
       </div>
     </div>
+    </>
   );
 }
 
@@ -363,6 +370,20 @@ export default function Profile() {
 function Sidebar({ profile, userId }) {
   const navigate = useNavigate();
   const path = window.location.pathname;
+  const [unreadCount, setUnreadCount] = useState(0);
+
+  useEffect(() => {
+    const handler = () => {
+      try {
+        const count = parseInt(localStorage.getItem("vt_notif_unread_count") || "0", 10);
+        setUnreadCount(isNaN(count) ? 0 : count);
+      } catch { setUnreadCount(0); }
+    };
+    window.addEventListener("vt_notif_update", handler);
+    handler();
+    return () => window.removeEventListener("vt_notif_update", handler);
+  }, []);
+
   const navItems = [
     { label: "Project Overview",        to: "/employer/dashboard",    icon: "⌂" },
     { label: "Deploy Job",              to: "/employer/post-job",     icon: "+" },
@@ -370,7 +391,8 @@ function Sidebar({ profile, userId }) {
     { label: "Analytics",               to: "/employer/analytics",    icon: "📊" },
     { label: "Billing",                 to: "/employer/billing",      icon: "💳" },
     { label: "Settings",                to: "/employer/profile",      icon: "⚙" },
-    ];
+  ];
+
   return (
     <div style={s.sidebar}>
       <div style={s.sidebarHeader}>
@@ -397,6 +419,24 @@ function Sidebar({ profile, userId }) {
             <span style={s.navLabel}>{item.label}</span>
           </button>
         ))}
+        {/* Notifications — separated with border-top */}
+        <div style={{ borderTop: "1px solid #e3e3e3", marginTop: "8px", paddingTop: "8px" }}>
+          <button
+            onClick={() => navigate("/employer/notifications")}
+            style={{ ...s.navBtn, ...(path === "/employer/notifications" ? s.navBtnActive : {}) }}
+          >
+            <span style={{ ...s.navIcon, ...(path === "/employer/notifications" ? s.navIconActive : {}) }}>
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/>
+                <path d="M13.73 21a2 2 0 0 1-3.46 0"/>
+              </svg>
+            </span>
+            <span style={s.navLabel}>Notifications</span>
+            {unreadCount > 0 && (
+              <span style={s.navBadge}>{unreadCount > 9 ? "9+" : unreadCount}</span>
+            )}
+          </button>
+        </div>
       </nav>
       <div style={s.sidebarBottom}>
         <div style={s.profileChip}>
@@ -406,9 +446,6 @@ function Sidebar({ profile, userId }) {
               : <div style={s.profileAvatar}>{profile?.companyName?.[0] || "E"}</div>
             }
           </div>
-          <div style={{ marginBottom: "8px" }}>
-            <NotificationDrawer userId={userId} />
-            </div>
           <div style={{ overflow: "hidden" }}>
             <div style={s.profileName}>{profile?.companyName || "Employer"}</div>
             <div style={s.profileEmail}>Admin Access</div>
@@ -445,7 +482,7 @@ const s = {
     height: "100vh",
     overflow: "hidden",
     background: "#f4f5f7",
-    fontFamily: '"Circular", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif',
+    fontFamily: FONT,
   },
 
   // ── Sidebar ──
@@ -474,6 +511,7 @@ const s = {
   navIcon: { fontSize: "18px", color: "#5f6368", display: "flex", alignItems: "center", justifyContent: "center", width: "24px" },
   navIconActive: { color: "#1967d2" },
   navLabel: { flex: 1 },
+  navBadge: { background: "#1a73e8", color: "#ffffff", borderRadius: "10px", padding: "1px 7px", fontSize: "11px", fontWeight: "600", flexShrink: 0 },
 
   sidebarBottom: { borderTop: "1px solid #e3e3e3", padding: "16px", background: "#f8f9fa" },
   profileChip: { display: "flex", alignItems: "center", gap: "10px" },
@@ -518,7 +556,7 @@ const s = {
     fontSize: "13px",
     outline: "none",
     width: "100%",
-    fontFamily: '"Circular", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif',
+    fontFamily: FONT,
     boxSizing: "border-box",
     transition: "border-color 0.2s",
   },
