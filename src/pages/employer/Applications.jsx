@@ -3,6 +3,7 @@ import { collection, query, where, getDocs, doc, updateDoc, deleteDoc, serverTim
 import { useNavigate } from "react-router-dom";
 import { db } from "../../lib/firebase";
 import { useAuth } from "../../context/AuthContext";
+import EmployerSidebar from "../../components/EmployerSidebar";
 
 const FONT = '"Circular Std", "Circular", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif';
 
@@ -285,17 +286,18 @@ export default function Applications() {
   const colApps = (colKey) => filtered.filter(a => a.status === colKey);
 
   if (loading) return (
+    <><style>{`* { font-family: ${FONT} !important; } body { font-family: ${FONT} !important; }`}</style>
     <div style={s.page}>
-      <Sidebar profile={employerProfile} userId={user?.uid} />
+      <EmployerSidebar />
       <div style={s.mainWrapper}><div style={s.empty}>Loading pipeline...</div></div>
-    </div>
+    </div></>
   );
 
   return (
     <>
       <style>{`* { font-family: ${FONT} !important; } body { font-family: ${FONT} !important; }`}</style>
       <div style={s.page}>
-      <Sidebar profile={employerProfile} userId={user?.uid} />
+      <EmployerSidebar />
       <div style={s.mainWrapper}>
 
         <div style={s.topbar}>
@@ -583,91 +585,6 @@ function DrawerContent({ app, onStatusChange, onSaveNotes, onDelete }) {
   );
 }
 
-function Sidebar({ profile, userId }) {
-  const navigate = useNavigate();
-  const path = window.location.pathname;
-  const [unreadCount, setUnreadCount] = useState(0);
-
-  useEffect(() => {
-    const handler = () => {
-      try {
-        const count = parseInt(localStorage.getItem("vt_notif_unread_count") || "0", 10);
-        setUnreadCount(isNaN(count) ? 0 : count);
-      } catch { setUnreadCount(0); }
-    };
-    window.addEventListener("vt_notif_update", handler);
-    handler();
-    return () => window.removeEventListener("vt_notif_update", handler);
-  }, []);
-
-  const navItems = [
-    { label: "Project Overview",        to: "/employer/dashboard",    icon: "home" },
-    { label: "Deploy Job",              to: "/employer/post-job",     icon: "plus" },
-    { label: "Database (Applications)", to: "/employer/applications", icon: "list" },
-    { label: "Analytics",               to: "/employer/analytics",    icon: "chart" },
-    { label: "Billing",                 to: "/employer/billing",      icon: "card" },
-    { label: "Settings",                to: "/employer/profile",      icon: "gear" },
-  ];
-  const ICONS = {
-    home:  <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>,
-    plus:  <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>,
-    list:  <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/><line x1="3" y1="6" x2="3.01" y2="6"/><line x1="3" y1="12" x2="3.01" y2="12"/><line x1="3" y1="18" x2="3.01" y2="18"/></svg>,
-    chart: <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>,
-    card:  <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><rect x="1" y="4" width="22" height="16" rx="2" ry="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg>,
-    gear:  <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>,
-    bell:  <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>,
-  };
-
-  return (
-    <div style={s.sidebar}>
-      <div style={s.sidebarHeader}>
-        <div style={s.projectSelector}>
-          <div style={s.logoMark}>V</div>
-          <div style={s.projectInfo}><div style={s.logoText}>Vetted</div><div style={s.logoSub}>Spark Plan</div></div>
-          <div style={s.dropdownArrow}>
-            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><polyline points="6 9 12 15 18 9"/></svg>
-          </div>
-        </div>
-      </div>
-      <nav style={s.nav}>
-        <div style={s.navSectionTitle}>Develop</div>
-        {navItems.map(item => (
-          <button key={item.to} onClick={() => navigate(item.to)} style={{ ...s.navBtn, ...(path === item.to ? s.navBtnActive : {}) }}>
-            <span style={{ ...s.navIcon, ...(path === item.to ? s.navIconActive : {}) }}>{ICONS[item.icon]}</span>
-            <span style={s.navLabel}>{item.label}</span>
-          </button>
-        ))}
-        {/* Notifications — separated with border-top */}
-        <div style={{ borderTop: "1px solid #e3e3e3", marginTop: "8px", paddingTop: "8px" }}>
-          <button
-            onClick={() => navigate("/employer/notifications")}
-            style={{ ...s.navBtn, ...(path === "/employer/notifications" ? s.navBtnActive : {}) }}
-          >
-            <span style={{ ...s.navIcon, ...(path === "/employer/notifications" ? s.navIconActive : {}) }}>
-              {ICONS.bell}
-            </span>
-            <span style={s.navLabel}>Notifications</span>
-            {unreadCount > 0 && (
-              <span style={s.navBadge}>{unreadCount > 9 ? "9+" : unreadCount}</span>
-            )}
-          </button>
-        </div>
-      </nav>
-      <div style={s.sidebarBottom}>
-        <div style={s.profileChip}>
-          <div style={s.profileAvatarWrap}>
-            {profile?.logoUrl ? <img src={profile.logoUrl} alt={profile.companyName} style={s.profileLogoImg} /> : <div style={s.profileAvatar}>{profile?.companyName?.[0] || "E"}</div>}
-          </div>
-          <div style={{ overflow: "hidden" }}>
-            <div style={s.profileName}>{profile?.companyName || "Employer"}</div>
-            <div style={s.profileEmail}>Admin Access</div>
-          </div>
-        </div>
-      </div>
-    </div>
-  );
-}
-
 function InfoRow({ label, value }) {
   if (!value) return null;
   return (
@@ -713,29 +630,6 @@ const dr = {
 
 const s = {
   page: { display: "flex", height: "100vh", overflow: "hidden", background: "#f4f5f7", fontFamily: FONT },
-  sidebar: { width: "256px", flexShrink: 0, height: "100%", background: "#ffffff", borderRight: "1px solid #e3e3e3", display: "flex", flexDirection: "column", zIndex: 10 },
-  sidebarHeader: { padding: "16px 20px", borderBottom: "1px solid #e3e3e3" },
-  projectSelector: { display: "flex", alignItems: "center", gap: "12px", cursor: "pointer", padding: "8px", borderRadius: "8px" },
-  logoMark: { width: "32px", height: "32px", borderRadius: "6px", background: "#ffca28", color: "#d84315", fontWeight: "700", fontSize: "18px", display: "flex", alignItems: "center", justifyContent: "center" },
-  projectInfo: { flex: 1, overflow: "hidden" },
-  logoText: { color: "#202124", fontWeight: "600", fontSize: "14px", whiteSpace: "nowrap", textOverflow: "ellipsis", overflow: "hidden" },
-  logoSub: { color: "#5f6368", fontSize: "12px", fontWeight: "500" },
-  dropdownArrow: { color: "#5f6368" },
-  nav: { display: "flex", flexDirection: "column", gap: "2px", flex: 1, padding: "16px 12px", overflowY: "auto" },
-  navSectionTitle: { color: "#5f6368", fontSize: "11px", fontWeight: "700", textTransform: "uppercase", letterSpacing: "0.5px", padding: "0 12px", marginBottom: "8px", marginTop: "8px" },
-  navBtn: { background: "none", border: "none", color: "#3c4043", fontSize: "13px", fontWeight: "500", padding: "10px 12px", borderRadius: "6px", cursor: "pointer", textAlign: "left", display: "flex", alignItems: "center", gap: "12px", transition: "all 0.15s", fontFamily: FONT },
-  navBtnActive: { background: "#e3f2fd", color: "#1967d2", fontWeight: "600" },
-  navIcon: { color: "#5f6368", display: "flex", alignItems: "center", justifyContent: "center", width: "20px", flexShrink: 0 },
-  navIconActive: { color: "#1967d2" },
-  navLabel: { flex: 1 },
-  navBadge: { background: "#1a73e8", color: "#ffffff", borderRadius: "10px", padding: "1px 7px", fontSize: "11px", fontWeight: "600", flexShrink: 0, fontFamily: FONT },
-  sidebarBottom: { borderTop: "1px solid #e3e3e3", padding: "16px", background: "#f8f9fa" },
-  profileChip: { display: "flex", alignItems: "center", gap: "10px", marginBottom: "12px" },
-  profileAvatarWrap: { width: "32px", height: "32px", borderRadius: "50%", overflow: "hidden", flexShrink: 0, border: "1px solid #dadce0" },
-  profileAvatar: { width: "100%", height: "100%", background: "#1a73e8", color: "#ffffff", fontWeight: "600", fontSize: "14px", display: "flex", alignItems: "center", justifyContent: "center" },
-  profileLogoImg: { width: "100%", height: "100%", objectFit: "cover" },
-  profileName: { color: "#202124", fontSize: "13px", fontWeight: "600", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" },
-  profileEmail: { color: "#5f6368", fontSize: "12px" },
   mainWrapper: { flex: 1, height: "100%", display: "flex", flexDirection: "column", overflow: "hidden", padding: "28px 28px 0 28px" },
   topbar: { display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: "20px", gap: "16px", flexShrink: 0 },
   pageTitle: { color: "#202124", fontSize: "22px", fontWeight: "600", margin: "0 0 2px", letterSpacing: "-0.4px" },

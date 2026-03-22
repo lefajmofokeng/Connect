@@ -1,11 +1,11 @@
 import { useState, useEffect } from "react";
 import { collection, query, where, getDocs, doc, updateDoc, deleteDoc, serverTimestamp } from "firebase/firestore";
 import { useNavigate, Link } from "react-router-dom";
-import { signOut } from "firebase/auth";
-import { db, auth } from "../../lib/firebase";
+import { db } from "../../lib/firebase";
 import { useAuth } from "../../context/AuthContext";
-import NotificationDrawer from "../../components/NotificationDrawer";
+import EmployerSidebar from "../../components/EmployerSidebar";
 
+const FONT = '"Circular Std", "Circular", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif';
 const JOB_PRICE = 450;
 
 function getDueDate() {
@@ -66,11 +66,6 @@ export default function Dashboard() {
     }
   };
 
-  const handleSignOut = async () => {
-    await signOut(auth);
-    navigate("/employer/login");
-  };
-
   const liveJobs = jobs.filter(j => j.status === "live");
   const draftJobs = jobs.filter(j => j.status === "draft");
   const newApps = applications.filter(a => a.status === "new");
@@ -95,40 +90,22 @@ export default function Dashboard() {
   const filteredJobs = activeTab === "all" ? jobs : jobs.filter(j => j.status === activeTab);
 
   if (loading) return (
-    <Layout profile={employerProfile} onSignOut={handleSignOut} userId={user?.uid} jobs={[]} applications={[]}>
-      <div style={s.empty}>Loading data...</div>
-    </Layout>
+    <><style>{`* { font-family: ${FONT} !important; } body { font-family: ${FONT} !important; }`}</style>
+    <div style={s.page}>
+      <EmployerSidebar />
+      <div style={s.mainWrapper}><div style={s.mainInner}>
+        <div style={s.empty}>Loading data...</div>
+      </div></div>
+    </div></>
   );
 
   // ── Verification guard — only approved employers see the full dashboard ──
   const verStatus = employerProfile?.verificationStatus;
   if (verStatus !== "approved") {
     return (
+      <><style>{`* { font-family: ${FONT} !important; } body { font-family: ${FONT} !important; }`}</style>
       <div style={s.page}>
-        <div style={s.sidebar}>
-          <div style={s.sidebarHeader}>
-            <div style={s.projectSelector}>
-              <div style={s.logoMark}>V</div>
-              <div style={s.projectInfo}>
-                <div style={s.logoText}>Vetted</div>
-                <div style={s.logoSub}>Employer Portal</div>
-              </div>
-            </div>
-          </div>
-          <div style={{ flex: 1 }} />
-          <div style={s.sidebarBottom}>
-            <div style={s.profileChip}>
-              <div style={s.profileAvatarWrap}>
-                <div style={s.profileAvatar}>{employerProfile?.companyName?.[0] || "E"}</div>
-              </div>
-              <div style={{ overflow: "hidden" }}>
-                <div style={s.profileName}>{employerProfile?.companyName || "Employer"}</div>
-                <div style={s.profileEmail}>{user?.email}</div>
-              </div>
-            </div>
-            <button onClick={handleSignOut} style={s.signOutBtn}>Sign Out</button>
-          </div>
-        </div>
+        <EmployerSidebar />
         <div style={s.mainWrapper}>
           <div style={s.mainInner}>
             <div style={{
@@ -192,11 +169,16 @@ export default function Dashboard() {
           </div>
         </div>
       </div>
+      </>
     );
   }
 
   return (
-    <Layout profile={employerProfile} onSignOut={handleSignOut} userId={user?.uid} jobs={jobs} applications={applications}>
+    <><style>{`* { font-family: ${FONT} !important; } body { font-family: ${FONT} !important; }`}</style>
+    <div style={s.page}>
+      <EmployerSidebar />
+      <div style={s.mainWrapper}>
+        <div style={s.mainInner}>
 
       {/* Header */}
       <div style={s.topbar}>
@@ -386,76 +368,10 @@ export default function Dashboard() {
         </div>
       </div>
 
-    </Layout>
-  );
-}
-
-// ── Layout ────────────────────────────────────────────────────────────
-function Layout({ children, profile, onSignOut, userId, jobs, applications }) {
-  const navigate = useNavigate();
-  const path = window.location.pathname;
-  const navItems = [
-    { label: "Project Overview",        to: "/employer/dashboard",    icon: "⌂" },
-    { label: "Deploy Job",              to: "/employer/post-job",     icon: "+" },
-    { label: "Database (Applications)", to: "/employer/applications", icon: "≡" },
-    { label: "Analytics",               to: "/employer/analytics",    icon: "📊" },
-    { label: "Billing",                 to: "/employer/billing",      icon: "💳" },
-    { label: "Settings",                to: "/employer/profile",      icon: "⚙" },
-  ];
-  return (
-    <div style={s.page}>
-      <div style={s.sidebar}>
-        <div style={s.sidebarHeader}>
-          <div style={s.projectSelector}>
-            <div style={s.logoMark}>V</div>
-            <div style={s.projectInfo}>
-              <div style={s.logoText}>Vetted</div>
-              <div style={s.logoSub}>Spark Plan</div>
-            </div>
-            <div style={s.dropdownArrow}>▾</div>
-          </div>
-        </div>
-        <nav style={s.nav}>
-          <div style={s.navSectionTitle}>Develop</div>
-          {navItems.map(item => (
-            <button
-              key={item.to}
-              onClick={() => navigate(item.to)}
-              style={{ ...s.navBtn, ...(path === item.to ? s.navBtnActive : {}) }}
-            >
-              <span style={{ ...s.navIcon, ...(path === item.to ? s.navIconActive : {}) }}>
-                {item.icon}
-              </span>
-              <span style={s.navLabel}>{item.label}</span>
-            </button>
-          ))}
-        </nav>
-        <div style={s.sidebarBottom}>
-          <div style={s.profileChip}>
-            <div style={s.profileAvatarWrap}>
-              {profile?.logoUrl
-                ? <img src={profile.logoUrl} alt={profile.companyName} style={s.profileLogoImg} />
-                : <div style={s.profileAvatar}>{profile?.companyName?.[0] || "E"}</div>
-              }
-            </div>
-            <div style={{ overflow: "hidden" }}>
-              <div style={s.profileName}>{profile?.companyName || "Employer"}</div>
-              <div style={s.profileEmail}>Admin Access</div>
-            </div>
-          </div>
-          {/* Bell icon — sits between profile chip and sign out */}
-          <div style={s.bellRow}>
-            <NotificationDrawer userId={userId} jobs={jobs} applications={applications} />
-          </div>
-          <button onClick={onSignOut} style={s.signOutBtn}>Sign Out</button>
-        </div>
-      </div>
-      <div style={s.mainWrapper}>
-        <div style={s.mainInner}>
-          {children}
         </div>
       </div>
     </div>
+    </>
   );
 }
 
@@ -497,45 +413,12 @@ function pillColor(status) {
 // ── Styles ────────────────────────────────────────────────────────────
 const s = {
   // ── Page Shell ──
-  page: {
-    display: "flex",
-    height: "100vh",
-    overflow: "hidden",
-    background: "#f4f5f7",
-    fontFamily: '"Circular", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif',
-  },
-
-  // ── Sidebar ──
-  sidebar: { width: "256px", flexShrink: 0, height: "100%", background: "#ffffff", borderRight: "1px solid #e3e3e3", display: "flex", flexDirection: "column", zIndex: 10 },
-  sidebarHeader: { padding: "16px 20px", borderBottom: "1px solid #e3e3e3" },
-  projectSelector: { display: "flex", alignItems: "center", gap: "12px", cursor: "pointer", padding: "8px", borderRadius: "8px", transition: "background 0.2s" },
-  logoMark: { width: "32px", height: "32px", borderRadius: "6px", background: "#ffca28", color: "#d84315", fontWeight: "700", fontSize: "18px", display: "flex", alignItems: "center", justifyContent: "center" },
-  projectInfo: { flex: 1, overflow: "hidden" },
-  logoText: { color: "#202124", fontWeight: "600", fontSize: "14px", whiteSpace: "nowrap", textOverflow: "ellipsis", overflow: "hidden" },
-  logoSub: { color: "#5f6368", fontSize: "12px", fontWeight: "500" },
-  dropdownArrow: { color: "#5f6368", fontSize: "12px" },
-
-  nav: { display: "flex", flexDirection: "column", gap: "2px", flex: 1, padding: "16px 12px", overflowY: "auto" },
-  navSectionTitle: { color: "#5f6368", fontSize: "11px", fontWeight: "700", textTransform: "uppercase", letterSpacing: "0.5px", padding: "0 12px", marginBottom: "8px", marginTop: "8px" },
-  navBtn: { background: "none", border: "none", color: "#3c4043", fontSize: "13px", fontWeight: "500", padding: "10px 12px", borderRadius: "6px", cursor: "pointer", textAlign: "left", display: "flex", alignItems: "center", gap: "12px", transition: "all 0.15s" },
-  navBtnActive: { background: "#e3f2fd", color: "#1967d2", fontWeight: "600" },
-  navIcon: { fontSize: "18px", color: "#5f6368", display: "flex", alignItems: "center", justifyContent: "center", width: "24px" },
-  navIconActive: { color: "#1967d2" },
-  navLabel: { flex: 1 },
-
-  sidebarBottom: { borderTop: "1px solid #e3e3e3", padding: "16px", background: "#f8f9fa" },
-  profileChip: { display: "flex", alignItems: "center", gap: "10px", marginBottom: "12px" },
-  bellRow: { marginBottom: "8px" },
-  profileAvatarWrap: { width: "32px", height: "32px", borderRadius: "50%", overflow: "hidden", flexShrink: 0, border: "1px solid #dadce0" },
-  profileAvatar: { width: "100%", height: "100%", background: "#1a73e8", color: "#ffffff", fontWeight: "600", fontSize: "14px", display: "flex", alignItems: "center", justifyContent: "center" },
-  profileLogoImg: { width: "100%", height: "100%", objectFit: "cover", background: "#ffffff" },
-  profileName: { color: "#202124", fontSize: "13px", fontWeight: "600", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" },
-  profileEmail: { color: "#5f6368", fontSize: "12px" },
-  signOutBtn: { width: "100%", background: "#ffffff", border: "1px solid #dadce0", color: "#3c4043", borderRadius: "4px", padding: "6px", fontSize: "12px", fontWeight: "600", cursor: "pointer", transition: "all 0.2s" },
+  page: { display: "flex", height: "100vh", overflow: "hidden", background: "#f4f5f7", fontFamily: FONT },
 
   // ── Main Content ──
   mainWrapper: { flex: 1, height: "100%", overflowY: "auto", position: "relative" },
   mainInner: { padding: "32px 48px", maxWidth: "1200px", margin: "0 auto" },
+  empty: { color: "#5f6368", padding: "48px", textAlign: "center", fontSize: "14px", fontWeight: "500", fontFamily: FONT },
 
   topbar: { display: "flex", alignItems: "flex-start", justifyContent: "space-between", marginBottom: "32px", gap: "16px", flexWrap: "wrap" },
   pageTitle: { color: "#202124", fontSize: "24px", fontWeight: "600", margin: "0 0 4px", letterSpacing: "-0.5px" },

@@ -3,6 +3,9 @@ import { collection, query, where, getDocs } from "firebase/firestore";
 import { useNavigate } from "react-router-dom";
 import { db } from "../../lib/firebase";
 import { useAuth } from "../../context/AuthContext";
+import EmployerSidebar from '../../components/EmployerSidebar';
+
+const FONT = '"Circular Std", "Circular", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif';
 
 export default function Analytics() {
   const { user, employerProfile } = useAuth();
@@ -88,19 +91,22 @@ export default function Analytics() {
   const avgPerJob   = liveJobs > 0 ? (totalApps / jobs.length).toFixed(1) : "0.0";
 
   if (loading) return (
+    <><style>{`* { font-family: ${FONT} !important; } body { font-family: ${FONT} !important; }`}</style>
     <div style={s.page}>
-      <Sidebar profile={employerProfile} userId={user?.uid} />
+      <EmployerSidebar />
       <div style={s.mainWrapper}>
         <div style={s.mainInner}>
           <div style={s.empty}>Fetching analytics...</div>
         </div>
       </div>
-    </div>
+    </div></>
   );
 
   return (
-    <div style={s.page}>
-      <Sidebar profile={employerProfile} userId={user?.uid} />
+    <>
+      <style>{`* { font-family: ${FONT} !important; } body { font-family: ${FONT} !important; }`}</style>
+      <div style={s.page}>
+      <EmployerSidebar />
 
       <div style={s.mainWrapper}>
         <div style={s.mainInner}>
@@ -280,113 +286,11 @@ export default function Analytics() {
         </div>
       </div>
     </div>
+    </>
   );
 }
 
-// ── Sidebar ────────────────────────────────────────────────────────────
-function Sidebar({ profile, userId }) {
-  const navigate = useNavigate();
-  const path = window.location.pathname;
-  const [unreadCount, setUnreadCount] = useState(0);
-
-  useEffect(() => {
-    try {
-      const read = JSON.parse(localStorage.getItem("vt_notif_read") || "[]");
-      // We don't know total notifications here, but we can show dot if any unread key exists
-      // The NotificationDrawer page itself handles the full count
-      // For the badge we just check if there's a stored unread marker
-      setUnreadCount(0); // Will be updated by visiting the notifications page
-    } catch { setUnreadCount(0); }
-  }, []);
-
-  // Listen for notification count updates from the notifications page
-  useEffect(() => {
-    const handler = () => {
-      try {
-        const count = parseInt(localStorage.getItem("vt_notif_unread_count") || "0", 10);
-        setUnreadCount(isNaN(count) ? 0 : count);
-      } catch { setUnreadCount(0); }
-    };
-    window.addEventListener("vt_notif_update", handler);
-    handler(); // run on mount
-    return () => window.removeEventListener("vt_notif_update", handler);
-  }, []);
-
-  const navItems = [
-    { label: "Project Overview",        to: "/employer/dashboard",    icon: "⌂" },
-    { label: "Deploy Job",              to: "/employer/post-job",     icon: "+" },
-    { label: "Database (Applications)", to: "/employer/applications", icon: "≡" },
-    { label: "Analytics",               to: "/employer/analytics",    icon: "📊" },
-    { label: "Billing",                 to: "/employer/billing",      icon: "💳" },
-    { label: "Settings",                to: "/employer/profile",      icon: "⚙" },
-  ];
-
-  return (
-    <div style={s.sidebar}>
-      <div style={s.sidebarHeader}>
-        <div style={s.projectSelector}>
-          <div style={s.logoMark}>V</div>
-          <div style={s.projectInfo}>
-            <div style={s.logoText}>Vetted</div>
-            <div style={s.logoSub}>Spark Plan</div>
-          </div>
-          <div style={s.dropdownArrow}>▾</div>
-        </div>
-      </div>
-      <nav style={s.nav}>
-        <div style={s.navSectionTitle}>Develop</div>
-        {navItems.map(item => (
-          <button
-            key={item.to}
-            onClick={() => navigate(item.to)}
-            style={{ ...s.navBtn, ...(path === item.to ? s.navBtnActive : {}) }}
-          >
-            <span style={{ ...s.navIcon, ...(path === item.to ? s.navIconActive : {}) }}>
-              {item.icon}
-            </span>
-            <span style={s.navLabel}>{item.label}</span>
-          </button>
-        ))}
-
-        {/* Notifications — separated with border-top */}
-        <div style={{ borderTop: "1px solid #e3e3e3", marginTop: "8px", paddingTop: "8px" }}>
-          <button
-            onClick={() => navigate("/employer/notifications")}
-            style={{ ...s.navBtn, ...(path === "/employer/notifications" ? s.navBtnActive : {}) }}
-          >
-            <span style={{ ...s.navIcon, ...(path === "/employer/notifications" ? s.navIconActive : {}) }}>
-              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/>
-                <path d="M13.73 21a2 2 0 0 1-3.46 0"/>
-              </svg>
-            </span>
-            <span style={s.navLabel}>Notifications</span>
-            {unreadCount > 0 && (
-              <span style={s.navBadge}>{unreadCount > 9 ? "9+" : unreadCount}</span>
-            )}
-          </button>
-        </div>
-      </nav>
-
-      <div style={s.sidebarBottom}>
-        <div style={s.profileChip}>
-          <div style={s.profileAvatarWrap}>
-            {profile?.logoUrl
-              ? <img src={profile.logoUrl} alt={profile.companyName} style={s.profileLogoImg} />
-              : <div style={s.profileAvatar}>{profile?.companyName?.[0] || "E"}</div>
-            }
-          </div>
-          <div style={{ overflow: "hidden" }}>
-            <div style={s.profileName}>{profile?.companyName || "Employer"}</div>
-            <div style={s.profileEmail}>Admin Access</div>
-          </div>
-        </div>
-      </div>
-    </div>
-  );
-}
-
-// ── Helpers ───────────────────────────────────────────────────────────
+// ── Helpers ────────────────────────────────────────────────────────────
 function StatCard({ label, value, color, small }) {
   return (
     <div style={s.statCard}>
@@ -428,33 +332,10 @@ const s = {
     height: "100vh",
     overflow: "hidden",
     background: "#f4f5f7",
-    fontFamily: '"Circular", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif',
+    fontFamily: FONT,
   },
 
   // ── Sidebar ──
-  sidebar: { width: "256px", flexShrink: 0, height: "100%", background: "#ffffff", borderRight: "1px solid #e3e3e3", display: "flex", flexDirection: "column", zIndex: 10 },
-  sidebarHeader: { padding: "16px 20px", borderBottom: "1px solid #e3e3e3" },
-  projectSelector: { display: "flex", alignItems: "center", gap: "12px", cursor: "pointer", padding: "8px", borderRadius: "8px", transition: "background 0.2s" },
-  logoMark: { width: "32px", height: "32px", borderRadius: "6px", background: "#ffca28", color: "#d84315", fontWeight: "700", fontSize: "18px", display: "flex", alignItems: "center", justifyContent: "center" },
-  projectInfo: { flex: 1, overflow: "hidden" },
-  logoText: { color: "#202124", fontWeight: "600", fontSize: "14px", whiteSpace: "nowrap", textOverflow: "ellipsis", overflow: "hidden" },
-  logoSub: { color: "#5f6368", fontSize: "12px", fontWeight: "500" },
-  dropdownArrow: { color: "#5f6368", fontSize: "12px" },
-  nav: { display: "flex", flexDirection: "column", gap: "2px", flex: 1, padding: "16px 12px", overflowY: "auto" },
-  navSectionTitle: { color: "#5f6368", fontSize: "11px", fontWeight: "700", textTransform: "uppercase", letterSpacing: "0.5px", padding: "0 12px", marginBottom: "8px", marginTop: "8px" },
-  navBtn: { background: "none", border: "none", color: "#3c4043", fontSize: "13px", fontWeight: "500", padding: "10px 12px", borderRadius: "6px", cursor: "pointer", textAlign: "left", display: "flex", alignItems: "center", gap: "12px", transition: "all 0.15s" },
-  navBtnActive: { background: "#e3f2fd", color: "#1967d2", fontWeight: "600" },
-  navIcon: { fontSize: "18px", color: "#5f6368", display: "flex", alignItems: "center", justifyContent: "center", width: "24px" },
-  navIconActive: { color: "#1967d2" },
-  navLabel: { flex: 1 },
-  navBadge: { background: "#1a73e8", color: "#ffffff", borderRadius: "10px", padding: "1px 7px", fontSize: "11px", fontWeight: "600", flexShrink: 0 },
-  sidebarBottom: { borderTop: "1px solid #e3e3e3", padding: "16px", background: "#f8f9fa" },
-  profileChip: { display: "flex", alignItems: "center", gap: "10px" },
-  profileAvatarWrap: { width: "32px", height: "32px", borderRadius: "50%", overflow: "hidden", flexShrink: 0, border: "1px solid #dadce0" },
-  profileAvatar: { width: "100%", height: "100%", background: "#1a73e8", color: "#ffffff", fontWeight: "600", fontSize: "14px", display: "flex", alignItems: "center", justifyContent: "center" },
-  profileLogoImg: { width: "100%", height: "100%", objectFit: "cover", background: "#ffffff" },
-  profileName: { color: "#202124", fontSize: "13px", fontWeight: "600", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" },
-  profileEmail: { color: "#5f6368", fontSize: "12px" },
 
   // ── Main ──
   mainWrapper: { flex: 1, height: "100%", overflowY: "auto", position: "relative" },

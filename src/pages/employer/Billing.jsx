@@ -3,7 +3,9 @@ import { collection, query, where, getDocs } from "firebase/firestore";
 import { useNavigate } from "react-router-dom";
 import { db } from "../../lib/firebase";
 import { useAuth } from "../../context/AuthContext";
-import NotificationDrawer from "../../components/NotificationDrawer";
+import EmployerSidebar from "../../components/EmployerSidebar";
+
+const FONT = '"Circular Std", "Circular", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif';
 
 const JOB_PRICE = 450;
 
@@ -291,19 +293,22 @@ export default function Billing() {
   const currentMonthIdx = months.length - 1;
 
   if (loading) return (
+    <><style>{`* { font-family: ${FONT} !important; } body { font-family: ${FONT} !important; }`}</style>
     <div style={s.page}>
-      <Sidebar profile={employerProfile} userId={user?.uid} />
+      <EmployerSidebar />
       <div style={s.mainWrapper}>
         <div style={s.mainInner}>
           <div style={s.empty}>Fetching billing data...</div>
         </div>
       </div>
-    </div>
+    </div></>
   );
 
   return (
-    <div style={s.page}>
-      <Sidebar profile={employerProfile} userId={user?.uid} />
+    <>
+      <style>{`* { font-family: ${FONT} !important; } body { font-family: ${FONT} !important; }`}</style>
+      <div style={s.page}>
+      <EmployerSidebar />
 
       <div style={s.mainWrapper}>
         <div style={s.mainInner}>
@@ -544,6 +549,7 @@ export default function Billing() {
         </div>
       </div>
     </div>
+    </>
   );
 }
 
@@ -569,66 +575,6 @@ function StatusBadge({ status, isPaid }) {
   );
 }
 
-// ── Sidebar ────────────────────────────────────────────────────────────
-function Sidebar({ profile, userId }) {
-  const navigate = useNavigate();
-  const path = window.location.pathname;
-  const navItems = [
-    { label: "Project Overview",        to: "/employer/dashboard",    icon: "⌂" },
-    { label: "Deploy Job",              to: "/employer/post-job",     icon: "+" },
-    { label: "Database (Applications)", to: "/employer/applications", icon: "≡" },
-    { label: "Analytics",               to: "/employer/analytics",    icon: "📊" },
-    { label: "Billing",                 to: "/employer/billing",      icon: "💳" },
-    { label: "Settings",                to: "/employer/profile",      icon: "⚙" },
-  ];
-  return (
-    <div style={s.sidebar}>
-      <div style={s.sidebarHeader}>
-        <div style={s.projectSelector}>
-          <div style={s.logoMark}>V</div>
-          <div style={s.projectInfo}>
-            <div style={s.logoText}>Vetted</div>
-            <div style={s.logoSub}>Spark Plan</div>
-          </div>
-          <div style={s.dropdownArrow}>▾</div>
-        </div>
-      </div>
-      <nav style={s.nav}>
-        <div style={s.navSectionTitle}>Develop</div>
-        {navItems.map(item => (
-          <button
-            key={item.to}
-            onClick={() => navigate(item.to)}
-            style={{ ...s.navBtn, ...(path === item.to ? s.navBtnActive : {}) }}
-          >
-            <span style={{ ...s.navIcon, ...(path === item.to ? s.navIconActive : {}) }}>
-              {item.icon}
-            </span>
-            <span style={s.navLabel}>{item.label}</span>
-          </button>
-        ))}
-      </nav>
-      <div style={s.sidebarBottom}>
-        <div style={s.profileChip}>
-          <div style={s.profileAvatarWrap}>
-            {profile?.logoUrl
-              ? <img src={profile.logoUrl} alt={profile.companyName} style={s.profileLogoImg} />
-              : <div style={s.profileAvatar}>{profile?.companyName?.[0] || "E"}</div>
-            }
-          </div>
-          <div style={{ marginBottom: "8px" }}>
-            <NotificationDrawer userId={userId} />
-          </div>
-          <div style={{ overflow: "hidden" }}>
-            <div style={s.profileName}>{profile?.companyName || "Employer"}</div>
-            <div style={s.profileEmail}>Admin Access</div>
-          </div>
-        </div>
-      </div>
-    </div>
-  );
-}
-
 // ── Helpers ───────────────────────────────────────────────────────────
 function StatCard({ label, value, color, small }) {
   return (
@@ -650,32 +596,10 @@ const s = {
     height: "100vh",
     overflow: "hidden",
     background: "#f4f5f7",
-    fontFamily: '"Circular", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif',
+    fontFamily: FONT,
   },
 
   // ── Sidebar ──
-  sidebar: { width: "256px", flexShrink: 0, height: "100%", background: "#ffffff", borderRight: "1px solid #e3e3e3", display: "flex", flexDirection: "column", zIndex: 10 },
-  sidebarHeader: { padding: "16px 20px", borderBottom: "1px solid #e3e3e3" },
-  projectSelector: { display: "flex", alignItems: "center", gap: "12px", cursor: "pointer", padding: "8px", borderRadius: "8px", transition: "background 0.2s" },
-  logoMark: { width: "32px", height: "32px", borderRadius: "6px", background: "#ffca28", color: "#d84315", fontWeight: "700", fontSize: "18px", display: "flex", alignItems: "center", justifyContent: "center" },
-  projectInfo: { flex: 1, overflow: "hidden" },
-  logoText: { color: "#202124", fontWeight: "600", fontSize: "14px", whiteSpace: "nowrap", textOverflow: "ellipsis", overflow: "hidden" },
-  logoSub: { color: "#5f6368", fontSize: "12px", fontWeight: "500" },
-  dropdownArrow: { color: "#5f6368", fontSize: "12px" },
-  nav: { display: "flex", flexDirection: "column", gap: "2px", flex: 1, padding: "16px 12px", overflowY: "auto" },
-  navSectionTitle: { color: "#5f6368", fontSize: "11px", fontWeight: "700", textTransform: "uppercase", letterSpacing: "0.5px", padding: "0 12px", marginBottom: "8px", marginTop: "8px" },
-  navBtn: { background: "none", border: "none", color: "#3c4043", fontSize: "13px", fontWeight: "500", padding: "10px 12px", borderRadius: "6px", cursor: "pointer", textAlign: "left", display: "flex", alignItems: "center", gap: "12px", transition: "all 0.15s" },
-  navBtnActive: { background: "#e3f2fd", color: "#1967d2", fontWeight: "600" },
-  navIcon: { fontSize: "18px", color: "#5f6368", display: "flex", alignItems: "center", justifyContent: "center", width: "24px" },
-  navIconActive: { color: "#1967d2" },
-  navLabel: { flex: 1 },
-  sidebarBottom: { borderTop: "1px solid #e3e3e3", padding: "16px", background: "#f8f9fa" },
-  profileChip: { display: "flex", alignItems: "center", gap: "10px" },
-  profileAvatarWrap: { width: "32px", height: "32px", borderRadius: "50%", overflow: "hidden", flexShrink: 0, border: "1px solid #dadce0" },
-  profileAvatar: { width: "100%", height: "100%", background: "#1a73e8", color: "#ffffff", fontWeight: "600", fontSize: "14px", display: "flex", alignItems: "center", justifyContent: "center" },
-  profileLogoImg: { width: "100%", height: "100%", objectFit: "cover", background: "#ffffff" },
-  profileName: { color: "#202124", fontSize: "13px", fontWeight: "600", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" },
-  profileEmail: { color: "#5f6368", fontSize: "12px" },
 
   // ── Main ──
   mainWrapper: { flex: 1, height: "100%", overflowY: "auto", position: "relative" },
@@ -683,7 +607,7 @@ const s = {
   topbar: { display: "flex", alignItems: "flex-start", justifyContent: "space-between", marginBottom: "32px", gap: "16px" },
   pageTitle: { color: "#202124", fontSize: "24px", fontWeight: "600", margin: "0 0 4px", letterSpacing: "-0.5px" },
   pageSub: { color: "#5f6368", fontSize: "14px", margin: 0 },
-  downloadInvoiceBtn: { display: "inline-flex", alignItems: "center", gap: "7px", background: "#1a73e8", border: "none", color: "#ffffff", borderRadius: "4px", padding: "9px 18px", fontSize: "13px", fontWeight: "600", cursor: "pointer", whiteSpace: "nowrap", flexShrink: 0, fontFamily: '"Circular", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif' },
+  downloadInvoiceBtn: { display: "inline-flex", alignItems: "center", gap: "7px", background: "#1a73e8", border: "none", color: "#ffffff", borderRadius: "4px", padding: "9px 18px", fontSize: "13px", fontWeight: "600", cursor: "pointer", whiteSpace: "nowrap", flexShrink: 0, fontFamily: FONT },
   empty: { color: "#5f6368", padding: "48px", textAlign: "center", fontSize: "14px", fontWeight: "500" },
 
   // ── Invoice hero card ──
@@ -728,7 +652,7 @@ const s = {
   pill: { padding: "4px 8px", borderRadius: "4px", fontSize: "11px", fontWeight: "600", textTransform: "uppercase", letterSpacing: "0.5px" },
   currentBadge: { display: "inline-block", background: "#e3f2fd", color: "#1967d2", borderRadius: "4px", padding: "2px 6px", fontSize: "10px", fontWeight: "700", marginTop: "4px", textTransform: "uppercase", letterSpacing: "0.4px" },
   statusBadge: { borderRadius: "4px", padding: "4px 8px", fontSize: "11px", fontWeight: "600" },
-  printBtn: { display: "inline-flex", alignItems: "center", gap: "5px", background: "transparent", border: "1px solid #dadce0", color: "#5f6368", borderRadius: "4px", padding: "5px 10px", fontSize: "12px", fontWeight: "600", cursor: "pointer", fontFamily: "inherit" },
+  printBtn: { display: "inline-flex", alignItems: "center", gap: "5px", background: "transparent", border: "1px solid #dadce0", color: "#5f6368", borderRadius: "4px", padding: "5px 10px", fontSize: "12px", fontWeight: "600", cursor: "pointer", fontFamily: FONT },
 
   // ── Pricing note ──
   pricingNote: { display: "flex", alignItems: "flex-start", gap: "10px", background: "#e3f2fd", color: "#1967d2", fontSize: "13px", lineHeight: "1.6", padding: "16px 18px", borderRadius: "8px", marginBottom: "40px" },
