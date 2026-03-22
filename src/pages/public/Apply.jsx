@@ -183,7 +183,7 @@ export default function Apply() {
   };
 
   if (loading) return (
-    <div style={s.page}><Navbar /><div style={s.empty}>Loading...</div></div>
+    <div className="apply-page" style={s.page}><Navbar /><div style={s.empty}>Loading...</div></div>
   );
 
   if (!job) return (
@@ -195,7 +195,7 @@ export default function Apply() {
     <div style={s.page}>
       <Navbar />
       <div style={s.body}>
-        <div style={s.successCard}>
+        <div className="apply-success-card" style={s.successCard}>
           <div style={s.successIcon}>
             <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#0d652d" strokeWidth="2.5">
               <polyline points="20 6 9 17 4 12"/>
@@ -212,7 +212,7 @@ export default function Apply() {
               <Link to="/jobseeker/dashboard" style={{ color: "#1a73e8", fontWeight: "600" }}>dashboard</Link>.
             </p>
           )}
-          <div style={s.successActions}>
+          <div className="apply-success-actions" style={s.successActions}>
             <button onClick={() => navigate("/jobs")} style={s.btnPrimary}>Browse More Jobs</button>
             <button onClick={() => navigate("/")} style={s.btnOutline}>Back to Home</button>
           </div>
@@ -225,22 +225,22 @@ export default function Apply() {
   return (
     <div style={s.page}>
       <Navbar />
-      <div style={s.body}>
+      <div className="apply-body" style={s.body}>
         <div style={s.inner}>
 
           {/* Back */}
-          <button onClick={() => navigate(`/jobs/${id}`)} style={s.backBtn}>
+          <button className="apply-back-btn" onClick={() => navigate(`/jobs/${id}`)} style={s.backBtn}>
             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" style={{ marginRight: 6 }}>
               <line x1="19" y1="12" x2="5" y2="12"/><polyline points="12 19 5 12 12 5"/>
             </svg>
             Back to Job
           </button>
 
-          <div style={s.layout}>
+          <div className="apply-layout" style={s.layout}>
 
             {/* ── Form column ── */}
             <div style={s.formCol}>
-              <div style={s.card}>
+              <div className="apply-card" style={s.card}>
 
                 {/* Horizontal stepper */}
                 <div style={s.stepper}>
@@ -249,7 +249,7 @@ export default function Apply() {
                     const isActive = i === step;
                     return (
                       <div key={label} style={s.stepItem}>
-                        <div style={{
+                        <div className="apply-step-label" style={{
                           ...s.stepDot,
                           ...(isActive ? s.stepDotActive : {}),
                           ...(isDone   ? s.stepDotDone   : {}),
@@ -259,7 +259,7 @@ export default function Apply() {
                             : i + 1
                           }
                         </div>
-                        <span style={{
+                        <span className="apply-step-label" style={{
                           ...s.stepLabel,
                           ...(isActive ? s.stepLabelActive : {}),
                           ...(isDone   ? s.stepLabelDone   : {}),
@@ -297,19 +297,19 @@ export default function Apply() {
                     )}
 
                     {/* Name */}
-                    <div style={s.row}>
+                    <div className="apply-row" style={s.row}>
                       <Field label="First Name *"><input style={s.input} value={form.firstName} onChange={set("firstName")} placeholder="Jane" /></Field>
                       <Field label="Last Name *"><input style={s.input} value={form.lastName} onChange={set("lastName")} placeholder="Smith" /></Field>
                     </div>
 
                     {/* Contact */}
-                    <div style={s.row}>
+                    <div className="apply-row" style={s.row}>
                       <Field label="Email Address *"><input style={s.input} type="email" value={form.email} onChange={set("email")} placeholder="jane@email.com" /></Field>
                       <Field label="Phone Number *"><input style={s.input} type="tel" value={form.phone} onChange={set("phone")} placeholder="071 000 0000" /></Field>
                     </div>
 
                     {/* DOB + Gender */}
-                    <div style={s.row}>
+                    <div className="apply-row" style={s.row}>
                       <Field label="Date of Birth *">
                         <input style={s.input} type="date" value={form.dateOfBirth} onChange={set("dateOfBirth")} max={new Date().toISOString().split("T")[0]} />
                       </Field>
@@ -328,7 +328,7 @@ export default function Apply() {
                     <Field label="Street Address *">
                       <input style={s.input} value={form.address} onChange={set("address")} placeholder="e.g. 123 Riverside Drive, Witsieshoek 9870" />
                     </Field>
-                    <div style={s.row}>
+                    <div className="apply-row" style={s.row}>
                       <Field label="City *">
                         <input style={s.input} value={form.city} onChange={set("city")} placeholder="e.g. Cape Town" />
                       </Field>
@@ -343,7 +343,7 @@ export default function Apply() {
                     </div>
 
                     {/* Qualification + Employment status */}
-                    <div style={s.row}>
+                    <div className="apply-row" style={s.row}>
                       <Field label="Highest Qualification *">
                         <select style={s.input} value={form.qualification} onChange={set("qualification")}>
                           <option value="">Select qualification</option>
@@ -397,7 +397,7 @@ export default function Apply() {
                         </div>
                       </Field>
                       {form.hasSimilarExperience === "Yes" && (
-                        <div style={s.row}>
+                        <div className="apply-row" style={s.row}>
                           <Field label="Years of Similar Experience">
                             <input style={s.input} value={form.similarExperienceYears} onChange={set("similarExperienceYears")} placeholder="e.g. 3 years" />
                           </Field>
@@ -668,7 +668,7 @@ export default function Apply() {
                 )}
 
                 {/* Navigation */}
-                <div style={s.navRow}>
+                <div className="apply-nav-row" style={s.navRow}>
                   {step > 0 && (
                     <button onClick={() => { setError(""); setStep(s => s - 1); }} style={s.btnBack2}>
                       <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" style={{ marginRight: 6 }}>
@@ -704,7 +704,7 @@ export default function Apply() {
             </div>
 
             {/* ── Job sidebar ── */}
-            <div style={s.sideCol}>
+            <div className="apply-side-col" style={s.sideCol}>
               <div style={s.jobCard}>
                 <div style={s.jobCardLabel}>Applying For</div>
                 <div style={s.jobLogoWrap}>
@@ -753,6 +753,33 @@ export default function Apply() {
         </div>
       </div>
       <Footer />
+
+      <style>{`
+        .apply-page * { font-family: ${FONT} !important; }
+        .apply-input:focus { border-color: #1a73e8 !important; outline: none; }
+        .apply-file-label:hover { border-color: #1a73e8 !important; }
+
+        /* Hide nav links on mobile */
+        @media (max-width: 768px) {
+          .apply-nav-links { display: none !important; }
+          .apply-layout { grid-template-columns: 1fr !important; }
+          .apply-side-col { position: static !important; }
+          .apply-row { grid-template-columns: 1fr !important; }
+          .apply-card { padding: 20px !important; }
+          .apply-body { padding: 80px 16px 40px !important; }
+          .apply-step-label { display: none !important; }
+          .apply-back-btn { padding: 0 0 16px !important; }
+          .apply-success-card { padding: 32px 20px !important; margin: 0 !important; }
+          .apply-success-actions { flex-direction: column !important; }
+          .apply-success-actions button { width: 100% !important; }
+          .apply-nav-row button { flex: 1; justify-content: center; }
+        }
+
+        @media (max-width: 480px) {
+          .apply-skill-input-row { flex-direction: column !important; }
+          .apply-skill-add-btn { width: 100% !important; }
+        }
+      `}</style>
     </div>
   );
 }
@@ -764,13 +791,15 @@ function Navbar() {
     <nav style={s.navbar}>
       <div style={s.navInner}>
         <div onClick={() => navigate("/")} style={s.navLogo}>
-          <img src="/logo.png" alt="Vetted" style={s.navLogoImg} />
+          <div style={s.logoMark}>V</div>
+          <span style={s.logoText}>Vetted</span>
         </div>
-        <div style={s.navLinks}>
+        <div className="apply-nav-links" style={s.navLinks}>
           <Link to="/jobs" style={s.navLink}>Browse Jobs</Link>
-          <Link to="/jobseeker/login" style={s.navLink}>Sign In</Link>
-          <Link to="/employer/login" style={s.navLinkBtn}>Employer Login</Link>
+          <Link to="/jobseeker/login" style={s.navSignIn}>Sign In</Link>
+          <Link to="/employer/login" style={s.navBtn}>Employer Login</Link>
         </div>
+        {/* Mobile — just logo */}
       </div>
     </nav>
   );
@@ -782,9 +811,12 @@ function Footer() {
     <footer style={s.footer}>
       <div style={s.footerInner}>
         <div style={s.footerBottom}>
-          <span>© {new Date().getFullYear()} Vetted. All rights reserved.</span>
-          <div style={{ display: "flex", gap: "24px" }}>
-            <Link to="/terms" style={s.footerLink}>Terms</Link>
+          <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
+            <div style={s.footerLogoMark}>V</div>
+            <span>© {new Date().getFullYear()} Vetted (Pty) Ltd. All rights reserved.</span>
+          </div>
+          <div style={{ display: "flex", gap: "20px" }}>
+            <Link to="/terms"   style={s.footerLink}>Terms</Link>
             <Link to="/privacy" style={s.footerLink}>Privacy</Link>
           </div>
         </div>
@@ -823,98 +855,102 @@ function ReviewRow({ label, value }) {
 }
 
 // ── Styles ────────────────────────────────────────────────────────────
+const FONT = '"Circular Std", "Circular", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif';
+
 const s = {
   page: {
     background: "#f4f5f7",
     minHeight: "100vh",
-    fontFamily: '"Circular", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif',
+    fontFamily: FONT,
     color: "#202124",
     display: "flex",
     flexDirection: "column",
   },
 
   // ── Navbar ──
-  navbar: { background: "#202124", position: "sticky", top: 0, zIndex: 100, borderBottom: "1px solid rgba(255,255,255,0.08)" },
+  navbar: { background: "#ffffff", borderBottom: "1px solid #dadce0", position: "fixed", top: 0, left: 0, right: 0, zIndex: 100 },
   navInner: { maxWidth: "1200px", margin: "0 auto", padding: "0 24px", height: "60px", display: "flex", alignItems: "center", justifyContent: "space-between" },
-  navLogo: { cursor: "pointer" },
-  navLogoImg: { height: "26px", objectFit: "contain" },
+  navLogo: { display: "flex", alignItems: "center", gap: "10px", cursor: "pointer" },
+  logoMark: { width: "28px", height: "28px", borderRadius: "5px", background: "#ffca28", color: "#d84315", fontWeight: "700", fontSize: "15px", display: "flex", alignItems: "center", justifyContent: "center", fontFamily: FONT },
+  logoText: { color: "#202124", fontWeight: "600", fontSize: "15px", fontFamily: FONT },
   navLinks: { display: "flex", alignItems: "center", gap: "8px" },
-  navLink: { color: "rgba(255,255,255,0.7)", fontSize: "13px", fontWeight: "500", textDecoration: "none", padding: "7px 12px", borderRadius: "4px" },
-  navLinkBtn: { background: "#1a73e8", color: "#fff", padding: "7px 14px", borderRadius: "4px", fontSize: "13px", fontWeight: "600", textDecoration: "none" },
+  navLink: { color: "#3c4043", fontSize: "13px", fontWeight: "500", textDecoration: "none", padding: "7px 10px", fontFamily: FONT },
+  navSignIn: { color: "#1a73e8", border: "1px solid #dadce0", background: "#fff", padding: "7px 14px", borderRadius: "20px", fontSize: "13px", fontWeight: "500", textDecoration: "none", fontFamily: FONT },
+  navBtn: { background: "#1a73e8", color: "#ffffff", padding: "7px 14px", borderRadius: "4px", fontSize: "13px", fontWeight: "600", textDecoration: "none", fontFamily: FONT },
 
   // ── Body ──
-  body: { flex: 1, padding: "32px 24px" },
+  body: { flex: 1, padding: "92px 24px 48px" },
   inner: { maxWidth: "1060px", margin: "0 auto" },
-  backBtn: { display: "inline-flex", alignItems: "center", background: "none", border: "none", color: "#5f6368", fontSize: "13px", fontWeight: "500", cursor: "pointer", padding: "0 0 20px", fontFamily: "inherit" },
+  backBtn: { display: "inline-flex", alignItems: "center", background: "none", border: "none", color: "#5f6368", fontSize: "13px", fontWeight: "500", cursor: "pointer", padding: "0 0 20px", fontFamily: FONT },
 
   // ── Layout ──
   layout: { display: "grid", gridTemplateColumns: "1fr 300px", gap: "24px", alignItems: "start" },
   formCol: {},
-  sideCol: { position: "sticky", top: "76px", display: "flex", flexDirection: "column", gap: "12px" },
+  sideCol: { position: "sticky", top: "80px", display: "flex", flexDirection: "column", gap: "12px" },
 
   // ── Main card ──
-  card: { background: "#ffffff", border: "1px solid #e3e3e3", borderRadius: "8px", padding: "28px", boxShadow: "0 1px 2px 0 rgba(60,64,67,0.08)" },
+  card: { background: "#ffffff", border: "1px solid #dadce0", borderRadius: "8px", padding: "28px", boxShadow: "0 1px 2px 0 rgba(60,64,67,0.08)" },
 
   // ── Horizontal stepper ──
   stepper: { display: "flex", alignItems: "center", marginBottom: "28px" },
   stepItem: { display: "flex", alignItems: "center", flex: 1 },
-  stepDot: { width: "28px", height: "28px", borderRadius: "50%", background: "#f1f3f4", border: "2px solid #e3e3e3", color: "#9aa0a6", fontSize: "12px", fontWeight: "700", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0, transition: "all 0.2s" },
+  stepDot: { width: "28px", height: "28px", borderRadius: "50%", background: "#f1f3f4", border: "2px solid #e3e3e3", color: "#9aa0a6", fontSize: "12px", fontWeight: "700", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0, transition: "all 0.2s", fontFamily: FONT },
   stepDotActive: { background: "#1a73e8", border: "2px solid #1a73e8", color: "#ffffff" },
   stepDotDone:   { background: "#e6f4ea", border: "2px solid #34a853", color: "#0d652d" },
-  stepLabel: { fontSize: "12px", color: "#9aa0a6", marginLeft: "8px", whiteSpace: "nowrap", fontWeight: "500" },
+  stepLabel: { fontSize: "12px", color: "#9aa0a6", marginLeft: "8px", whiteSpace: "nowrap", fontWeight: "500", fontFamily: FONT },
   stepLabelActive: { color: "#202124", fontWeight: "600" },
   stepLabelDone:   { color: "#0d652d" },
   stepLine: { flex: 1, height: "2px", background: "#e3e3e3", margin: "0 8px", borderRadius: "1px" },
   stepLineDone: { background: "#34a853" },
 
   // ── Alerts / notes ──
-  alertError: { display: "flex", alignItems: "flex-start", background: "#fce8e6", border: "1px solid #f5c6c2", color: "#c5221f", borderRadius: "4px", padding: "12px 14px", fontSize: "13px", fontWeight: "500", marginBottom: "20px" },
-  prefillNote: { display: "flex", alignItems: "center", background: "#e3f2fd", border: "1px solid #bdd7f5", color: "#1967d2", borderRadius: "4px", padding: "10px 14px", fontSize: "13px" },
-  infoNote: { display: "flex", alignItems: "center", background: "#f8f9fa", border: "1px solid #e3e3e3", borderRadius: "4px", padding: "10px 14px", color: "#5f6368", fontSize: "13px" },
+  alertError: { display: "flex", alignItems: "flex-start", background: "#fce8e6", border: "1px solid #f5c6c2", color: "#c5221f", borderRadius: "4px", padding: "12px 14px", fontSize: "13px", fontWeight: "500", marginBottom: "20px", gap: "8px", fontFamily: FONT },
+  prefillNote: { display: "flex", alignItems: "center", gap: "6px", background: "#e3f2fd", border: "1px solid #bdd7f5", color: "#1967d2", borderRadius: "4px", padding: "10px 14px", fontSize: "13px", fontFamily: FONT },
+  infoNote: { display: "flex", alignItems: "center", gap: "6px", background: "#f8f9fa", border: "1px solid #e3e3e3", borderRadius: "4px", padding: "10px 14px", color: "#5f6368", fontSize: "13px", fontFamily: FONT },
 
   // ── Form ──
   form: { display: "flex", flexDirection: "column", gap: "16px", marginBottom: "24px" },
   row: { display: "grid", gridTemplateColumns: "1fr 1fr", gap: "14px" },
-  fieldLabel: { color: "#5f6368", fontSize: "12px", fontWeight: "600", textTransform: "uppercase", letterSpacing: "0.3px" },
-  input: { background: "#ffffff", border: "1px solid #e3e3e3", borderRadius: "4px", padding: "9px 12px", color: "#202124", fontSize: "13px", outline: "none", width: "100%", fontFamily: "inherit", boxSizing: "border-box", transition: "border-color 0.15s" },
+  fieldLabel: { color: "#5f6368", fontSize: "11px", fontWeight: "600", textTransform: "uppercase", letterSpacing: "0.4px", fontFamily: FONT },
+  input: { background: "#ffffff", border: "1px solid #dadce0", borderRadius: "4px", padding: "10px 12px", color: "#202124", fontSize: "14px", outline: "none", width: "100%", fontFamily: FONT, boxSizing: "border-box", transition: "border-color 0.15s" },
 
   // ── Document groups ──
-  docGroup: { background: "#f8f9fa", border: "1px solid #e3e3e3", borderRadius: "8px", padding: "16px 18px", display: "flex", flexDirection: "column", gap: "12px" },
-  docGroupTitle: { color: "#202124", fontSize: "13px", fontWeight: "600", display: "flex", alignItems: "center", marginBottom: "2px" },
-  docGroupNote: { color: "#9aa0a6", fontSize: "12px", margin: 0, lineHeight: "1.5" },
-  optionalBadge: { background: "#e3e3e3", color: "#5f6368", borderRadius: "4px", padding: "2px 7px", fontSize: "11px", fontWeight: "500", marginLeft: "8px" },
-  fileLabel: { display: "flex", alignItems: "center", background: "#ffffff", border: "1px dashed #dadce0", borderRadius: "4px", padding: "10px 14px", color: "#5f6368", fontSize: "13px", cursor: "pointer", transition: "border-color 0.15s" },
-  fileAttached: { display: "flex", alignItems: "center", background: "#e6f4ea", border: "1px solid #ceead6", borderRadius: "4px", padding: "10px 14px" },
-  fileAttachedName: { color: "#0d652d", fontSize: "13px", fontWeight: "500", flex: 1, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" },
-  removeFileBtn: { display: "flex", alignItems: "center", gap: "4px", background: "none", border: "none", color: "#c5221f", fontSize: "12px", fontWeight: "500", cursor: "pointer", whiteSpace: "nowrap", flexShrink: 0, fontFamily: "inherit" },
+  docGroup: { background: "#f8f9fa", border: "1px solid #dadce0", borderRadius: "8px", padding: "16px 18px", display: "flex", flexDirection: "column", gap: "12px" },
+  docGroupTitle: { color: "#202124", fontSize: "13px", fontWeight: "600", display: "flex", alignItems: "center", marginBottom: "2px", fontFamily: FONT },
+  docGroupNote: { color: "#9aa0a6", fontSize: "12px", margin: 0, lineHeight: "1.5", fontFamily: FONT },
+  optionalBadge: { background: "#e3e3e3", color: "#5f6368", borderRadius: "4px", padding: "2px 7px", fontSize: "11px", fontWeight: "500", marginLeft: "8px", fontFamily: FONT },
+  fileLabel: { display: "flex", alignItems: "center", background: "#ffffff", border: "1px dashed #dadce0", borderRadius: "4px", padding: "11px 14px", color: "#5f6368", fontSize: "13px", cursor: "pointer", transition: "border-color 0.15s", fontFamily: FONT },
+  fileAttached: { display: "flex", alignItems: "center", background: "#e6f4ea", border: "1px solid #ceead6", borderRadius: "4px", padding: "10px 14px", gap: "8px" },
+  fileAttachedName: { color: "#0d652d", fontSize: "13px", fontWeight: "500", flex: 1, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap", fontFamily: FONT },
+  removeFileBtn: { display: "flex", alignItems: "center", gap: "4px", background: "none", border: "none", color: "#c5221f", fontSize: "12px", fontWeight: "500", cursor: "pointer", whiteSpace: "nowrap", flexShrink: 0, fontFamily: FONT },
 
   // ── Declarations ──
-  declCard: { background: "#ffffff", border: "1px solid #e3e3e3", borderRadius: "8px", padding: "18px", display: "flex", flexDirection: "column", gap: 0 },
-  declTitle: { color: "#202124", fontSize: "13px", fontWeight: "600", marginBottom: "6px" },
-  declNote: { color: "#5f6368", fontSize: "12px", marginBottom: "14px", lineHeight: "1.5" },
+  declCard: { background: "#ffffff", border: "1px solid #dadce0", borderRadius: "8px", padding: "18px", display: "flex", flexDirection: "column", gap: 0 },
+  declTitle: { color: "#202124", fontSize: "13px", fontWeight: "600", marginBottom: "6px", fontFamily: FONT },
+  declNote: { color: "#5f6368", fontSize: "12px", marginBottom: "14px", lineHeight: "1.5", fontFamily: FONT },
   checkRow: { display: "flex", alignItems: "flex-start", gap: "12px", cursor: "pointer", padding: "10px 12px", borderRadius: "6px", margin: "0 -12px", transition: "background 0.15s" },
-  checkRowChecked: { background: "#e3f2fd" },
+  checkRowChecked: { background: "#e8f0fe" },
   checkbox: { width: "17px", height: "17px", borderRadius: "3px", border: "2px solid #dadce0", background: "#ffffff", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0, marginTop: "2px", transition: "all 0.15s" },
   checkboxChecked: { background: "#1a73e8", border: "2px solid #1a73e8" },
-  checkLabel: { color: "#202124", fontSize: "13px", lineHeight: "1.5", userSelect: "none" },
+  checkLabel: { color: "#202124", fontSize: "13px", lineHeight: "1.5", userSelect: "none", fontFamily: FONT },
 
-  // ── Navigation ──
+  // ── Navigation buttons ──
   navRow: { display: "flex", alignItems: "center", gap: "12px", paddingTop: "4px" },
-  btnBack2: { display: "inline-flex", alignItems: "center", background: "#ffffff", border: "1px solid #dadce0", color: "#5f6368", borderRadius: "4px", padding: "9px 16px", fontSize: "13px", fontWeight: "600", cursor: "pointer", fontFamily: "inherit" },
-  btnNext: { display: "inline-flex", alignItems: "center", background: "#1a73e8", color: "#ffffff", border: "none", borderRadius: "4px", padding: "9px 20px", fontSize: "13px", fontWeight: "600", cursor: "pointer", fontFamily: "inherit", boxShadow: "0 1px 2px rgba(0,0,0,0.1)" },
-  btnSubmit: { display: "inline-flex", alignItems: "center", background: "#1a73e8", color: "#ffffff", border: "none", borderRadius: "4px", padding: "9px 20px", fontSize: "13px", fontWeight: "600", cursor: "pointer", fontFamily: "inherit", boxShadow: "0 1px 2px rgba(0,0,0,0.1)" },
+  btnBack2: { display: "inline-flex", alignItems: "center", gap: "6px", background: "#ffffff", border: "1px solid #dadce0", color: "#5f6368", borderRadius: "4px", padding: "9px 16px", fontSize: "13px", fontWeight: "600", cursor: "pointer", fontFamily: FONT },
+  btnNext: { display: "inline-flex", alignItems: "center", gap: "6px", background: "#1a73e8", color: "#ffffff", border: "none", borderRadius: "24px", padding: "9px 22px", fontSize: "13px", fontWeight: "500", cursor: "pointer", fontFamily: FONT },
+  btnSubmit: { display: "inline-flex", alignItems: "center", gap: "8px", background: "#1a73e8", color: "#ffffff", border: "none", borderRadius: "24px", padding: "10px 24px", fontSize: "13px", fontWeight: "500", cursor: "pointer", fontFamily: FONT },
 
   // ── Review sections ──
-  reviewSection: { background: "#f8f9fa", border: "1px solid #e3e3e3", borderRadius: "8px", padding: "16px 20px", marginBottom: "12px" },
-  reviewSectionTitle: { color: "#5f6368", fontSize: "11px", fontWeight: "700", textTransform: "uppercase", letterSpacing: "0.5px", marginBottom: "12px" },
-  reviewRow: { display: "flex", justifyContent: "space-between", gap: "12px", padding: "7px 0", borderBottom: "1px solid #e3e3e3", fontSize: "13px" },
-  reviewLabel: { color: "#5f6368" },
-  reviewValue: { color: "#202124", textAlign: "right", maxWidth: "60%", wordBreak: "break-word", fontWeight: "500" },
-  reviewNote: { background: "#fef7e0", border: "1px solid #fde68a", borderRadius: "4px", padding: "12px 14px", color: "#ea8600", fontSize: "12px", lineHeight: "1.6" },
+  reviewSection: { background: "#ffffff", border: "1px solid #dadce0", borderRadius: "8px", padding: "16px 20px", marginBottom: "12px" },
+  reviewSectionTitle: { color: "#5f6368", fontSize: "11px", fontWeight: "700", textTransform: "uppercase", letterSpacing: "0.5px", marginBottom: "12px", fontFamily: FONT },
+  reviewRow: { display: "flex", justifyContent: "space-between", gap: "12px", padding: "7px 0", borderBottom: "1px solid #f1f3f4", fontSize: "13px" },
+  reviewLabel: { color: "#5f6368", fontFamily: FONT },
+  reviewValue: { color: "#202124", textAlign: "right", maxWidth: "60%", wordBreak: "break-word", fontWeight: "500", fontFamily: FONT },
+  reviewNote: { background: "#fff8e1", border: "1px solid #ffe082", borderRadius: "4px", padding: "12px 14px", color: "#f57f17", fontSize: "12px", lineHeight: "1.6", fontFamily: FONT },
 
   // ── Similar experience section ──
-  expSection: { background: "#f8f9fa", border: "1px solid #e3e3e3", borderRadius: "8px", padding: "16px 18px", display: "flex", flexDirection: "column", gap: "14px" },
-  expSectionTitle: { display: "flex", alignItems: "center", gap: "8px", color: "#202124", fontSize: "13px", fontWeight: "600" },
+  expSection: { background: "#f8f9fa", border: "1px solid #dadce0", borderRadius: "8px", padding: "16px 18px", display: "flex", flexDirection: "column", gap: "14px" },
+  expSectionTitle: { display: "flex", alignItems: "center", gap: "8px", color: "#202124", fontSize: "13px", fontWeight: "600", fontFamily: FONT },
 
   // ── Radio buttons ──
   radioGroup: { display: "flex", gap: "16px", alignItems: "center", paddingTop: "4px" },
@@ -922,50 +958,51 @@ const s = {
   radioBtn: { width: "18px", height: "18px", borderRadius: "50%", border: "2px solid #dadce0", background: "#ffffff", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0, transition: "border-color 0.15s", cursor: "pointer" },
   radioBtnActive: { borderColor: "#1a73e8" },
   radioDot: { width: "8px", height: "8px", borderRadius: "50%", background: "#1a73e8" },
-  radioText: { color: "#202124", fontSize: "13px", fontWeight: "500", userSelect: "none" },
+  radioText: { color: "#202124", fontSize: "13px", fontWeight: "500", userSelect: "none", fontFamily: FONT },
 
   // ── Skills section ──
-  skillsSection: { background: "#f8f9fa", border: "1px solid #e3e3e3", borderRadius: "8px", padding: "16px 18px", display: "flex", flexDirection: "column", gap: "12px" },
+  skillsSection: { background: "#f8f9fa", border: "1px solid #dadce0", borderRadius: "8px", padding: "16px 18px", display: "flex", flexDirection: "column", gap: "12px" },
   skillsSectionHeader: { display: "flex", alignItems: "center", justifyContent: "space-between" },
-  skillsSectionTitle: { display: "flex", alignItems: "center", gap: "8px", color: "#202124", fontSize: "13px", fontWeight: "600" },
-  skillsVisibleBadge: { display: "inline-flex", alignItems: "center", gap: "5px", background: "#e3f2fd", border: "1px solid #bdd7f5", color: "#1967d2", borderRadius: "4px", padding: "3px 8px", fontSize: "11px", fontWeight: "600" },
-  skillsSectionHint: { color: "#5f6368", fontSize: "12px", lineHeight: "1.5", margin: 0 },
+  skillsSectionTitle: { display: "flex", alignItems: "center", gap: "8px", color: "#202124", fontSize: "13px", fontWeight: "600", fontFamily: FONT },
+  skillsVisibleBadge: { display: "inline-flex", alignItems: "center", gap: "5px", background: "#e8f0fe", border: "1px solid #d2e3fc", color: "#1967d2", borderRadius: "16px", padding: "3px 10px", fontSize: "11px", fontWeight: "500", fontFamily: FONT },
+  skillsSectionHint: { color: "#5f6368", fontSize: "12px", lineHeight: "1.5", margin: 0, fontFamily: FONT },
   skillInputRow: { display: "flex", gap: "8px" },
-  skillAddBtn: { background: "#ffffff", border: "1px solid #dadce0", color: "#1a73e8", borderRadius: "4px", padding: "9px 14px", fontSize: "13px", fontWeight: "600", cursor: "pointer", whiteSpace: "nowrap", fontFamily: '"Circular", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif' },
+  skillAddBtn: { background: "#ffffff", border: "1px solid #dadce0", color: "#1a73e8", borderRadius: "20px", padding: "9px 16px", fontSize: "13px", fontWeight: "500", cursor: "pointer", whiteSpace: "nowrap", fontFamily: FONT },
   skillTags: { display: "flex", flexWrap: "wrap", gap: "6px" },
-  skillTag: { display: "inline-flex", alignItems: "center", gap: "6px", background: "#ffffff", border: "1px solid #bdd7f5", color: "#1967d2", borderRadius: "4px", padding: "4px 10px", fontSize: "12px", fontWeight: "500" },
-  skillRemoveBtn: { background: "none", border: "none", color: "#9aa0a6", cursor: "pointer", fontSize: "14px", padding: "0", lineHeight: 1, fontWeight: "600" },
-  skillsEmpty: { color: "#9aa0a6", fontSize: "12px", margin: 0 },
+  skillTag: { display: "inline-flex", alignItems: "center", gap: "6px", background: "#e8f0fe", border: "none", color: "#1967d2", borderRadius: "16px", padding: "4px 12px", fontSize: "13px", fontWeight: "400", fontFamily: FONT },
+  skillRemoveBtn: { background: "none", border: "none", color: "#5f6368", cursor: "pointer", fontSize: "16px", padding: "0", lineHeight: 1, fontFamily: FONT },
+  skillsEmpty: { color: "#9aa0a6", fontSize: "12px", margin: 0, fontFamily: FONT },
 
   // ── Job sidebar card ──
-  jobCard: { background: "#ffffff", border: "1px solid #e3e3e3", borderRadius: "8px", padding: "20px", boxShadow: "0 1px 2px 0 rgba(60,64,67,0.06)" },
-  jobCardLabel: { color: "#5f6368", fontSize: "11px", fontWeight: "700", textTransform: "uppercase", letterSpacing: "0.5px", marginBottom: "14px" },
-  jobLogoWrap: { width: "44px", height: "44px", borderRadius: "8px", overflow: "hidden", border: "1px solid #e3e3e3", marginBottom: "12px" },
+  jobCard: { background: "#ffffff", border: "1px solid #dadce0", borderRadius: "8px", padding: "20px", boxShadow: "0 1px 2px 0 rgba(60,64,67,0.08)" },
+  jobCardLabel: { color: "#9aa0a6", fontSize: "11px", fontWeight: "600", textTransform: "uppercase", letterSpacing: "0.5px", marginBottom: "14px", fontFamily: FONT },
+  jobLogoWrap: { width: "44px", height: "44px", borderRadius: "4px", overflow: "hidden", border: "1px solid #dadce0", marginBottom: "12px" },
   jobLogoImg: { width: "100%", height: "100%", objectFit: "contain" },
-  jobLogoPlaceholder: { width: "100%", height: "100%", display: "flex", alignItems: "center", justifyContent: "center", color: "#fff", fontWeight: "700", fontSize: "18px" },
-  jobTitle: { color: "#202124", fontSize: "15px", fontWeight: "600", marginBottom: "3px", letterSpacing: "-0.2px" },
-  jobCompany: { color: "#5f6368", fontSize: "13px", marginBottom: "14px" },
+  jobLogoPlaceholder: { width: "100%", height: "100%", display: "flex", alignItems: "center", justifyContent: "center", color: "#fff", fontWeight: "700", fontSize: "18px", fontFamily: FONT },
+  jobTitle: { color: "#202124", fontSize: "15px", fontWeight: "500", marginBottom: "2px", fontFamily: FONT },
+  jobCompany: { color: "#1a73e8", fontSize: "13px", marginBottom: "14px", fontFamily: FONT },
   jobMeta: { display: "flex", flexDirection: "column", gap: "8px" },
-  jobMetaItem: { display: "flex", alignItems: "center", gap: "7px", color: "#5f6368", fontSize: "12px" },
+  jobMetaItem: { display: "flex", alignItems: "center", gap: "7px", color: "#5f6368", fontSize: "12px", fontFamily: FONT },
 
   // ── Sign-in prompt ──
-  signInPrompt: { background: "#e3f2fd", border: "1px solid #bdd7f5", borderRadius: "8px", padding: "16px", textAlign: "center", display: "flex", flexDirection: "column", alignItems: "center" },
-  signInPromptText: { color: "#5f6368", fontSize: "13px", lineHeight: "1.5", margin: 0 },
+  signInPrompt: { background: "#e8f0fe", border: "1px solid #d2e3fc", borderRadius: "8px", padding: "16px", textAlign: "center", display: "flex", flexDirection: "column", alignItems: "center", gap: "6px" },
+  signInPromptText: { color: "#5f6368", fontSize: "13px", lineHeight: "1.5", margin: 0, fontFamily: FONT },
 
   // ── Success ──
-  successCard: { maxWidth: "480px", margin: "60px auto", background: "#ffffff", border: "1px solid #e3e3e3", borderRadius: "8px", padding: "48px 40px", textAlign: "center", boxShadow: "0 1px 3px 1px rgba(60,64,67,0.08)" },
-  successIcon: { width: "56px", height: "56px", borderRadius: "50%", background: "#e6f4ea", border: "1px solid #ceead6", display: "flex", alignItems: "center", justifyContent: "center", margin: "0 auto 24px" },
-  successTitle: { color: "#202124", fontSize: "22px", fontWeight: "600", margin: "0 0 12px", letterSpacing: "-0.3px" },
-  successSub: { color: "#5f6368", fontSize: "14px", lineHeight: "1.6", margin: "0 0 24px" },
+  successCard: { maxWidth: "500px", margin: "0 auto", background: "#ffffff", border: "1px solid #dadce0", borderRadius: "8px", padding: "48px 40px", textAlign: "center", boxShadow: "0 1px 3px rgba(60,64,67,0.1)" },
+  successIcon: { width: "56px", height: "56px", borderRadius: "50%", background: "#e6f4ea", display: "flex", alignItems: "center", justifyContent: "center", margin: "0 auto 24px" },
+  successTitle: { color: "#202124", fontSize: "22px", fontWeight: "400", margin: "0 0 12px", fontFamily: FONT },
+  successSub: { color: "#5f6368", fontSize: "14px", lineHeight: "1.7", margin: "0 0 20px", fontFamily: FONT },
   successActions: { display: "flex", gap: "12px", justifyContent: "center", flexWrap: "wrap" },
-  btnPrimary: { background: "#1a73e8", color: "#ffffff", border: "none", borderRadius: "4px", padding: "10px 22px", fontSize: "13px", fontWeight: "600", cursor: "pointer", fontFamily: "inherit", boxShadow: "0 1px 2px rgba(0,0,0,0.1)" },
-  btnOutline: { background: "#ffffff", border: "1px solid #dadce0", color: "#5f6368", borderRadius: "4px", padding: "10px 22px", fontSize: "13px", fontWeight: "500", cursor: "pointer", fontFamily: "inherit" },
+  btnPrimary: { background: "#1a73e8", color: "#ffffff", border: "none", borderRadius: "24px", padding: "10px 24px", fontSize: "14px", fontWeight: "500", cursor: "pointer", fontFamily: FONT },
+  btnOutline: { background: "#ffffff", border: "1px solid #dadce0", color: "#3c4043", borderRadius: "24px", padding: "10px 24px", fontSize: "14px", fontWeight: "400", cursor: "pointer", fontFamily: FONT },
 
-  empty: { color: "#5f6368", textAlign: "center", padding: "80px", fontSize: "14px" },
+  empty: { color: "#5f6368", textAlign: "center", padding: "80px", fontSize: "14px", fontFamily: FONT },
 
   // ── Footer ──
-  footer: { background: "#202124", padding: "20px 24px" },
+  footer: { background: "#ffffff", borderTop: "1px solid #dadce0", padding: "20px 24px" },
   footerInner: { maxWidth: "1200px", margin: "0 auto" },
-  footerBottom: { display: "flex", justifyContent: "space-between", color: "rgba(255,255,255,0.35)", fontSize: "12px", flexWrap: "wrap", gap: "8px" },
-  footerLink: { color: "rgba(255,255,255,0.4)", textDecoration: "none" },
+  footerBottom: { display: "flex", justifyContent: "space-between", alignItems: "center", color: "#9aa0a6", fontSize: "12px", flexWrap: "wrap", gap: "8px", fontFamily: FONT },
+  footerLogoMark: { width: "20px", height: "20px", borderRadius: "4px", background: "#ffca28", color: "#d84315", fontWeight: "700", fontSize: "11px", display: "flex", alignItems: "center", justifyContent: "center", fontFamily: FONT },
+  footerLink: { color: "#9aa0a6", textDecoration: "none", fontFamily: FONT },
 };

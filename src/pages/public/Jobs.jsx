@@ -89,13 +89,14 @@ export default function Jobs() {
   const jsInitials = jobSeekerProfile?.firstName?.[0]?.toUpperCase() || user?.email?.[0]?.toUpperCase() || null;
 
   return (
-    <div style={s.page}>
+    <div className="jobs-page" style={s.page}>
 
       {/* ── White Navbar ── */}
       <nav style={s.navbar}>
         <div style={s.navInner}>
           <div style={s.navLogo} onClick={() => navigate("/")}>
-            <img src="/logo.png" alt="Croloft Jobs" style={s.navLogoImg} />
+            <div style={s.logoMark}>V</div>
+            <span style={s.logoText}>Vetted</span>
           </div>
           <div style={s.navLinks} className="nav-links">
             <Link to="/jobs" className="nav-link" style={{ ...s.navLink, color: "#1a73e8", fontWeight: "500" }}>Browse Jobs</Link>
@@ -105,7 +106,7 @@ export default function Jobs() {
                 {jsPhoto ? <img src={jsPhoto} alt="" style={s.navAvatarImg} /> : <div style={s.navAvatarInitials}>{jsInitials}</div>}
               </div>
             ) : (
-              <Link to="/jobseeker/login" className="nav-link" style={s.navLink}>Sign In</Link>
+              <Link to="/jobseeker/login" className="nav-link" style={s.navSignIn}>Sign In</Link>
             )}
             <Link to="/employer/login" style={s.navBtn}>Employer Login</Link>
           </div>
@@ -136,7 +137,7 @@ export default function Jobs() {
             <h1 style={s.pageTitle} className="page-title">Browse Jobs</h1>
             <p style={s.pageSub}>Verified employers across South Africa</p>
           </div>
-          <div style={s.headerStats}>
+          <div className="header-stats" style={s.headerStats}>
             <span style={s.headerStat}><strong style={{ color: "#1a73e8" }}>{jobs.length}</strong> live jobs</span>
             <span style={s.headerStatDivider} />
             <span style={s.headerStat}><strong style={{ color: "#1a73e8" }}>9</strong> provinces</span>
@@ -427,16 +428,22 @@ export default function Jobs() {
       {/* Footer */}
       <footer style={s.footer}>
         <div style={s.footerInner}>
-          <span>© {new Date().getFullYear()} Croloft Jobs. All rights reserved.</span>
-          <div style={{ display: "flex", gap: "24px" }}>
-            <Link to="/" style={s.footerLink}>Home</Link>
-            <Link to="/terms" style={s.footerLink}>Terms</Link>
+          <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
+            <div style={s.footerLogoMark}>V</div>
+            <span style={s.footerCopy}>© {new Date().getFullYear()} Vetted (Pty) Ltd. All rights reserved.</span>
+          </div>
+          <div style={{ display: "flex", gap: "20px" }}>
+            <Link to="/"        style={s.footerLink}>Home</Link>
+            <Link to="/terms"   style={s.footerLink}>Terms</Link>
             <Link to="/privacy" style={s.footerLink}>Privacy</Link>
           </div>
         </div>
       </footer>
 
       <style>{`
+        *, *::before, *::after { box-sizing: border-box; }
+        .jobs-page * { font-family: ${FONT} !important; }
+
         @media (max-width: 1024px) {
           .two-panel { grid-template-columns: 200px 1fr !important; }
         }
@@ -446,138 +453,143 @@ export default function Jobs() {
           .filter-sidebar { display: none !important; }
           .filter-toggle-btn { display: inline-flex !important; }
           .two-panel { grid-template-columns: 1fr !important; }
-          .page-header-inner { flex-direction: column !important; align-items: flex-start !important; gap: 12px !important; }
+          .page-header-inner { flex-direction: column !important; align-items: flex-start !important; gap: 10px !important; }
           .results-bar { flex-direction: column !important; align-items: flex-start !important; gap: 10px !important; }
           .results-bar-right { width: 100% !important; justify-content: space-between !important; }
           .body-inner { padding: 16px 16px 48px !important; }
-          .page-header { padding: 24px 16px 0 !important; }
+          .page-header { padding: 80px 16px 0 !important; }
           .search-wrap { padding: 0 0 16px !important; }
-          .job-card-top { flex-wrap: wrap !important; }
         }
         @media (max-width: 480px) {
-          .job-card { padding: 16px !important; }
-          .page-title { font-size: 24px !important; }
+          .job-card { padding: 14px !important; }
+          .page-title { font-size: 22px !important; }
           .pagination { gap: 4px !important; }
+          .header-stats { display: none !important; }
         }
-        .job-card:hover { box-shadow: 0 4px 14px rgba(60,64,67,0.12) !important; border-color: #1a73e8 !important; }
+        .job-card:hover { box-shadow: 0 1px 3px 0 rgba(60,64,67,0.3), 0 4px 8px 3px rgba(60,64,67,0.15) !important; border-color: transparent !important; }
         .view-job-btn:hover { background: #1557b0 !important; }
         .chip:hover { background: #e8f0fe !important; border-color: #1a73e8 !important; color: #1a73e8 !important; }
-        .nav-link:hover { background: #f1f3f4 !important; color: #202124 !important; }
-        input:focus { border-color: #1a73e8 !important; box-shadow: 0 0 0 3px rgba(26,115,232,0.12) !important; }
+        .nav-link:hover { background: #f1f3f4 !important; }
       `}</style>
     </div>
   );
 }
 
-const s = {
-  page: { background: "#f8f9fa", minHeight: "100vh", fontFamily: "'Circular Std', sans-serif", color: "#202124", display: "flex", flexDirection: "column" },
+const FONT = '"Circular Std", "Circular", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif';
 
-  // Navbar — white
-  navbar: { background: "#fff", borderBottom: "1px solid #e0e0e0", position: "sticky", top: 0, zIndex: 100, boxShadow: "0 1px 4px rgba(60,64,67,0.08)" },
-  navInner: { maxWidth: "1280px", margin: "0 auto", padding: "0 24px", height: "64px", display: "flex", alignItems: "center", justifyContent: "space-between", gap: "16px" },
-  navLogo: { cursor: "pointer", display: "flex", alignItems: "center", flexShrink: 0 },
-  navLogoImg: { height: "30px", objectFit: "contain" },
+const s = {
+  page: { background: "#f4f5f7", minHeight: "100vh", fontFamily: FONT, color: "#202124", display: "flex", flexDirection: "column" },
+
+  // ── Navbar ──
+  navbar: { background: "#ffffff", borderBottom: "1px solid #dadce0", position: "fixed", top: 0, left: 0, right: 0, zIndex: 100 },
+  navInner: { maxWidth: "1280px", margin: "0 auto", padding: "0 24px", height: "60px", display: "flex", alignItems: "center", justifyContent: "space-between", gap: "16px" },
+  navLogo: { cursor: "pointer", display: "flex", alignItems: "center", gap: "10px", flexShrink: 0 },
+  logoMark: { width: "28px", height: "28px", borderRadius: "5px", background: "#ffca28", color: "#d84315", fontWeight: "700", fontSize: "15px", display: "flex", alignItems: "center", justifyContent: "center", fontFamily: FONT },
+  logoText: { color: "#202124", fontWeight: "600", fontSize: "15px", fontFamily: FONT },
   navLinks: { display: "flex", alignItems: "center", gap: "4px" },
-  navLink: { color: "#5f6368", fontSize: "15px", textDecoration: "none", padding: "8px 14px", borderRadius: "8px", transition: "background 0.15s" },
-  navBtn: { background: "#1a73e8", color: "#fff", padding: "8px 18px", borderRadius: "999px", fontSize: "14px", fontWeight: "500", textDecoration: "none", marginLeft: "8px" },
-  navAvatar: { width: "34px", height: "34px", borderRadius: "50%", overflow: "hidden", cursor: "pointer", border: "2px solid #e0e0e0", flexShrink: 0, marginLeft: "8px" },
+  navLink: { color: "#5f6368", fontSize: "14px", textDecoration: "none", padding: "7px 12px", borderRadius: "4px", fontFamily: FONT },
+  navSignIn: { color: "#1a73e8", border: "1px solid #dadce0", background: "#fff", padding: "7px 14px", borderRadius: "20px", fontSize: "13px", fontWeight: "500", textDecoration: "none", fontFamily: FONT },
+  navBtn: { background: "#1a73e8", color: "#fff", padding: "7px 16px", borderRadius: "4px", fontSize: "13px", fontWeight: "600", textDecoration: "none", marginLeft: "4px", fontFamily: FONT },
+  navAvatar: { width: "32px", height: "32px", borderRadius: "50%", overflow: "hidden", cursor: "pointer", border: "1px solid #dadce0", flexShrink: 0, marginLeft: "8px" },
   navAvatarImg: { width: "100%", height: "100%", objectFit: "cover" },
   navAvatarInitials: { width: "100%", height: "100%", background: "#1a73e8", color: "#fff", display: "flex", alignItems: "center", justifyContent: "center", fontSize: "13px", fontWeight: "700" },
   menuToggle: { display: "none", background: "none", border: "none", cursor: "pointer", padding: "4px", alignItems: "center" },
-  mobileMenu: { background: "#fff", borderTop: "1px solid #e0e0e0", padding: "10px 16px 16px", display: "flex", flexDirection: "column", gap: "2px", boxShadow: "0 4px 8px rgba(60,64,67,0.1)" },
-  mobileLink: { color: "#202124", fontSize: "16px", padding: "13px 16px", borderRadius: "8px", textDecoration: "none", display: "block" },
-  mobileLinkBtn: { color: "#fff", background: "#1a73e8", fontSize: "16px", padding: "13px 16px", borderRadius: "8px", textDecoration: "none", display: "block", textAlign: "center", marginTop: "8px" },
+  mobileMenu: { background: "#fff", borderTop: "1px solid #dadce0", padding: "10px 16px 16px", display: "flex", flexDirection: "column", gap: "2px" },
+  mobileLink: { color: "#202124", fontSize: "15px", padding: "12px 16px", borderRadius: "4px", textDecoration: "none", display: "block", fontFamily: FONT },
+  mobileLinkBtn: { color: "#fff", background: "#1a73e8", fontSize: "15px", padding: "12px 16px", borderRadius: "4px", textDecoration: "none", display: "block", textAlign: "center", marginTop: "8px", fontFamily: FONT },
 
-  // Page header
-  pageHeader: { background: "#fff", borderBottom: "1px solid #e0e0e0", padding: "32px 24px 0" },
-  pageHeaderInner: { maxWidth: "1280px", margin: "0 auto", display: "flex", alignItems: "flex-end", justifyContent: "space-between", gap: "16px", marginBottom: "24px" },
-  pageTitle: { color: "#202124", fontSize: "32px", fontWeight: "800", margin: "0 0 6px", letterSpacing: "-0.01em" },
-  pageSub: { color: "#5f6368", fontSize: "16px", margin: 0 },
-  headerStats: { display: "flex", alignItems: "center", gap: "0", background: "#f8f9fa", border: "1px solid #e0e0e0", borderRadius: "999px", padding: "8px 4px", flexShrink: 0 },
-  headerStat: { color: "#5f6368", fontSize: "14px", padding: "0 16px" },
-  headerStatDivider: { width: "1px", height: "14px", background: "#e0e0e0" },
+  // ── Page header ──
+  pageHeader: { background: "#ffffff", borderBottom: "1px solid #dadce0", padding: "92px 24px 0", paddingTop: "92px" },
+  pageHeaderInner: { maxWidth: "1280px", margin: "0 auto", display: "flex", alignItems: "flex-end", justifyContent: "space-between", gap: "16px", marginBottom: "20px" },
+  pageTitle: { color: "#202124", fontSize: "28px", fontWeight: "700", margin: "0 0 4px", letterSpacing: "-0.5px", fontFamily: FONT },
+  pageSub: { color: "#5f6368", fontSize: "14px", margin: 0, fontFamily: FONT },
+  headerStats: { display: "flex", alignItems: "center", gap: "0", background: "#f8f9fa", border: "1px solid #dadce0", borderRadius: "20px", padding: "8px 4px", flexShrink: 0 },
+  headerStat: { color: "#5f6368", fontSize: "13px", padding: "0 16px", fontFamily: FONT },
+  headerStatDivider: { width: "1px", height: "14px", background: "#dadce0" },
 
-  // Search
+  // ── Search ──
   searchWrap: { maxWidth: "1280px", margin: "0 auto", paddingBottom: "20px" },
-  searchBox: { display: "flex", alignItems: "center", gap: "12px", background: "#fff", border: "2px solid #dadce0", borderRadius: "12px", padding: "14px 18px", transition: "border-color 0.15s, box-shadow 0.15s", boxShadow: "0 1px 4px rgba(60,64,67,0.06)" },
-  searchInput: { flex: 1, border: "none", outline: "none", fontSize: "16px", color: "#202124", background: "transparent", fontFamily: "'Circular Std', sans-serif", minWidth: 0 },
+  searchBox: { display: "flex", alignItems: "center", gap: "12px", background: "#fff", border: "1px solid #dadce0", borderRadius: "32px", padding: "12px 18px", boxShadow: "0 1px 6px rgba(32,33,36,0.18)" },
+  searchInput: { flex: 1, border: "none", outline: "none", fontSize: "15px", color: "#202124", background: "transparent", fontFamily: FONT, minWidth: 0 },
   searchClearBtn: { background: "none", border: "none", cursor: "pointer", padding: "2px", display: "flex", alignItems: "center", flexShrink: 0 },
 
-  // Body
+  // ── Body ──
   body: { flex: 1, padding: "0 24px" },
   bodyInner: { maxWidth: "1280px", margin: "0 auto", padding: "24px 0 64px" },
 
-  // Results bar
+  // ── Results bar ──
   resultsBar: { display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: "18px", gap: "12px" },
-  resultsText: { display: "flex", alignItems: "center", gap: "12px", color: "#5f6368", fontSize: "15px" },
-  clearAllBtn: { display: "inline-flex", alignItems: "center", gap: "5px", background: "none", border: "none", color: "#1a73e8", fontSize: "14px", cursor: "pointer", padding: 0, fontFamily: "'Circular Std', sans-serif" },
+  resultsText: { display: "flex", alignItems: "center", gap: "12px", color: "#5f6368", fontSize: "14px", fontFamily: FONT },
+  clearAllBtn: { display: "inline-flex", alignItems: "center", gap: "5px", background: "none", border: "none", color: "#1a73e8", fontSize: "13px", cursor: "pointer", padding: 0, fontFamily: FONT },
   resultsBarRight: { display: "flex", alignItems: "center", gap: "10px" },
   sortWrap: { display: "flex", alignItems: "center", gap: "7px" },
-  sortSelect: { background: "#fff", border: "1px solid #dadce0", borderRadius: "8px", padding: "9px 14px", fontSize: "14px", color: "#202124", outline: "none", cursor: "pointer", fontFamily: "'Circular Std', sans-serif" },
-  filterToggleBtn: { display: "none", alignItems: "center", gap: "7px", background: "#fff", border: "1px solid #dadce0", borderRadius: "8px", padding: "9px 14px", fontSize: "14px", color: "#202124", cursor: "pointer", fontFamily: "'Circular Std', sans-serif" },
-  filterBadge: { background: "#1a73e8", color: "#fff", borderRadius: "999px", padding: "1px 7px", fontSize: "12px" },
+  sortSelect: { background: "#fff", border: "1px solid #dadce0", borderRadius: "4px", padding: "8px 12px", fontSize: "13px", color: "#202124", outline: "none", cursor: "pointer", fontFamily: FONT },
+  filterToggleBtn: { display: "none", alignItems: "center", gap: "7px", background: "#fff", border: "1px solid #dadce0", borderRadius: "4px", padding: "8px 12px", fontSize: "13px", color: "#202124", cursor: "pointer", fontFamily: FONT },
+  filterBadge: { background: "#1a73e8", color: "#fff", borderRadius: "10px", padding: "1px 7px", fontSize: "11px", fontWeight: "600" },
 
-  // Two-panel
-  twoPanel: { display: "grid", gridTemplateColumns: "240px 1fr", gap: "24px", alignItems: "start" },
+  // ── Two-panel ──
+  twoPanel: { display: "grid", gridTemplateColumns: "220px 1fr", gap: "24px", alignItems: "start" },
 
-  // Filter Sidebar
-  filterSidebar: { background: "#fff", border: "1px solid #e0e0e0", borderRadius: "12px", padding: "20px", display: "flex", flexDirection: "column", gap: "22px", position: "sticky", top: "80px", boxShadow: "0 1px 3px rgba(60,64,67,0.06)" },
+  // ── Filter sidebar ──
+  filterSidebar: { background: "#ffffff", border: "1px solid #dadce0", borderRadius: "8px", padding: "20px", display: "flex", flexDirection: "column", gap: "20px", position: "sticky", top: "76px", boxShadow: "0 1px 2px rgba(60,64,67,0.06)" },
   filterSidebarHead: { display: "flex", alignItems: "center", justifyContent: "space-between" },
-  filterSidebarTitle: { color: "#202124", fontSize: "16px", fontWeight: "700" },
+  filterSidebarTitle: { color: "#202124", fontSize: "14px", fontWeight: "600", fontFamily: FONT },
   filterBlock: { display: "flex", flexDirection: "column", gap: "10px" },
-  filterBlockLabel: { color: "#202124", fontSize: "13px", fontWeight: "600", textTransform: "uppercase", letterSpacing: "0.04em" },
-  filterSelectEl: { background: "#f8f9fa", border: "1px solid #e0e0e0", borderRadius: "8px", padding: "10px 12px", fontSize: "14px", color: "#202124", outline: "none", cursor: "pointer", fontFamily: "'Circular Std', sans-serif" },
-  filterChips: { display: "flex", flexWrap: "wrap", gap: "7px" },
-  chip: { background: "#f8f9fa", border: "1px solid #e0e0e0", borderRadius: "999px", padding: "5px 12px", fontSize: "13px", color: "#5f6368", cursor: "pointer", fontFamily: "'Circular Std', sans-serif", transition: "all 0.15s" },
+  filterBlockLabel: { color: "#5f6368", fontSize: "11px", fontWeight: "700", textTransform: "uppercase", letterSpacing: "0.4px", fontFamily: FONT },
+  filterSelectEl: { background: "#f8f9fa", border: "1px solid #dadce0", borderRadius: "4px", padding: "9px 10px", fontSize: "13px", color: "#202124", outline: "none", cursor: "pointer", fontFamily: FONT },
+  filterChips: { display: "flex", flexWrap: "wrap", gap: "6px" },
+  chip: { background: "#f8f9fa", border: "1px solid #dadce0", borderRadius: "16px", padding: "4px 11px", fontSize: "12px", color: "#5f6368", cursor: "pointer", fontFamily: FONT, transition: "all 0.15s" },
   chipActive: { background: "#e8f0fe", border: "1px solid #1a73e8", color: "#1a73e8", fontWeight: "500" },
-  filterCount: { display: "flex", alignItems: "center", gap: "7px", color: "#5f6368", fontSize: "14px", paddingTop: "10px", borderTop: "1px solid #f1f3f4" },
+  filterCount: { display: "flex", alignItems: "center", gap: "7px", color: "#9aa0a6", fontSize: "13px", paddingTop: "10px", borderTop: "1px solid #f1f3f4", fontFamily: FONT },
 
-  // Drawer
-  drawerOverlay: { position: "fixed", inset: 0, background: "rgba(0,0,0,0.4)", zIndex: 299 },
-  filterDrawer: { position: "fixed", top: 0, left: 0, bottom: 0, width: "300px", background: "#fff", zIndex: 300, overflowY: "auto", display: "flex", flexDirection: "column", gap: "20px", padding: "20px", boxShadow: "4px 0 16px rgba(0,0,0,0.15)" },
+  // ── Filter drawer (mobile) ──
+  drawerOverlay: { position: "fixed", inset: 0, background: "rgba(0,0,0,0.35)", zIndex: 299 },
+  filterDrawer: { position: "fixed", top: 0, left: 0, bottom: 0, width: "290px", background: "#fff", zIndex: 300, overflowY: "auto", display: "flex", flexDirection: "column", gap: "20px", padding: "20px", boxShadow: "4px 0 16px rgba(0,0,0,0.12)" },
   drawerHeader: { display: "flex", alignItems: "center", justifyContent: "space-between" },
   drawerCloseBtn: { background: "none", border: "none", cursor: "pointer", padding: "4px", display: "flex", alignItems: "center" },
 
-  // Job cards
-  jobListCol: { display: "flex", flexDirection: "column", gap: "14px" },
-  skeleton: { background: "linear-gradient(90deg,#f1f3f4 25%,#e8eaed 50%,#f1f3f4 75%)", backgroundSize: "200%", animation: "shimmer 1.5s infinite", borderRadius: "12px", height: "200px" },
-  emptyState: { background: "#fff", border: "1px solid #e0e0e0", borderRadius: "12px", padding: "64px 24px", display: "flex", flexDirection: "column", alignItems: "center", textAlign: "center" },
-  emptyTitle: { color: "#202124", fontSize: "20px", fontWeight: "700", marginBottom: "8px" },
-  emptySub: { color: "#5f6368", fontSize: "15px", marginBottom: "20px" },
-  emptyBtn: { background: "#1a73e8", color: "#fff", border: "none", borderRadius: "8px", padding: "11px 24px", fontSize: "14px", cursor: "pointer", fontFamily: "'Circular Std', sans-serif" },
+  // ── Job cards ──
+  jobListCol: { display: "flex", flexDirection: "column", gap: "12px" },
+  skeleton: { background: "linear-gradient(90deg,#f1f3f4 25%,#e8eaed 50%,#f1f3f4 75%)", backgroundSize: "200%", animation: "shimmer 1.5s infinite", borderRadius: "8px", height: "180px" },
+  emptyState: { background: "#fff", border: "1px solid #dadce0", borderRadius: "8px", padding: "64px 24px", display: "flex", flexDirection: "column", alignItems: "center", textAlign: "center" },
+  emptyTitle: { color: "#202124", fontSize: "18px", fontWeight: "600", marginBottom: "8px", fontFamily: FONT },
+  emptySub: { color: "#5f6368", fontSize: "14px", marginBottom: "20px", fontFamily: FONT },
+  emptyBtn: { background: "#1a73e8", color: "#fff", border: "none", borderRadius: "4px", padding: "10px 22px", fontSize: "13px", cursor: "pointer", fontFamily: FONT },
 
-  jobCard: { background: "#fff", border: "1px solid #e0e0e0", borderRadius: "12px", padding: "20px", transition: "box-shadow 0.15s, border-color 0.15s", boxShadow: "0 1px 3px rgba(60,64,67,0.06)" },
-  jobCardTop: { display: "flex", alignItems: "flex-start", gap: "14px", marginBottom: "14px" },
-  jobLogo: { width: "52px", height: "52px", borderRadius: "10px", overflow: "hidden", border: "1px solid #e0e0e0", flexShrink: 0 },
+  jobCard: { background: "#fff", border: "1px solid #dadce0", borderRadius: "8px", padding: "20px", boxShadow: "0 1px 2px rgba(60,64,67,0.06)" },
+  jobCardTop: { display: "flex", alignItems: "flex-start", gap: "14px", marginBottom: "12px" },
+  jobLogo: { width: "44px", height: "44px", borderRadius: "4px", overflow: "hidden", border: "1px solid #dadce0", flexShrink: 0 },
   jobLogoImg: { width: "100%", height: "100%", objectFit: "contain" },
-  jobLogoPlaceholder: { width: "52px", height: "52px", borderRadius: "10px", display: "flex", alignItems: "center", justifyContent: "center", color: "#fff", fontWeight: "700", fontSize: "20px" },
+  jobLogoPlaceholder: { width: "44px", height: "44px", borderRadius: "4px", display: "flex", alignItems: "center", justifyContent: "center", color: "#fff", fontWeight: "700", fontSize: "18px" },
   jobInfo: { flex: 1, minWidth: 0 },
-  jobTitle: { color: "#202124", fontSize: "18px", fontWeight: "700", marginBottom: "3px" },
-  jobCompany: { color: "#5f6368", fontSize: "15px", marginBottom: "8px" },
-  jobMeta: { display: "flex", flexWrap: "wrap", gap: "12px" },
-  jobMetaItem: { display: "flex", alignItems: "center", gap: "5px", color: "#5f6368", fontSize: "14px" },
-  remoteBadge: { background: "#e6f4ea", color: "#1e8e3e", borderRadius: "999px", padding: "2px 10px", fontSize: "13px", fontWeight: "500" },
+  jobTitle: { color: "#1a73e8", fontSize: "16px", fontWeight: "500", marginBottom: "2px", fontFamily: FONT },
+  jobCompany: { color: "#5f6368", fontSize: "13px", marginBottom: "8px", fontFamily: FONT },
+  jobMeta: { display: "flex", flexWrap: "wrap", gap: "10px" },
+  jobMetaItem: { display: "flex", alignItems: "center", gap: "5px", color: "#5f6368", fontSize: "13px", fontFamily: FONT },
+  remoteBadge: { background: "#e8f0fe", color: "#1967d2", borderRadius: "4px", padding: "2px 8px", fontSize: "12px", fontWeight: "500", fontFamily: FONT },
   saveBtn: { background: "none", border: "none", cursor: "pointer", padding: "4px", flexShrink: 0 },
 
-  // Requirements
-  reqBlock: { background: "#f8f9fa", border: "1px solid #e8f0fe", borderRadius: "10px", padding: "14px 16px", marginBottom: "14px" },
-  reqBlockLabel: { display: "flex", alignItems: "center", gap: "6px", color: "#1a73e8", fontSize: "12px", fontWeight: "700", textTransform: "uppercase", letterSpacing: "0.06em", marginBottom: "10px" },
-  reqItem: { display: "flex", alignItems: "flex-start", gap: "8px", color: "#3c4043", fontSize: "14px", lineHeight: "1.6", marginBottom: "6px" },
+  // ── Requirements ──
+  reqBlock: { background: "#f8f9fa", border: "1px solid #e8f0fe", borderRadius: "6px", padding: "12px 14px", marginBottom: "12px" },
+  reqBlockLabel: { display: "flex", alignItems: "center", gap: "6px", color: "#1a73e8", fontSize: "11px", fontWeight: "700", textTransform: "uppercase", letterSpacing: "0.5px", marginBottom: "10px", fontFamily: FONT },
+  reqItem: { display: "flex", alignItems: "flex-start", gap: "8px", color: "#3c4043", fontSize: "13px", lineHeight: "1.6", marginBottom: "6px", fontFamily: FONT },
 
-  // Footer
-  jobCardFooter: { display: "flex", alignItems: "center", justifyContent: "space-between", paddingTop: "14px", borderTop: "1px solid #f1f3f4" },
-  jobCloses: { display: "flex", alignItems: "center", color: "#80868b", fontSize: "13px" },
-  viewJobBtn: { display: "inline-flex", alignItems: "center", background: "#1a73e8", color: "#fff", border: "none", borderRadius: "8px", padding: "10px 20px", fontSize: "14px", fontWeight: "500", cursor: "pointer", fontFamily: "'Circular Std', sans-serif", transition: "background 0.15s" },
-  applyBtn: { background: "#1a73e8", color: "#fff", border: "none", borderRadius: "8px", padding: "12px 20px", fontSize: "15px", fontWeight: "500", cursor: "pointer", fontFamily: "'Circular Std', sans-serif" },
+  // ── Card footer ──
+  jobCardFooter: { display: "flex", alignItems: "center", justifyContent: "space-between", paddingTop: "12px", borderTop: "1px solid #f1f3f4" },
+  jobCloses: { display: "flex", alignItems: "center", color: "#80868b", fontSize: "12px", fontFamily: FONT },
+  viewJobBtn: { display: "inline-flex", alignItems: "center", gap: "6px", background: "#1a73e8", color: "#fff", border: "none", borderRadius: "24px", padding: "8px 18px", fontSize: "13px", fontWeight: "500", cursor: "pointer", fontFamily: FONT },
+  applyBtn: { background: "#1a73e8", color: "#fff", border: "none", borderRadius: "4px", padding: "10px 18px", fontSize: "14px", fontWeight: "500", cursor: "pointer", fontFamily: FONT },
 
-  // Pagination
+  // ── Pagination ──
   pagination: { display: "flex", alignItems: "center", gap: "6px", justifyContent: "center", marginTop: "28px", flexWrap: "wrap" },
-  pageBtn: { display: "inline-flex", alignItems: "center", gap: "5px", background: "#fff", border: "1px solid #dadce0", color: "#5f6368", borderRadius: "8px", padding: "9px 14px", fontSize: "14px", cursor: "pointer", fontFamily: "'Circular Std', sans-serif", transition: "all 0.15s" },
+  pageBtn: { display: "inline-flex", alignItems: "center", gap: "5px", background: "#fff", border: "1px solid #dadce0", color: "#5f6368", borderRadius: "4px", padding: "8px 12px", fontSize: "13px", cursor: "pointer", fontFamily: FONT, transition: "all 0.15s" },
   pageBtnActive: { background: "#e8f0fe", border: "1px solid #1a73e8", color: "#1a73e8", fontWeight: "600" },
   pageBtnDisabled: { opacity: 0.4, cursor: "not-allowed" },
 
-  // Footer
-  footer: { background: "#202124", padding: "24px", marginTop: "auto" },
-  footerInner: { maxWidth: "1280px", margin: "0 auto", display: "flex", justifyContent: "space-between", alignItems: "center", flexWrap: "wrap", gap: "8px", color: "rgba(255,255,255,0.3)", fontSize: "13px" },
-  footerLink: { color: "rgba(255,255,255,0.4)", textDecoration: "none", fontSize: "13px" },
+  // ── Footer ──
+  footer: { background: "#ffffff", borderTop: "1px solid #dadce0", padding: "20px 24px" },
+  footerInner: { maxWidth: "1280px", margin: "0 auto", display: "flex", justifyContent: "space-between", alignItems: "center", flexWrap: "wrap", gap: "8px" },
+  footerLogoMark: { width: "20px", height: "20px", borderRadius: "4px", background: "#ffca28", color: "#d84315", fontWeight: "700", fontSize: "11px", display: "flex", alignItems: "center", justifyContent: "center", fontFamily: FONT },
+  footerCopy: { color: "#9aa0a6", fontSize: "12px", fontFamily: FONT },
+  footerLink: { color: "#9aa0a6", textDecoration: "none", fontSize: "12px", fontFamily: FONT },
 };
