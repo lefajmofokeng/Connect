@@ -191,7 +191,7 @@ const s = {
   profileAvatarWrap:{ width: "32px", height: "32px", borderRadius: "50%", overflow: "hidden", flexShrink: 0, border: "1px solid #dadce0" },
   profileAvatar:    { width: "100%", height: "100%", background: "#1a73e8", color: "#ffffff", fontWeight: "600", fontSize: "14px", display: "flex", alignItems: "center", justifyContent: "center", fontFamily: FONT },
   profileLogoImg:   { width: "100%", height: "100%", objectFit: "cover" },
-  profileName:      { color: "#202124", fontSize: "13px", fontWeight: "600", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis", fontFamily: FONT },
-  profileEmail:     { color: "#5f6368", fontSize: "12px", fontFamily: FONT },
-  signOutBtn:       { marginTop: "10px", width: "100%", display: "flex", alignItems: "center", justifyContent: "center", gap: "7px", background: "#ffffff", border: "1px solid #dadce0", color: "#5f6368", borderRadius: "4px", padding: "7px", fontSize: "12px", fontWeight: "600", cursor: "pointer", fontFamily: FONT, transition: "all 0.15s" },
+  profileName:      { color: "#202124", fontSize: "15px", fontWeight: "600", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis", fontFamily: FONT },
+  profileEmail:     { color: "#5f6368", fontSize: "14px", fontFamily: FONT },
+  signOutBtn:       { marginTop: "10px", width: "100%", display: "flex", alignItems: "center", justifyContent: "center", gap: "7px", background: "#ffffff", border: "1px solid #dadce0", color: "#5f6368", borderRadius: "50px", padding: "9px", fontSize: "14px", fontWeight: "500", cursor: "pointer", fontFamily: FONT, transition: "all 0.15s" },
 };

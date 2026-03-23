@@ -18,6 +18,7 @@ const INDUSTRIES = [
   "Legal","Logistics & Transport","Manufacturing","Media & Marketing",
   "Mining","NGO & Non-Profit","Real Estate","Retail","Telecommunications","Other"
 ];
+
 export default function Home() {
   const navigate = useNavigate();
   const { user, jobSeekerProfile } = useAuth();
@@ -27,10 +28,12 @@ export default function Home() {
   const [filterProvince, setFilterProvince] = useState("");
   const [filterType, setFilterType] = useState("");
   const [filterIndustry, setFilterIndustry] = useState("");
+  const [filterSalary, setFilterSalary] = useState("");
   const [sortBy, setSortBy] = useState("newest");
   const [selectedJob, setSelectedJob] = useState(null);
   const [savedJobs, setSavedJobs] = useState(getLocalSavedJobs);
   const [mobileView, setMobileView] = useState("list");
+  const [openDropdown, setOpenDropdown] = useState(null);
   const detailRef = useRef(null);
 
   useEffect(() => { fetchJobs(); }, [sortBy]);
@@ -63,7 +66,8 @@ export default function Home() {
     const matchProvince = !filterProvince || j.province === filterProvince;
     const matchType = !filterType || j.type === filterType;
     const matchIndustry = !filterIndustry || j.industry === filterIndustry || j.department === filterIndustry;
-    return matchSearch && matchProvince && matchType && matchIndustry;
+    const matchSalary = !filterSalary || (j.salary && j.salary.toLowerCase().includes(filterSalary.toLowerCase()));
+    return matchSearch && matchProvince && matchType && matchIndustry && matchSalary;
   });
 
   const toggleSave = async (e, jobId) => {
@@ -78,8 +82,9 @@ export default function Home() {
     detailRef.current?.scrollTo({ top: 0, behavior: "smooth" });
   };
 
-  const clearFilters = () => { setSearch(""); setFilterProvince(""); setFilterType(""); setFilterIndustry(""); };
-  const hasFilters = search || filterProvince || filterType || filterIndustry;
+  const closeDropdown = () => setOpenDropdown(null);
+  const clearFilters = () => { setSearch(""); setFilterProvince(""); setFilterType(""); setFilterIndustry(""); setFilterSalary(""); setOpenDropdown(null); };
+  const hasFilters = search || filterProvince || filterType || filterIndustry || filterSalary;
 
   return (
     <div className="page-wrapper" style={s.page}>
@@ -131,41 +136,68 @@ export default function Home() {
       </div>
 
       {/* ── Filter / Command Bar ── */}
-      <div style={s.filterRow}>
+      <div style={s.filterRow} onClick={closeDropdown}>
         <div className="filter-scroll-container" style={s.filterRowInner}>
-          
-          <div style={s.filterGroup}>
-            <select style={{...s.googleChip, ...(filterType ? s.googleChipActive : {})}} value={filterType} onChange={e => setFilterType(e.target.value)}>
-              <option value="">Job Type</option>
-              {JOB_TYPES.map(t => <option key={t}>{t}</option>)}
-            </select>
-          </div>
 
-          <div style={s.filterGroup}>
-            <select style={{...s.googleChip, ...(filterProvince ? s.googleChipActive : {})}} value={filterProvince} onChange={e => setFilterProvince(e.target.value)}>
-              <option value="">Province</option>
-              {PROVINCES.map(p => <option key={p}>{p}</option>)}
-            </select>
-          </div>
+          {/* Job Type */}
+          <FilterTab
+            label="Job Type"
+            value={filterType}
+            options={JOB_TYPES}
+            open={openDropdown === "type"}
+            onToggle={e => { e.stopPropagation(); setOpenDropdown(openDropdown === "type" ? null : "type"); }}
+            onSelect={v => { setFilterType(v); setOpenDropdown(null); }}
+            onClear={() => { setFilterType(""); setOpenDropdown(null); }}
+          />
 
-          <div style={s.filterGroup}>
-            <select style={{...s.googleChip, ...(filterIndustry ? s.googleChipActive : {})}} value={filterIndustry} onChange={e => setFilterIndustry(e.target.value)}>
-              <option value="">Industry</option>
-              {INDUSTRIES.map(i => <option key={i}>{i}</option>)}
-            </select>
-          </div>
+          {/* Province */}
+          <FilterTab
+            label="Province"
+            value={filterProvince}
+            options={PROVINCES}
+            open={openDropdown === "province"}
+            onToggle={e => { e.stopPropagation(); setOpenDropdown(openDropdown === "province" ? null : "province"); }}
+            onSelect={v => { setFilterProvince(v); setOpenDropdown(null); }}
+            onClear={() => { setFilterProvince(""); setOpenDropdown(null); }}
+          />
 
-          <div style={s.filterGroup}>
-            <select style={s.googleChip} value={sortBy} onChange={e => setSortBy(e.target.value)}>
-              <option value="newest">Sort: Newest</option>
-              <option value="oldest">Sort: Oldest</option>
-            </select>
-          </div>
+          {/* Industry */}
+          <FilterTab
+            label="Industry"
+            value={filterIndustry}
+            options={INDUSTRIES}
+            open={openDropdown === "industry"}
+            onToggle={e => { e.stopPropagation(); setOpenDropdown(openDropdown === "industry" ? null : "industry"); }}
+            onSelect={v => { setFilterIndustry(v); setOpenDropdown(null); }}
+            onClear={() => { setFilterIndustry(""); setOpenDropdown(null); }}
+          />
+
+          {/* Salary */}
+          <FilterTab
+            label="Salary"
+            value={filterSalary}
+            options={["R0 – R10k", "R10k – R20k", "R20k – R35k", "R35k – R50k", "R50k – R75k", "R75k+", "Market Related"]}
+            open={openDropdown === "salary"}
+            onToggle={e => { e.stopPropagation(); setOpenDropdown(openDropdown === "salary" ? null : "salary"); }}
+            onSelect={v => { setFilterSalary(v); setOpenDropdown(null); }}
+            onClear={() => { setFilterSalary(""); setOpenDropdown(null); }}
+          />
+
+          {/* Sort */}
+          <FilterTab
+            label="Sort"
+            value={sortBy === "oldest" ? "Oldest First" : "Newest First"}
+            options={["Newest First", "Oldest First"]}
+            open={openDropdown === "sort"}
+            onToggle={e => { e.stopPropagation(); setOpenDropdown(openDropdown === "sort" ? null : "sort"); }}
+            onSelect={v => { setSortBy(v === "Oldest First" ? "oldest" : "newest"); setOpenDropdown(null); }}
+            isSort
+          />
 
           {hasFilters && (
-            <button style={s.clearBtn} onClick={clearFilters}>
-              Clear
-            </button>
+            <div className="clear-btn-wrap">
+              <button style={s.clearBtn} onClick={clearFilters}>✕ Clear</button>
+            </div>
           )}
 
         </div>
@@ -182,7 +214,7 @@ export default function Home() {
               </button>
             ) : (
               <span style={s.resultsCount}>
-                <strong>{filtered.length}</strong> {filtered.length === 1 ? "job" : "jobs"} found
+                <strong>{filtered.length}</strong> {filtered.length === 1 ? "job" : "jobs"} available
                 {filterProvince && <span style={s.resultsLocation}> in {filterProvince}</span>}
               </span>
             )}
@@ -205,7 +237,7 @@ export default function Home() {
                 filtered.slice(0, 20).map(job => (
                   <div
                     key={job.id}
-                    className="job-card-hover"
+                    className={`job-card-hover${selectedJob?.id === job.id ? " job-card-selected" : ""}`}
                     style={{ ...s.jobCard, ...(selectedJob?.id === job.id ? s.jobCardActive : {}) }}
                     onClick={() => handleSelectJob(job)}
                   >
@@ -219,7 +251,6 @@ export default function Home() {
                       <div style={s.jobCardHeadInfo}>
                         <div style={s.jobEmployer}>{job.employerName}</div>
                         <div style={s.jobTitle}>{job.title}</div>
-                        <div style={s.jobLocation}>{job.city}, {job.province}</div>
                       </div>
                       <button style={s.saveBtn} onClick={e => toggleSave(e, job.id)}>
                         {savedJobs.includes(job.id)
@@ -227,6 +258,12 @@ export default function Home() {
                           : <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#5f6368" strokeWidth="1.5"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
                         }
                       </button>
+                    </div>
+                    <div style={s.jobLocation}>
+                      <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" style={{ flexShrink: 0 }}>
+                        <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/>
+                      </svg>
+                      {job.city}, {job.province}
                     </div>
                     {job.requirements?.length > 0 && (
                       <div style={s.reqPreview}>
@@ -411,8 +448,14 @@ export default function Home() {
         ::-webkit-scrollbar-track { background: transparent; }
         ::-webkit-scrollbar-thumb { background: #dadce0; border-radius: 4px; }
 
-        .job-card-hover { transition: box-shadow 0.2s ease, border-color 0.2s ease; }
-        .job-card-hover:hover { box-shadow: 0 1px 3px 0 rgba(60,64,67,0.3), 0 4px 8px 3px rgba(60,64,67,0.15); border-color: transparent !important; z-index: 2; }
+        .job-card-hover { transition: box-shadow 0.2s ease, border-color 0.2s ease !important; transform: translateZ(0); }
+        .job-card-hover:hover:not(.job-card-selected) { box-shadow: 0 4px 12px rgba(60,64,67,0.12) !important; border-color: #bdc1c6 !important; }
+        .job-card-selected { border-color: #1a73e8 !important; box-shadow: inset 0 0 0 1px #1a73e8 !important; }
+
+        .filter-tab-wrap button:hover { background: #f8f9fa !important; }
+        .filter-tab-wrap .ft-option:hover { background: #f1f3f4 !important; }
+
+        @keyframes shimmer { 0%{background-position:200% 0} 100%{background-position:-200% 0} }
 
         @media (max-width: 900px) {
           .split-layout { grid-template-columns: 1fr !important; gap: 0 !important; }
@@ -427,8 +470,9 @@ export default function Home() {
           .search-bar-inner { flex-direction: column !important; padding: 8px !important; border-radius: 16px !important; }
           .search-divider { width: 100% !important; height: 1px !important; margin: 4px 0 !important; }
           .search-bar-inner button { width: 100%; border-radius: 8px !important; margin-top: 8px; }
-          .filter-scroll-container { flex-wrap: nowrap !important; overflow-x: auto !important; justify-content: flex-start !important; padding-bottom: 4px; -webkit-overflow-scrolling: touch; gap: 8px !important; }
-          .filter-scroll-container::-webkit-scrollbar { display: none; }
+          .filter-scroll-container { display: flex !important; flex-wrap: wrap !important; justify-content: center !important; gap: 12px !important; padding-bottom: 12px; }
+          .filter-tab-wrap { flex: 1 1 calc(50% - 12px); min-width: 140px; }
+          .clear-btn-wrap { flex: 1 1 100%; text-align: center; margin-top: 8px; }
           .main-inner { padding: 16px !important; }
           .employer-grid-mobile { grid-template-columns: 1fr !important; gap: 32px !important; }
         }
@@ -441,6 +485,110 @@ export default function Home() {
     </div>
   );
 }
+
+// ── FilterTab — custom label-over-line dropdown ────────────────────────
+function FilterTab({ label, value, options, open, onToggle, onSelect, onClear, isSort }) {
+  const isActive = isSort ? false : !!value;
+  const displayValue = isSort ? value : (value || "- Select -");
+  
+  return (
+    <div style={ft.tabWrap} className="filter-tab-wrap">
+      <button
+        onClick={onToggle}
+        style={{
+          ...ft.tab,
+          ...(isActive || open ? ft.tabActive : {}),
+        }}
+      >
+        {/* Floating Label overlay cutting the top border */}
+        <span style={{ 
+          ...ft.tabLabel, 
+          ...(isActive || open ? ft.tabLabelActive : {}) 
+        }}>
+          {label}
+        </span>
+
+        <span style={{ ...ft.tabValue, ...(isActive ? ft.tabValueActive : {}) }}>
+          {displayValue}
+        </span>
+
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"
+          style={{ flexShrink: 0, color: (isActive || open) ? "#1967d2" : "#5f6368", transform: open ? "rotate(180deg)" : "none", transition: "transform 0.2s" }}>
+          <polyline points="6 9 12 15 18 9"/>
+        </svg>
+      </button>
+
+      {open && (
+        <div style={ft.dropdown} onClick={e => e.stopPropagation()}>
+          {!isSort && (
+            <button style={ft.optionClear} onClick={onClear}>
+              <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+              Clear
+            </button>
+          )}
+          {options.map(opt => (
+            <button
+              key={opt}
+              style={{ ...ft.option, ...(value === opt ? ft.optionActive : {}) }}
+              onClick={() => onSelect(opt)}
+            >
+              {value === opt && (
+                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#1967d2" strokeWidth="2.5" style={{ flexShrink: 0 }}>
+                  <polyline points="20 6 9 17 4 12"/>
+                </svg>
+              )}
+              {opt}
+            </button>
+          ))}
+        </div>
+      )}
+    </div>
+  );
+}
+
+const ft = {
+  tabWrap: { position: "relative", marginTop: "10px" },
+  tab: {
+    position: "relative", display: "flex", alignItems: "center", justifyContent: "space-between",
+    background: "#fff", border: "1px solid #9aa0a6", borderRadius: "4px",
+    padding: "10px 14px", cursor: "pointer", minWidth: "160px", gap: "12px",
+    fontFamily: '"Circular Std", "Circular", -apple-system, sans-serif',
+    transition: "border-color 0.15s, box-shadow 0.15s",
+  },
+  tabActive: { borderColor: "#1967d2", boxShadow: "inset 0 0 0 1px #1967d2" },
+  tabLabel: { 
+    position: "absolute", top: "-8px", left: "10px", background: "#fff", 
+    padding: "0 4px", fontSize: "12px", fontWeight: "400", color: "#5f6368", 
+    lineHeight: 1, zIndex: 1, transition: "color 0.15s" 
+  },
+  tabLabelActive: { color: "#1967d2", fontWeight: "500" },
+  tabValue: { fontSize: "15px", fontWeight: "400", color: "#5f6368", lineHeight: 1.4, whiteSpace: "nowrap" },
+  tabValueActive: { color: "#202124" },
+  dropdown: {
+    position: "absolute", top: "calc(100% + 8px)", left: 0, zIndex: 100,
+    background: "#fff", border: "1px solid #dadce0", borderRadius: "8px",
+    boxShadow: "0 4px 16px rgba(60,64,67,0.18)", minWidth: "200px",
+    maxHeight: "280px", overflowY: "auto", padding: "4px",
+    display: "flex", flexDirection: "column",
+  },
+  option: {
+    display: "flex", alignItems: "center", gap: "8px",
+    background: "none", border: "none", width: "100%", textAlign: "left",
+    padding: "9px 14px", fontSize: "14px", fontWeight: "400", color: "#202124",
+    cursor: "pointer", borderRadius: "4px",
+    fontFamily: '"Circular Std", "Circular", -apple-system, sans-serif',
+    transition: "background 0.1s",
+  },
+  optionActive: { color: "#1967d2", fontWeight: "600", background: "#f0f4ff" },
+  optionClear: {
+    display: "flex", alignItems: "center", gap: "6px",
+    background: "none", border: "none", borderBottom: "1px solid #f1f3f4",
+    width: "100%", textAlign: "left", padding: "8px 14px 10px",
+    fontSize: "13px", fontWeight: "500", color: "#9aa0a6", cursor: "pointer",
+    fontFamily: '"Circular Std", "Circular", -apple-system, sans-serif',
+    marginBottom: "4px",
+  },
+};
 
 const s = {
   page: { background: "#ffffff", minHeight: "100vh", fontFamily: '"Circular Std", "Circular", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif', color: "#202124" },
@@ -460,12 +608,10 @@ const s = {
   provinceSelect: { flex: 1, border: "none", outline: "none", fontSize: "16px", color: "#3c4043", background: "transparent", cursor: "pointer", fontFamily: "inherit", padding: "12px 0", appearance: "none" },
   searchBtn: { background: "#1a73e8", color: "#fff", border: "none", padding: "14px 32px", fontSize: "15px", fontWeight: "500", cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0, borderRadius: "24px" },
 
-  filterRow: { background: "#fff", borderBottom: "1px solid #dadce0", padding: "12px 24px" },
-  filterRowInner: { maxWidth: "1200px", margin: "0 auto", display: "flex", alignItems: "center", gap: "12px", flexWrap: "wrap", justifyContent: "center" },
+  filterRow: { background: "#fff", borderBottom: "1px solid #dadce0", padding: "0 24px" },
+  filterRowInner: { maxWidth: "1200px", margin: "0 auto", display: "flex", alignItems: "center", justifyContent: "center", gap: "16px", flexWrap: "wrap", paddingBottom: "16px" },
   filterGroup: { display: "flex", alignItems: "center" },
-  googleChip: { appearance: "none", background: "#fff url('data:image/svg+xml;utf8,<svg width=\"16\" height=\"16\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"%235f6368\" stroke-width=\"2\"><path d=\"M6 9l6 6 6-6\"/></svg>') no-repeat right 12px center", border: "1px solid #dadce0", borderRadius: "16px", padding: "8px 36px 8px 16px", fontSize: "14px", color: "#3c4043", cursor: "pointer", outline: "none", fontWeight: "400", fontFamily: "inherit" },
-  googleChipActive: { background: "#e8f0fe", color: "#1967d2", borderColor: "#d2e3fc", backgroundImage: "url('data:image/svg+xml;utf8,<svg width=\"16\" height=\"16\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"%231967d2\" stroke-width=\"2\"><path d=\"M6 9l6 6 6-6\"/></svg>')" },
-  clearBtn: { color: "#1a73e8", background: "none", border: "none", fontSize: "14px", fontWeight: "500", cursor: "pointer", padding: "8px 12px", fontFamily: "inherit" },
+  clearBtn: { color: "#c5221f", background: "none", border: "none", fontSize: "14px", fontWeight: "500", cursor: "pointer", padding: "10px 16px", fontFamily: "inherit", alignSelf: "center", marginTop: "10px" },
 
   mainSection: { flex: 1, background: "#f8f9fa", paddingTop: "24px" },
   mainInner: { maxWidth: "1200px", margin: "0 auto", padding: "0 24px 64px" },
@@ -487,17 +633,17 @@ const s = {
   emptySub: { color: "#5f6368", fontSize: "15px", marginBottom: "24px" },
 
   jobCard: { background: "#fff", border: "1px solid #dadce0", borderRadius: "8px", padding: "16px", cursor: "pointer", position: "relative" },
-  jobCardActive: { borderColor: "#1a73e8", boxShadow: "0 0 0 1px #1a73e8" },
+  jobCardActive: { borderColor: "#1a73e8 !important", boxShadow: "inset 0 0 0 1px #1a73e8" },
 
-  jobCardHead: { display: "flex", alignItems: "flex-start", gap: "12px", marginBottom: "10px" },
+  jobCardHead: { display: "flex", alignItems: "flex-start", gap: "12px", marginBottom: "6px" },
   jobLogo: { width: "40px", height: "40px", borderRadius: "4px", overflow: "hidden", border: "1px solid #dadce0", flexShrink: 0 },
   jobLogoImg: { width: "100%", height: "100%", objectFit: "contain" },
   jobLogoPlaceholder: { width: "40px", height: "40px", borderRadius: "4px", display: "flex", alignItems: "center", justifyContent: "center", fontWeight: "500", fontSize: "18px" },
   jobCardHeadInfo: { flex: 1, minWidth: 0 },
   jobEmployer: { color: "#5f6368", fontSize: "12px", marginBottom: "2px" },
   saveBtn: { background: "none", border: "none", cursor: "pointer", padding: "4px", flexShrink: 0 },
-  jobTitle: { color: "#1a73e8", fontSize: "16px", fontWeight: "500", marginBottom: "2px", lineHeight: "1.3" },
-  jobLocation: { color: "#5f6368", fontSize: "13px", marginBottom: "0" },
+  jobTitle: { color: "#1a73e8", fontSize: "16px", fontWeight: "500", lineHeight: "1.3" },
+  jobLocation: { display: "flex", alignItems: "center", gap: "4px", color: "#5f6368", fontSize: "12px", marginBottom: "8px", marginTop: "2px" },
   reqPreview: { marginBottom: "10px", marginTop: "8px" },
   reqPreviewItem: { display: "flex", alignItems: "flex-start", gap: "8px", marginBottom: "4px" },
   reqPreviewDot: { color: "#9aa0a6", fontSize: "12px", marginTop: "1px" },
