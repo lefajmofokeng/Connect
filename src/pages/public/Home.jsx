@@ -301,6 +301,8 @@ export default function Home() {
                 </div>
               ) : (
                 <div style={s.detailContent}>
+                  
+                  {/* Fixed Header */}
                   <div style={s.detailHead}>
                     <div style={s.detailHeadTop}>
                       <div style={s.detailLogo}>
@@ -344,64 +346,68 @@ export default function Home() {
                     </div>
                   </div>
 
-                  {selectedJob.description && (
-                    <div style={s.detailSection}>
-                      <div style={s.detailSectionTitle}>Description</div>
-                      <p style={s.detailText}>{selectedJob.description}</p>
-                    </div>
-                  )}
+                  {/* Scrollable body content */}
+                  <div style={s.detailScrollArea}>
+                    {selectedJob.description && (
+                      <div style={s.detailSection}>
+                        <div style={s.detailSectionTitle}>Description</div>
+                        <p style={s.detailText}>{selectedJob.description}</p>
+                      </div>
+                    )}
 
-                  {selectedJob.responsibilities?.length > 0 && (
-                    <div style={s.detailSection}>
-                      <div style={s.detailSectionTitle}>Responsibilities</div>
-                      {selectedJob.responsibilities.map((r, i) => (
-                        <div key={i} style={s.detailBullet}>
-                          <span style={s.detailBulletDot}>•</span>
-                          <span style={s.detailText}>{r}</span>
-                        </div>
-                      ))}
-                    </div>
-                  )}
+                    {selectedJob.responsibilities?.length > 0 && (
+                      <div style={s.detailSection}>
+                        <div style={s.detailSectionTitle}>Responsibilities</div>
+                        {selectedJob.responsibilities.map((r, i) => (
+                          <div key={i} style={s.detailBullet}>
+                            <span style={s.detailBulletDot}>•</span>
+                            <span style={s.detailText}>{r}</span>
+                          </div>
+                        ))}
+                      </div>
+                    )}
 
-                  {selectedJob.requirements?.length > 0 && (
-                    <div style={s.detailSection}>
-                      <div style={s.detailSectionTitle}>Requirements</div>
-                      {selectedJob.requirements.map((r, i) => (
-                        <div key={i} style={s.detailBullet}>
-                          <span style={s.detailBulletDot}>•</span>
-                          <span style={s.detailText}>{r}</span>
-                        </div>
-                      ))}
-                    </div>
-                  )}
+                    {selectedJob.requirements?.length > 0 && (
+                      <div style={s.detailSection}>
+                        <div style={s.detailSectionTitle}>Requirements</div>
+                        {selectedJob.requirements.map((r, i) => (
+                          <div key={i} style={s.detailBullet}>
+                            <span style={s.detailBulletDot}>•</span>
+                            <span style={s.detailText}>{r}</span>
+                          </div>
+                        ))}
+                      </div>
+                    )}
 
-                  {selectedJob.niceToHaves?.length > 0 && (
-                    <div style={s.detailSection}>
-                      <div style={s.detailSectionTitle}>Nice to Have</div>
-                      {selectedJob.niceToHaves.map((r, i) => (
-                        <div key={i} style={s.detailBullet}>
-                          <span style={s.detailBulletDot}>•</span>
-                          <span style={s.detailText}>{r}</span>
-                        </div>
-                      ))}
-                    </div>
-                  )}
+                    {selectedJob.niceToHaves?.length > 0 && (
+                      <div style={s.detailSection}>
+                        <div style={s.detailSectionTitle}>Nice to Have</div>
+                        {selectedJob.niceToHaves.map((r, i) => (
+                          <div key={i} style={s.detailBullet}>
+                            <span style={s.detailBulletDot}>•</span>
+                            <span style={s.detailText}>{r}</span>
+                          </div>
+                        ))}
+                      </div>
+                    )}
 
-                  {selectedJob.specialNotes && (
-                    <div style={s.detailSection}>
-                      <div style={s.detailSectionTitle}>Special Notes</div>
-                      <div style={s.specialNote}>{selectedJob.specialNotes}</div>
-                    </div>
-                  )}
+                    {selectedJob.specialNotes && (
+                      <div style={s.detailSection}>
+                        <div style={s.detailSectionTitle}>Special Notes</div>
+                        <div style={s.specialNote}>{selectedJob.specialNotes}</div>
+                      </div>
+                    )}
 
-                  <div style={s.detailCloses}>
-                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
-                    Application closes <strong>{selectedJob.closes}</strong>
+                    <div style={s.detailCloses}>
+                      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+                      Application closes <strong>{selectedJob.closes}</strong>
+                    </div>
+
+                    <button style={s.fullDetailsBtn} onClick={() => navigate(`/jobs/${selectedJob.id}`)}>
+                      View Full Specification →
+                    </button>
                   </div>
 
-                  <button style={s.fullDetailsBtn} onClick={() => navigate(`/jobs/${selectedJob.id}`)}>
-                    View Full Specification →
-                  </button>
                 </div>
               )}
             </div>
@@ -443,14 +449,20 @@ export default function Home() {
 
       {/* ── Page-specific CSS ── */}
       <style>{`
+        /* Global override to nuke any browser default focus rings causing ghost borders */
+        *:focus { outline: none !important; box-shadow: none !important; }
+        button, div, a { -webkit-tap-highlight-color: transparent !important; }
+
         .page-wrapper { -webkit-font-smoothing: antialiased; }
         ::-webkit-scrollbar { width: 6px; height: 6px; }
         ::-webkit-scrollbar-track { background: transparent; }
         ::-webkit-scrollbar-thumb { background: #dadce0; border-radius: 4px; }
 
-        .job-card-hover { transition: box-shadow 0.2s ease, border-color 0.2s ease !important; transform: translateZ(0); }
-        .job-card-hover:hover:not(.job-card-selected) { box-shadow: 0 4px 12px rgba(60,64,67,0.12) !important; border-color: #bdc1c6 !important; }
-        .job-card-selected { border-color: #1a73e8 !important; box-shadow: inset 0 0 0 1px #1a73e8 !important; }
+        .job-card-hover { transition: border-color 0.2s ease !important; transform: translateZ(0); outline: none !important; }
+        .job-card-hover:hover:not(.job-card-selected) { border-color: #bdc1c6 !important; }
+        
+        /* Removed all trace of box-shadow to prevent subpixel ghosting */
+        .job-card-selected { border-color: #1a73e8 !important; outline: none !important; }
 
         .filter-tab-wrap button:hover { background: #f8f9fa !important; }
         .filter-tab-wrap .ft-option:hover { background: #f1f3f4 !important; }
@@ -550,12 +562,12 @@ const ft = {
   tabWrap: { position: "relative", marginTop: "10px" },
   tab: {
     position: "relative", display: "flex", alignItems: "center", justifyContent: "space-between",
-    background: "#fff", border: "1px solid #9aa0a6", borderRadius: "4px",
+    background: "#fff", border: "1px solid #9aa0a6", borderRadius: "4px", outline: "none",
     padding: "10px 14px", cursor: "pointer", minWidth: "160px", gap: "12px",
     fontFamily: '"Circular Std", "Circular", -apple-system, sans-serif',
-    transition: "border-color 0.15s, box-shadow 0.15s",
+    transition: "border-color 0.15s",
   },
-  tabActive: { borderColor: "#1967d2", boxShadow: "inset 0 0 0 1px #1967d2" },
+  tabActive: { borderColor: "#1967d2" },
   tabLabel: { 
     position: "absolute", top: "-8px", left: "10px", background: "#fff", 
     padding: "0 4px", fontSize: "12px", fontWeight: "400", color: "#5f6368", 
@@ -566,13 +578,13 @@ const ft = {
   tabValueActive: { color: "#202124" },
   dropdown: {
     position: "absolute", top: "calc(100% + 8px)", left: 0, zIndex: 100,
-    background: "#fff", border: "1px solid #dadce0", borderRadius: "8px",
+    background: "#fff", border: "1px solid #dadce0", borderRadius: "8px", outline: "none",
     boxShadow: "0 4px 16px rgba(60,64,67,0.18)", minWidth: "200px",
     maxHeight: "280px", overflowY: "auto", padding: "4px",
     display: "flex", flexDirection: "column",
   },
   option: {
-    display: "flex", alignItems: "center", gap: "8px",
+    display: "flex", alignItems: "center", gap: "8px", outline: "none",
     background: "none", border: "none", width: "100%", textAlign: "left",
     padding: "9px 14px", fontSize: "14px", fontWeight: "400", color: "#202124",
     cursor: "pointer", borderRadius: "4px",
@@ -581,7 +593,7 @@ const ft = {
   },
   optionActive: { color: "#1967d2", fontWeight: "600", background: "#f0f4ff" },
   optionClear: {
-    display: "flex", alignItems: "center", gap: "6px",
+    display: "flex", alignItems: "center", gap: "6px", outline: "none",
     background: "none", border: "none", borderBottom: "1px solid #f1f3f4",
     width: "100%", textAlign: "left", padding: "8px 14px 10px",
     fontSize: "13px", fontWeight: "500", color: "#9aa0a6", cursor: "pointer",
@@ -602,16 +614,16 @@ const s = {
   searchBarInner: { maxWidth: "900px", margin: "0 auto", display: "flex", alignItems: "center", background: "#fff", borderRadius: "32px", boxShadow: "0 1px 6px rgba(32,33,36,0.28)", padding: "8px 8px 8px 20px" },
   searchLeft: { flex: 2, display: "flex", alignItems: "center", gap: "12px", minWidth: 0 },
   searchInput: { flex: 1, border: "none", outline: "none", fontSize: "16px", color: "#202124", background: "transparent", fontFamily: "inherit", padding: "12px 0" },
-  searchClear: { background: "none", border: "none", cursor: "pointer", padding: "4px", display: "flex", alignItems: "center" },
+  searchClear: { background: "none", border: "none", outline: "none", cursor: "pointer", padding: "4px", display: "flex", alignItems: "center" },
   searchDivider: { width: "1px", height: "32px", background: "#dadce0", flexShrink: 0, margin: "0 16px" },
   searchRight: { flex: 1, display: "flex", alignItems: "center", gap: "12px", minWidth: 0 },
   provinceSelect: { flex: 1, border: "none", outline: "none", fontSize: "16px", color: "#3c4043", background: "transparent", cursor: "pointer", fontFamily: "inherit", padding: "12px 0", appearance: "none" },
-  searchBtn: { background: "#1a73e8", color: "#fff", border: "none", padding: "14px 32px", fontSize: "15px", fontWeight: "500", cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0, borderRadius: "24px" },
+  searchBtn: { background: "#1a73e8", color: "#fff", border: "none", outline: "none", padding: "14px 32px", fontSize: "15px", fontWeight: "500", cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0, borderRadius: "24px" },
 
   filterRow: { background: "#fff", borderBottom: "1px solid #dadce0", padding: "0 24px" },
   filterRowInner: { maxWidth: "1200px", margin: "0 auto", display: "flex", alignItems: "center", justifyContent: "center", gap: "16px", flexWrap: "wrap", paddingBottom: "16px" },
   filterGroup: { display: "flex", alignItems: "center" },
-  clearBtn: { color: "#c5221f", background: "none", border: "none", fontSize: "14px", fontWeight: "500", cursor: "pointer", padding: "10px 16px", fontFamily: "inherit", alignSelf: "center", marginTop: "10px" },
+  clearBtn: { color: "#c5221f", background: "none", border: "none", outline: "none", fontSize: "14px", fontWeight: "500", cursor: "pointer", padding: "10px 16px", fontFamily: "inherit", alignSelf: "center", marginTop: "10px" },
 
   mainSection: { flex: 1, background: "#f8f9fa", paddingTop: "24px" },
   mainInner: { maxWidth: "1200px", margin: "0 auto", padding: "0 24px 64px" },
@@ -619,12 +631,13 @@ const s = {
   resultsRow: { marginBottom: "20px", display: "flex", alignItems: "center" },
   resultsCount: { color: "#5f6368", fontSize: "14px" },
   resultsLocation: { color: "#202124", fontWeight: "500" },
-  mobileBackBtn: { display: "flex", alignItems: "center", gap: "8px", background: "none", border: "none", color: "#1a73e8", fontSize: "15px", fontWeight: "500", cursor: "pointer", fontFamily: "inherit", padding: 0 },
+  mobileBackBtn: { display: "flex", alignItems: "center", gap: "8px", background: "none", border: "none", outline: "none", color: "#1a73e8", fontSize: "15px", fontWeight: "500", cursor: "pointer", fontFamily: "inherit", padding: 0 },
 
   splitLayout: { display: "grid", gridTemplateColumns: "380px 1fr", gap: "24px", alignItems: "start" },
   
   leftPanel: { display: "flex", flexDirection: "column", gap: "12px" }, 
-  rightPanel: { position: "sticky", top: "76px", background: "#fff", border: "1px solid #dadce0", borderRadius: "8px", overflowY: "auto", maxHeight: "calc(100vh - 96px)" },
+  
+  rightPanel: { position: "sticky", top: "76px", background: "#fff", border: "1px solid #dadce0", outline: "none", borderRadius: "8px", overflow: "hidden", maxHeight: "calc(100vh - 96px)", display: "flex", flexDirection: "column" },
 
   skeleton: { background: "linear-gradient(90deg,#f1f3f4 25%,#e8eaed 50%,#f1f3f4 75%)", backgroundSize: "200%", animation: "shimmer 1.5s infinite", height: "140px", border: "1px solid #dadce0", borderRadius: "8px" },
 
@@ -632,8 +645,8 @@ const s = {
   emptyTitle: { color: "#202124", fontSize: "20px", fontWeight: "400", marginBottom: "8px" },
   emptySub: { color: "#5f6368", fontSize: "15px", marginBottom: "24px" },
 
-  jobCard: { background: "#fff", border: "1px solid #dadce0", borderRadius: "8px", padding: "16px", cursor: "pointer", position: "relative" },
-  jobCardActive: { borderColor: "#1a73e8 !important", boxShadow: "inset 0 0 0 1px #1a73e8" },
+  jobCard: { background: "#fff", border: "1px solid #dadce0", outline: "none", borderRadius: "8px", padding: "16px", cursor: "pointer", position: "relative" },
+  jobCardActive: { borderColor: "#1a73e8 !important", outline: "none" },
 
   jobCardHead: { display: "flex", alignItems: "flex-start", gap: "12px", marginBottom: "6px" },
   jobLogo: { width: "40px", height: "40px", borderRadius: "4px", overflow: "hidden", border: "1px solid #dadce0", flexShrink: 0 },
@@ -641,7 +654,7 @@ const s = {
   jobLogoPlaceholder: { width: "40px", height: "40px", borderRadius: "4px", display: "flex", alignItems: "center", justifyContent: "center", fontWeight: "500", fontSize: "18px" },
   jobCardHeadInfo: { flex: 1, minWidth: 0 },
   jobEmployer: { color: "#5f6368", fontSize: "12px", marginBottom: "2px" },
-  saveBtn: { background: "none", border: "none", cursor: "pointer", padding: "4px", flexShrink: 0 },
+  saveBtn: { background: "none", border: "none", outline: "none", cursor: "pointer", padding: "4px", flexShrink: 0 },
   jobTitle: { color: "#1a73e8", fontSize: "16px", fontWeight: "500", lineHeight: "1.3" },
   jobLocation: { display: "flex", alignItems: "center", gap: "4px", color: "#5f6368", fontSize: "12px", marginBottom: "8px", marginTop: "2px" },
   reqPreview: { marginBottom: "10px", marginTop: "8px" },
@@ -651,11 +664,13 @@ const s = {
   jobType: { background: "#f1f3f4", color: "#3c4043", borderRadius: "4px", padding: "4px 8px", fontSize: "12px", fontWeight: "500" },
   remoteBadge: { background: "#e8f0fe", color: "#1967d2", borderRadius: "4px", padding: "4px 8px", fontSize: "12px", fontWeight: "500" },
   jobCloses: { color: "#80868b", fontSize: "12px", marginLeft: "auto" },
-  viewMoreBtn: { display: "block", textAlign: "center", color: "#1a73e8", fontSize: "14px", textDecoration: "none", fontWeight: "500", padding: "16px", border: "1px solid #dadce0", background: "#fff", borderRadius: "24px" },
+  viewMoreBtn: { display: "block", textAlign: "center", color: "#1a73e8", fontSize: "14px", textDecoration: "none", fontWeight: "500", padding: "16px", border: "1px solid #dadce0", outline: "none", background: "#fff", borderRadius: "24px" },
 
-  detailEmpty: { display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", height: "500px", textAlign: "center", background: "#f8f9fa" },
-  detailContent: { padding: "0" },
-  detailHead: { padding: "32px", borderBottom: "1px solid #dadce0", background: "#fff" },
+  detailEmpty: { display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", height: "500px", textAlign: "center", background: "#f8f9fa", flex: 1 },
+  
+  detailContent: { padding: "0", display: "flex", flexDirection: "column", height: "100%", overflow: "hidden" },
+  
+  detailHead: { padding: "32px", borderBottom: "1px solid #dadce0", background: "#fff", flexShrink: 0 },
   detailHeadTop: { display: "flex", alignItems: "flex-start", gap: "14px", marginBottom: "16px" },
   detailLogo: { width: "56px", height: "56px", borderRadius: "8px", overflow: "hidden", border: "1px solid #dadce0", flexShrink: 0 },
   detailLogoImg: { width: "100%", height: "100%", objectFit: "contain" },
@@ -666,9 +681,11 @@ const s = {
   detailMeta: { display: "flex", flexWrap: "wrap", gap: "20px", marginBottom: "24px" },
   detailMetaItem: { display: "flex", alignItems: "center", gap: "8px", color: "#5f6368", fontSize: "15px" },
   detailActions: { display: "flex", gap: "12px", alignItems: "center" },
-  applyBtn: { background: "#1a73e8", color: "#fff", border: "none", borderRadius: "24px", padding: "12px 28px", fontSize: "15px", fontWeight: "500", cursor: "pointer", fontFamily: "inherit", textDecoration: "none", display: "inline-block" },
-  saveDetailBtn: { height: "46px", padding: "0 24px", border: "1px solid #dadce0", borderRadius: "24px", background: "#fff", cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 },
-  outlineBtn: { background: "#fff", color: "#1a73e8", border: "1px solid #dadce0", borderRadius: "24px", padding: "12px 28px", fontSize: "15px", fontWeight: "500", cursor: "pointer", textDecoration: "none", display: "inline-block" },
+  applyBtn: { background: "#1a73e8", color: "#fff", border: "none", outline: "none", borderRadius: "24px", padding: "12px 28px", fontSize: "15px", fontWeight: "500", cursor: "pointer", fontFamily: "inherit", textDecoration: "none", display: "inline-block" },
+  saveDetailBtn: { height: "46px", padding: "0 24px", border: "1px solid #dadce0", outline: "none", borderRadius: "24px", background: "#fff", cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 },
+  outlineBtn: { background: "#fff", color: "#1a73e8", border: "1px solid #dadce0", outline: "none", borderRadius: "24px", padding: "12px 28px", fontSize: "15px", fontWeight: "500", cursor: "pointer", textDecoration: "none", display: "inline-block" },
+  
+  detailScrollArea: { flex: 1, overflowY: "auto" },
   
   detailSection: { padding: "24px 32px 0" },
   detailSectionTitle: { color: "#202124", fontSize: "18px", fontWeight: "500", marginBottom: "16px" },
@@ -678,14 +695,14 @@ const s = {
   specialNote: { background: "#e8f0fe", padding: "16px 20px", color: "#202124", fontSize: "15px", lineHeight: "1.6", borderRadius: "8px" },
   
   detailCloses: { display: "flex", alignItems: "center", gap: "8px", color: "#5f6368", fontSize: "14px", padding: "32px", borderTop: "1px solid #dadce0", marginTop: "32px", background: "#f8f9fa" },
-  fullDetailsBtn: { background: "#fff", border: "none", borderTop: "1px solid #dadce0", color: "#1a73e8", padding: "20px", fontSize: "15px", fontWeight: "500", cursor: "pointer", fontFamily: "inherit", width: "100%", display: "block" },
+  fullDetailsBtn: { background: "#fff", border: "none", outline: "none", borderTop: "1px solid #dadce0", color: "#1a73e8", padding: "20px", fontSize: "15px", fontWeight: "500", cursor: "pointer", fontFamily: "inherit", width: "100%", display: "block" },
 
   employerSection: { background: "#f8f9fa", padding: "80px 24px" },
   employerInner: { maxWidth: "1150px", margin: "0 auto", display: "grid", gridTemplateColumns: "1fr 1fr", gap: "64px", alignItems: "center" },
   heroTag: { display: "inline-block", color: "#1a73e8", fontSize: "13px", fontWeight: "500", textTransform: "uppercase", letterSpacing: "1px", marginBottom: "16px" },
   employerTitle: { color: "#202124", fontSize: "36px", fontWeight: "400", margin: "0 0 16px", lineHeight: "1.2" },
   employerDesc: { color: "#5f6368", fontSize: "16px", lineHeight: "1.6", marginBottom: "32px", maxWidth: "480px" },
-  outlineBtnLight: { background: "transparent", color: "#1a73e8", border: "1px solid #dadce0", borderRadius: "24px", padding: "12px 28px", fontSize: "15px", fontWeight: "500", cursor: "pointer", textDecoration: "none", display: "inline-block" },
+  outlineBtnLight: { background: "transparent", color: "#1a73e8", border: "1px solid #dadce0", outline: "none", borderRadius: "24px", padding: "12px 28px", fontSize: "15px", fontWeight: "500", cursor: "pointer", textDecoration: "none", display: "inline-block" },
   employerFeaturesBox: { display: "flex", flexDirection: "column", gap: "16px" },
   featureCard: { background: "#fff", border: "1px solid #dadce0", borderRadius: "8px", padding: "24px", boxShadow: "0 1px 2px 0 rgba(60,64,67,0.1)" },
   featureCardTitle: { color: "#202124", fontSize: "16px", fontWeight: "500", marginBottom: "6px" },

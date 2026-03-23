@@ -47,14 +47,14 @@ export default function CompanyPage() {
   if (loading) return (
     <div style={s.page}>
       <Navbar />
-      <div style={s.loadingWrap}>
+      <div style={s.loadingWrap} className="cp-page-padding">
         <div style={{ ...s.skeleton, height: 160 }} />
-        <div style={s.loadingBody}>
+        <div style={s.loadingBody} className="cp-loading-body">
           <div style={{ display: "flex", flexDirection: "column", gap: 14, flex: 1 }}>
             <div style={{ ...s.skeleton, height: 140 }} />
             <div style={{ ...s.skeleton, height: 220 }} />
           </div>
-          <div style={{ width: 280, display: "flex", flexDirection: "column", gap: 14 }}>
+          <div style={{ width: 280, display: "flex", flexDirection: "column", gap: 14 }} className="cp-loading-side">
             <div style={{ ...s.skeleton, height: 180 }} />
           </div>
         </div>
@@ -66,7 +66,7 @@ export default function CompanyPage() {
   if (!employer) return (
     <div style={s.page}>
       <Navbar />
-      <div style={s.emptyWrap}>
+      <div style={s.emptyWrap} className="cp-page-padding">
         <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="#dadce0" strokeWidth="1.5" style={{ marginBottom: 16 }}>
           <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/>
         </svg>
@@ -82,8 +82,8 @@ export default function CompanyPage() {
       <Navbar />
 
       {/* ── Hero banner ── */}
-      <div style={{ ...s.hero, background: `${accent}0d`, borderBottom: `3px solid ${accent}` }}>
-        <div style={s.heroInner}>
+      <div style={{ ...s.hero, background: `${accent}0d`, borderBottom: `3px solid ${accent}` }} className="cp-hero cp-page-padding">
+        <div style={s.heroInner} className="cp-hero-inner">
 
           {/* Logo */}
           <div style={s.heroLogo}>
@@ -94,7 +94,7 @@ export default function CompanyPage() {
           </div>
 
           {/* Info */}
-          <div style={s.heroInfo}>
+          <div style={s.heroInfo} className="cp-hero-info">
             <h1 style={s.companyName}>{employer.companyName}</h1>
 
             <div style={s.companyMeta}>
@@ -135,7 +135,7 @@ export default function CompanyPage() {
           </div>
 
           {/* Open positions count */}
-          <div style={{ ...s.heroJobCount, borderColor: `${accent}30`, background: "#ffffff" }}>
+          <div style={{ ...s.heroJobCount, borderColor: `${accent}30`, background: "#ffffff" }} className="cp-hero-job-count">
             <div style={{ ...s.jobCountNum, color: accent }}>{jobs.length}</div>
             <div style={s.jobCountLabel}>Open Position{jobs.length !== 1 ? "s" : ""}</div>
           </div>
@@ -143,9 +143,9 @@ export default function CompanyPage() {
       </div>
 
       {/* ── Body ── */}
-      <div style={s.body}>
+      <div style={s.body} className="cp-body cp-page-padding">
         <div style={s.inner}>
-          <div style={s.layout}>
+          <div style={s.layout} className="cp-layout">
 
             {/* Main column */}
             <div style={s.mainCol}>
@@ -162,7 +162,7 @@ export default function CompanyPage() {
               )}
 
               {/* Open Positions */}
-              <div style={s.card}>
+              <div style={s.card} className="jobs-list-anchor">
                 <div style={s.cardTitle}>
                   <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#5f6368" strokeWidth="2"><rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"/></svg>
                   Open Positions
@@ -182,6 +182,7 @@ export default function CompanyPage() {
                       <div
                         key={job.id}
                         style={s.jobRow}
+                        className="cp-job-row"
                         onClick={() => navigate(`/jobs/${job.id}`)}
                       >
                         <div style={s.jobInfo}>
@@ -204,7 +205,7 @@ export default function CompanyPage() {
                             {job.remote && <span style={s.remoteBadge}>Remote</span>}
                           </div>
                         </div>
-                        <div style={s.jobRowRight}>
+                        <div style={s.jobRowRight} className="cp-job-row-right">
                           <span style={s.jobCloses}>Closes {job.closes}</span>
                           <button
                             style={{ ...s.applyBtn, background: accent }}
@@ -221,7 +222,7 @@ export default function CompanyPage() {
             </div>
 
             {/* Sidebar */}
-            <div style={s.sideCol}>
+            <div style={s.sideCol} className="cp-side">
 
               {/* Company details */}
               <div style={s.sideCard}>
@@ -283,13 +284,33 @@ export default function CompanyPage() {
 
       <style>{`
         @keyframes shimmer { 0%{background-position:200% 0} 100%{background-position:-200% 0} }
-        @media (max-width: 900px) { .cp-layout{grid-template-columns:1fr!important} .cp-side{position:static!important} }
-        @media (max-width: 768px) {
-          .cp-hero-inner{flex-direction:column!important;align-items:flex-start!important;gap:16px!important}
-          .cp-job-row{flex-direction:column!important;align-items:flex-start!important;gap:12px!important}
-          .cp-job-row-right{width:100%!important;flex-direction:row!important;justify-content:space-between!important;align-items:center!important}
+        
+        /* Tablet Breakpoint */
+        @media (max-width: 900px) { 
+          .cp-layout { grid-template-columns: 1fr !important; } 
+          .cp-side { position: static !important; } 
+          .cp-loading-body { flex-direction: column !important; }
+          .cp-loading-side { width: 100% !important; }
         }
-        .cp-job-row:hover{border-color:#1a73e8!important;background:#f8fbff!important}
+        
+        /* Mobile Breakpoint */
+        @media (max-width: 768px) {
+          .cp-page-padding { padding-left: 16px !important; padding-right: 16px !important; }
+          .cp-hero { padding-top: 80px !important; padding-bottom: 24px !important; }
+          .cp-body { padding-top: 24px !important; }
+          
+          .cp-hero-inner { flex-direction: column !important; align-items: flex-start !important; gap: 16px !important; }
+          .cp-hero-info h1 { font-size: 24px !important; }
+          
+          .cp-hero-job-count { width: 100% !important; display: flex; flex-direction: row; justify-content: space-between; align-items: center; padding: 16px !important; }
+          .cp-hero-job-count .jobCountLabel { margin-top: 0 !important; }
+          
+          .cp-job-row { flex-direction: column !important; align-items: flex-start !important; gap: 12px !important; }
+          .cp-job-row-right { width: 100% !important; flex-direction: row !important; justify-content: space-between !important; align-items: center !important; }
+        }
+        
+        /* Desktop Hover Effects */
+        .cp-job-row:hover { border-color: #1a73e8 !important; background: #f8fbff !important; }
       `}</style>
     </div>
   );
@@ -386,6 +407,4 @@ const s = {
   emptyTitle: { color: "#202124", fontSize: "20px", fontWeight: "600", marginBottom: "8px", letterSpacing: "-0.3px" },
   emptySub: { color: "#5f6368", fontSize: "14px", marginBottom: "24px" },
   emptyBtn: { background: "#1a73e8", color: "#ffffff", border: "none", borderRadius: "4px", padding: "10px 24px", fontSize: "13px", fontWeight: "600", cursor: "pointer", fontFamily: "inherit" },
-
-  // ── Footer ──
 };
