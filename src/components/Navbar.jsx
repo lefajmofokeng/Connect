@@ -99,7 +99,7 @@ export default function Navbar() {
 
 const s = {
   navbar: {
-    background: "#ffffff",
+    background: "#080d1b",
     borderBottom: "1px solid #dadce0",
     position: "fixed",
     top: 0, left: 0, right: 0,
@@ -122,11 +122,11 @@ const s = {
   logoText: { color: "#202124", fontWeight: "600", fontSize: "15px", fontFamily: FONT },
 
   // Desktop nav
-  navLinks:     { display: "flex", alignItems: "center", gap: "16px" },
-  navLink:      { color: "#3c4043", fontSize: "14px", fontWeight: "500", textDecoration: "none", padding: "8px 12px", borderRadius: "4px", fontFamily: FONT },
+  navLinks:     { display: "flex", alignItems: "center", gap: "12px" },
+  navLink:      { color: "#f4f4f4", fontSize: "14px", fontWeight: "500", textDecoration: "none", padding: "8px 12px", borderRadius: "50px", fontFamily: FONT },
   navLinkActive:{ color: "#1a73e8" },
-  navSignIn:    { color: "#1a73e8", border: "1px solid #dadce0", background: "#fff", padding: "7px 16px", borderRadius: "20px", fontSize: "14px", fontWeight: "500", textDecoration: "none", fontFamily: FONT },
-  navBtn:       { background: "#1a73e8", color: "#fff", border: "none", padding: "8px 18px", borderRadius: "4px", fontSize: "14px", fontWeight: "500", textDecoration: "none", fontFamily: FONT },
+  navSignIn:    { color: "#92d1ff", background: "#1199fa33", padding: "7px 16px", borderRadius: "50px", fontSize: "14px", fontWeight: "500", textDecoration: "none", fontFamily: FONT, border: "none", textDecoration: "none" },
+  navBtn:       { background: "#1199fa", color: "#f7f9fa", border: "none", padding: "8px 18px", borderRadius: "50px", fontSize: "14px", fontWeight: "500", textDecoration: "none", fontFamily: FONT },
 
   // Avatar
   navAvatar:        { width: "36px", height: "36px", borderRadius: "50%", overflow: "hidden", cursor: "pointer", border: "1px solid #dadce0", flexShrink: 0 },
@@ -139,5 +139,5 @@ const s = {
   // Mobile menu
   mobileMenu:   { background: "#fff", borderTop: "1px solid #dadce0", padding: "16px", display: "flex", flexDirection: "column", gap: "8px" },
   mobileLink:   { color: "#202124", fontSize: "15px", padding: "12px 16px", textDecoration: "none", display: "block", fontFamily: FONT },
-  mobileLinkBtn:{ color: "#1a73e8", background: "#fff", border: "1px solid #dadce0", fontSize: "15px", padding: "12px 16px", borderRadius: "24px", textDecoration: "none", display: "block", textAlign: "center", marginTop: "12px", fontWeight: "500", fontFamily: FONT },
+  mobileLinkBtn:{ color: "#1a73e8", background: "#fff", border: "1px solid #dadce0", fontSize: "15px", padding: "12px 16px", borderRadius: "50px", textDecoration: "none", display: "block", textAlign: "center", marginTop: "12px", fontWeight: "500", fontFamily: FONT },
 };
