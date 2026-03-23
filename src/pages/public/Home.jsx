@@ -283,13 +283,20 @@ export default function Home() {
             </div>
 
             {/* ── Right: Detail Panel ── */}
-            <div ref={detailRef} className={`right-panel ${mobileView === "list" ? "hide-on-mobile" : ""}`} style={s.rightPanel}>
+            <div ref={detailRef} className={`right-panel ${mobileView === "list" ? "hide-on-mobile" : "show-detail"}`} style={s.rightPanel}>
               {!selectedJob ? (
                 <div style={s.detailEmpty}>
                   <p style={{ color: "#80868b", fontSize: "14px" }}>Select a position to view details</p>
                 </div>
               ) : (
                 <div style={s.detailContent}>
+                  {/* Mobile back button — sticky at top of detail panel */}
+                  <div className="mobile-back-btn-wrap" style={{ display: "none" }}>
+                    <button style={s.mobileBackBtn} onClick={() => setMobileView("list")}>
+                      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><line x1="19" y1="12" x2="5" y2="12"/><polyline points="12 19 5 12 12 5"/></svg>
+                      Back to results
+                    </button>
+                  </div>
                   <div style={s.detailHead}>
                     <div style={s.detailHeadTop}>
                       <div style={s.detailLogo}>
@@ -523,56 +530,139 @@ export default function Home() {
         *:focus { outline: none !important; box-shadow: none !important; }
         button, div, a { -webkit-tap-highlight-color: transparent !important; }
 
-        /* FIX 2: Crisp font rendering — kill all transitions/transforms on text elements */
         .page-wrapper { -webkit-font-smoothing: antialiased; -moz-osx-font-smoothing: grayscale; text-rendering: optimizeLegibility; }
 
         ::-webkit-scrollbar { width: 6px; height: 6px; }
         ::-webkit-scrollbar-track { background: transparent; }
         ::-webkit-scrollbar-thumb { background: #dadce0; border-radius: 4px; }
 
-        /* FIX 2: No transform/transition on job list items — transforms cause font blurring */
         .job-list-item-hover { will-change: auto !important; transform: none !important; backface-visibility: visible !important; outline: none !important; }
         .job-list-item-hover:hover:not(.job-list-item-selected) { background-color: #f8f9fa !important; }
         .job-list-item-selected { outline: none !important; }
 
-        /* FIX 2: Crisp text on filter tabs */
         .filter-tab-wrap { will-change: auto !important; }
         .filter-tab-wrap button { will-change: auto !important; transform: none !important; -webkit-font-smoothing: antialiased !important; }
         .filter-tab-wrap button:hover { background: #f8f9fa !important; }
 
         @keyframes shimmer { 0%{background-position:200% 0} 100%{background-position:-200% 0} }
 
-        /* Desktop: hide mobile filter button */
+        /* ── Desktop: hide mobile filter button and mobile back btn ── */
         .mobile-filter-btn { display: none !important; }
+        .mobile-back-btn-wrap { display: none !important; }
 
-        /* Mobile: hide desktop filter tabs, show filter button */
+        /* ── Mobile: show back button inside detail panel ── */
+        @media (max-width: 900px) {
+          .show-detail .mobile-back-btn-wrap { display: block !important; }
+        }
+
+        /* ── Tablet / Mobile ── */
+        @media (max-width: 900px) {
+          .split-layout { grid-template-columns: 1fr !important; gap: 0 !important; }
+          .hide-on-mobile { display: none !important; }
+          .results-header-mobile {
+            background: #fff;
+            padding: 12px 16px;
+            margin-bottom: 0 !important;
+            position: sticky;
+            top: 56px;
+            z-index: 10;
+            border-bottom: 1px solid #f1f3f4;
+            margin-left: -16px;
+            margin-right: -16px;
+          }
+          /* Right panel — full screen on mobile */
+          .right-panel {
+            position: fixed !important;
+            inset: 0 !important;
+            top: 0 !important;
+            max-height: 50dvh !important;
+            border-radius: 0 !important;
+            border: none !important;
+            z-index: 200;
+          }
+        }
+
+        /* ── Mobile ── */
         @media (max-width: 768px) {
           .desktop-filters { display: none !important; }
           .mobile-filter-btn { display: flex !important; }
           .results-header-mobile { display: flex; align-items: center; justify-content: space-between; width: 100%; }
-        }
 
-        @media (max-width: 900px) {
-          .split-layout { grid-template-columns: 1fr !important; gap: 0 !important; }
-          .hide-on-mobile { display: none !important; }
-          .results-header-mobile { background: #fff; padding: 12px 0; margin-bottom: 0 !important; position: sticky; top: 64px; z-index: 10; border-bottom: 1px solid #f1f3f4; }
-        }
+          /* Hero */
+          .hero-title { font-size: 26px !important; line-height: 1.25 !important; }
+          .hero-subtitle { font-size: 14px !important; }
 
-        @media (max-width: 768px) {
-          .hero-title { font-size: 28px !important; line-height: 1.25 !important; }
-          .hero-subtitle { font-size: 15px !important; }
-          .search-bar-inner { flex-direction: column !important; padding: 8px !important; border-radius: 16px !important; }
-          .search-divider { width: 100% !important; height: 1px !important; margin: 4px 0 !important; }
-          .search-bar-inner button { width: 100%; border-radius: 8px !important; margin-top: 8px; }
-          .main-inner { padding: 12px 16px 48px !important; }
+          /* Search bar — stack vertically */
+          .search-bar-inner {
+            flex-direction: column !important;
+            padding: 12px !important;
+            border-radius: 16px !important;
+            gap: 0 !important;
+            align-items: stretch !important;
+          }
+          .search-bar-inner > div:first-child {
+            padding: 4px 0 !important;
+          }
+          .search-divider {
+            width: 100% !important;
+            height: 1px !important;
+            margin: 8px 0 !important;
+          }
+          .search-bar-inner > div:last-of-type {
+            padding: 4px 0 !important;
+          }
+          .search-bar-inner button {
+            width: 100% !important;
+            border-radius: 10px !important;
+            margin-top: 10px !important;
+            padding: 14px !important;
+            font-size: 15px !important;
+          }
 
-          /* FIX 3: job cards on mobile — full width, proper padding, readable */
+          /* Main inner padding */
+          .main-inner { padding: 0 20px 48px !important; }
+
+          /* Job list cards */
           .job-list-item-hover { padding: 16px 0 !important; }
+
+          /* Detail panel mobile — full screen with back button */
+          .right-panel {
+            position: fixed !important;
+            inset: 0 !important;
+            max-height: 100dvh !important;
+            border-radius: 0 !important;
+            border: none !important;
+            z-index: 200;
+            overflow-y: auto !important;
+          }
+
+          /* Back button on mobile detail */
+          .mobile-back-btn-wrap {
+            position: sticky;
+            top: 0;
+            background: #fff;
+            padding: 15px 20px;
+            border-bottom: 1px solid #dadce0;
+            z-index: 10;
+          }
         }
 
+        /* ── Small phones ── */
         @media (max-width: 480px) {
-          .detail-actions-mobile { flex-direction: column; width: 100%; }
-          .detail-actions-mobile button { width: 100%; justify-content: center; }
+          .detail-actions-mobile {
+            flex-direction: column !important;
+            width: 100% !important;
+            gap: 10px !important;
+          }
+          .detail-actions-mobile a,
+          .detail-actions-mobile button {
+            width: 100% !important;
+            justify-content: center !important;
+            text-align: center !important;
+            box-sizing: border-box !important;
+          }
+          .hero-title { font-size: 22px !important; }
+          .main-inner { padding: 0 12px 40px !important; }
         }
 
         /* ── Employer Pricing Section ── */
@@ -594,7 +684,7 @@ export default function Home() {
         .vt-pricing-container { position: relative; z-index: 2; max-width: 1200px; margin: 0 auto; padding: 50px 20px 0; }
         .vt-pricing-headline { font-size: 48px; font-weight: 500; line-height: 1.15; color: #202124; margin-bottom: 56px; font-family: inherit; }
         .vt-pricing-grid { display: flex; flex-wrap: wrap; gap: 28px; }
-        .vt-pricing-card { flex: 1; border-radius: 8px; overflow: hidden; box-shadow: 0 15px 35px rgba(0,0,0,0.1), 0 5px 15px rgba(0,0,0,0.05); display: flex; min-height: 320px; }
+        .vt-pricing-card { display: flex; border-radius: 8px; overflow: hidden; min-height: 280px; flex: 1 1 400px; }
         .vt-card-standard { background: #ffffff; }
         .vt-card-enterprise { background: #202124; }
         .vt-card-left { padding: 40px; flex: 1.4; display: flex; flex-direction: column; justify-content: space-between; }
@@ -603,7 +693,7 @@ export default function Home() {
         .vt-price-large { font-size: 30px; font-weight: 700; color: #202124; margin-bottom: 8px; font-family: inherit; }
         .vt-price-sub { font-size: 15px; line-height: 1.5; color: #5f6368; font-family: inherit; }
         .vt-card-features-right { flex: 1; background: rgba(255,255,255,0.08); display: flex; flex-direction: column; margin: 6px; border-radius: 4px; }
-        .vt-feature-list { list-style: none; height: 100%; display: flex; flex-direction: column; }
+        .vt-feature-list { list-style: none; height: 100%; display: flex; flex-direction: column; margin: 0; padding: 0; }
         .vt-feature-item { flex: 1; display: flex; align-items: center; padding: 0 28px; font-size: 15px; font-weight: 400; color: #ffffff; border-bottom: 1px solid rgba(255,255,255,0.12); font-family: inherit; }
         .vt-item-last { border-bottom: none; }
         .vt-card-title { font-size: 22px; font-weight: 700; margin-bottom: 14px; color: #202124; font-family: inherit; }
@@ -627,14 +717,14 @@ export default function Home() {
         }
         @media (max-width: 600px) {
           .vt-pricing-wrapper { padding: 60px 16px 80px; }
-          .vt-pricing-headline { font-size: 28px; margin-bottom: 32px; }
+          .vt-pricing-headline { font-size: 26px; margin-bottom: 32px; line-height: 1.2; }
           .vt-pricing-card { flex-direction: column; }
           .vt-card-left { padding: 28px 24px; }
           .vt-card-left-dark { padding-right: 24px; }
           .vt-card-price-right { margin: 0; border-top: 1px solid rgba(0,0,0,0.07); padding: 24px; border-radius: 0; }
           .vt-card-features-right { margin: 0; border-radius: 0; border-top: 1px solid rgba(255,255,255,0.12); }
           .vt-price-large { font-size: 26px; }
-          .vt-feature-item { padding: 18px 20px; font-size: 14px; }
+          .vt-feature-item { padding: 16px 20px; font-size: 14px; }
           .vt-btn { width: 100%; justify-content: center; }
         }
       `}</style>
@@ -707,7 +797,7 @@ const ft = {
   tabActive: { borderColor: "#1967d2" },
   tabLabel: {
     position: "absolute", top: "-8px", left: "10px", background: "#f4f4f4",
-    padding: "0 4px", fontSize: "18px", fontWeight: "400", color: "#0058aa",
+    padding: "0 4px", fontSize: "14px", fontWeight: "400", color: "#0058aa",
     lineHeight: 1, zIndex: 1,
     // FIX 2: No transition on label text
     WebkitFontSmoothing: "antialiased",
@@ -744,12 +834,12 @@ const ft = {
 const s = {
   page: { background: "#f4f4f4", minHeight: "100vh", fontFamily: '"Circular Std", "Circular", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif', color: "#202124" },
 
-  heroSection: { background: "#f4f4f4", padding: "128px 24px 40px", textAlign: "center" },
+  heroSection: { background: "#f4f4f4", padding: "clamp(90px, 15vw, 128px) clamp(16px, 4vw, 24px) 40px", textAlign: "center" },
   heroInner: { maxWidth: "800px", margin: "0 auto" },
-  heroTitle: { color: "#000000", fontSize: "44px", fontWeight: "400", margin: "0 0 16px", letterSpacing: "-0.5px", lineHeight: "1.2" },
-  heroSubtitle: { color: "#5f6368", fontSize: "18px", lineHeight: "1.6", margin: "0" },
+  heroTitle: { color: "#000000", fontSize: "clamp(22px, 5vw, 44px)", fontWeight: "400", margin: "0 0 16px", letterSpacing: "-0.5px", lineHeight: "1.2" },
+  heroSubtitle: { color: "#5f6368", fontSize: "clamp(14px, 2.5vw, 18px)", lineHeight: "1.6", margin: "0" },
 
-  searchContainer: { background: "#f4f4f4", padding: "16px 24px 32px", position: "relative", zIndex: 10 },
+  searchContainer: { background: "#f4f4f4", padding: "16px clamp(12px, 4vw, 24px) 32px", position: "relative", zIndex: 10 },
   searchBarInner: { maxWidth: "900px", margin: "0 auto", display: "flex", alignItems: "center", background: "#fff", borderRadius: "32px", boxShadow: "0 1px 6px rgba(32,33,36,0.28)", padding: "8px 8px 8px 20px" },
   searchLeft: { flex: 2, display: "flex", alignItems: "center", gap: "12px", minWidth: 0 },
   searchInput: { flex: 1, border: "none", outline: "none", fontSize: "16px", color: "#202124", background: "transparent", fontFamily: "inherit", padding: "12px 0" },
@@ -764,12 +854,12 @@ const s = {
   clearBtn: { color: "#c5221f", background: "none", outline: "none", fontSize: "14px", fontWeight: "500", cursor: "pointer", padding: "10px 16px", fontFamily: "inherit", alignSelf: "center", marginTop: "10px" },
 
   mainSection: { flex: 1, background: "#f4f4f4", paddingTop: "24px" },
-  mainInner: { maxWidth: "1200px", margin: "0 auto", padding: "0 24px 64px" },
+  mainInner: { maxWidth: "1200px", margin: "0 auto", padding: "0 clamp(12px, 3vw, 24px) 64px" },
 
   resultsRow: { marginBottom: "20px", display: "flex", alignItems: "center", justifyContent: "space-between" },
   resultsCount: { color: "#5f6368", fontSize: "14px" },
   resultsLocation: { color: "#202124", fontWeight: "500" },
-  mobileBackBtn: { display: "flex", alignItems: "center", gap: "8px", background: "none", border: "none", outline: "none", color: "#1a73e8", fontSize: "15px", fontWeight: "500", cursor: "pointer", fontFamily: "inherit", padding: 0 },
+  mobileBackBtn: { display: "flex", alignItems: "center", gap: "8px", background: "none", border: "none", outline: "none", color: "#0099fa", fontSize: "15px", fontWeight: "500", cursor: "pointer", fontFamily: "inherit", padding: 0 },
 
   // FIX 3: Mobile filter button style
   mobileFilterBtn: { display: "none", alignItems: "center", gap: "7px", background: "#fff", border: "1px solid #dadce0", borderRadius: "20px", padding: "8px 16px", fontSize: "14px", color: "#202124", cursor: "pointer", fontFamily: "inherit", fontWeight: "500" },
@@ -788,8 +878,8 @@ const s = {
   jobListItem: { padding: "20px 0", cursor: "pointer", position: "relative", borderBottom: "1px solid #a6a6a6" },
   jobListItemActive: { background: "#f8f9fa !important", outline: "none" },
   // FIX 2: Explicit font rendering properties on text elements
-  jobListItemTitle: { color: "#000000", fontSize: "24px", fontWeight: "500", margin: "0 0 4px", letterSpacing: "0.2px", lineHeight: "1.3", WebkitFontSmoothing: "antialiased", MozOsxFontSmoothing: "grayscale" },
-  jobListItemSub: { display: "flex", alignItems: "center", gap: "6px", color: "#5f6368", fontSize: "18px", fontWeight: "400", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis", WebkitFontSmoothing: "antialiased" },
+  jobListItemTitle: { color: "#000000", fontSize: "clamp(17px, 2.5vw, 24px)", fontWeight: "500", margin: "0 0 4px", letterSpacing: "0.2px", lineHeight: "1.3", WebkitFontSmoothing: "antialiased", MozOsxFontSmoothing: "grayscale" },
+  jobListItemSub: { display: "flex", alignItems: "center", gap: "6px", color: "#5f6368", fontSize: "clamp(13px, 2vw, 18px)", fontWeight: "400", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis", WebkitFontSmoothing: "antialiased" },
   jobListItemDept: { color: "#004599", fontWeight: "500" }, // FIX 1: now shows company name
   jobListItemSeparator: { color: "#9aa0a6" },
   jobListItemLocation: { color: "#004599", fontWeight: "500" },
@@ -832,12 +922,12 @@ const s = {
   drawerOverlay: { position: "fixed", inset: 0, background: "rgba(0,0,0,0.4)", zIndex: 299 },
   mobileDrawer: { position: "fixed", top: 0, left: 0, bottom: 0, width: "300px", background: "#fff", zIndex: 300, display: "flex", flexDirection: "column", boxShadow: "4px 0 24px rgba(0,0,0,0.15)", overflowY: "auto" },
   mobileDrawerHeader: { display: "flex", alignItems: "center", justifyContent: "space-between", padding: "20px 20px 16px", borderBottom: "1px solid #f1f3f4" },
-  mobileDrawerTitle: { color: "#202124", fontSize: "17px", fontWeight: "600", fontFamily: "inherit" },
+  mobileDrawerTitle: { color: "#000", fontSize: "17px", fontWeight: "600", fontFamily: "inherit" },
   mobileDrawerClose: { background: "none", border: "none", cursor: "pointer", padding: "4px", display: "flex", alignItems: "center" },
   mobileDrawerGroup: { padding: "16px 20px 0" },
-  mobileDrawerLabel: { color: "#5f6368", fontSize: "12px", fontWeight: "600", textTransform: "uppercase", letterSpacing: "0.05em", marginBottom: "8px" },
-  mobileDrawerSelect: { width: "100%", background: "#f8f9fa", border: "1px solid #e0e0e0", borderRadius: "8px", padding: "11px 14px", fontSize: "15px", color: "#202124", outline: "none", cursor: "pointer", fontFamily: "inherit" },
+  mobileDrawerLabel: { color: "#004598", fontSize: "14px", fontWeight: "500", marginBottom: "8px" },
+  mobileDrawerSelect: { width: "100%", background: "#f8f9fa", border: "2px solid #e0e0e0", borderRadius: "4px", padding: "11px 14px", fontSize: "15px", color: "#202124", outline: "none", cursor: "pointer", fontFamily: "inherit" },
   mobileDrawerFooter: { padding: "20px", marginTop: "auto", display: "flex", flexDirection: "column", gap: "10px", borderTop: "1px solid #f1f3f4" },
-  mobileDrawerApply: { background: "#1a73e8", color: "#fff", border: "none", borderRadius: "8px", padding: "13px", fontSize: "15px", fontWeight: "500", cursor: "pointer", fontFamily: "inherit" },
+  mobileDrawerApply: { background: "#1a73e8", color: "#fff", border: "none", borderRadius: "50px", padding: "13px", fontSize: "15px", fontWeight: "500", cursor: "pointer", fontFamily: "inherit" },
   mobileDrawerClear: { background: "none", border: "none", color: "#c5221f", fontSize: "14px", fontWeight: "500", cursor: "pointer", fontFamily: "inherit", textAlign: "center" },
 };
