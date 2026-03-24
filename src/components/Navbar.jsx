@@ -100,7 +100,6 @@ export default function Navbar() {
 const s = {
   navbar: {
     background: "#080d1b",
-    borderBottom: "1px solid #dadce0",
     position: "fixed",
     top: 0, left: 0, right: 0,
     zIndex: 100,
@@ -110,7 +109,7 @@ const s = {
     maxWidth: "1200px",
     margin: "0 auto",
     padding: "0 24px",
-    height: "64px",
+    height: "55px",
     display: "flex",
     alignItems: "center",
     justifyContent: "space-between",

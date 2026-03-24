@@ -796,8 +796,8 @@ const ft = {
   },
   tabActive: { borderColor: "#1967d2" },
   tabLabel: {
-    position: "absolute", top: "-8px", left: "10px", background: "#f4f4f4",
-    padding: "0 4px", fontSize: "14px", fontWeight: "400", color: "#0058aa",
+    position: "absolute", top: "-10px", left: "10px", background: "#f4f4f4",
+    padding: "0 4px", fontSize: "17px", fontWeight: "400", color: "#0058aa",
     lineHeight: 1, zIndex: 1,
     // FIX 2: No transition on label text
     WebkitFontSmoothing: "antialiased",
@@ -836,7 +836,7 @@ const s = {
 
   heroSection: { background: "#f4f4f4", padding: "clamp(90px, 15vw, 128px) clamp(16px, 4vw, 24px) 40px", textAlign: "center" },
   heroInner: { maxWidth: "800px", margin: "0 auto" },
-  heroTitle: { color: "#000000", fontSize: "clamp(22px, 5vw, 44px)", fontWeight: "400", margin: "0 0 16px", letterSpacing: "-0.5px", lineHeight: "1.2" },
+  heroTitle: { color: "#000000", fontSize: "clamp(22px, 5vw, 55px)", fontWeight: "400", margin: "0 0 16px", lineHeight: "1.2" },
   heroSubtitle: { color: "#5f6368", fontSize: "clamp(14px, 2.5vw, 18px)", lineHeight: "1.6", margin: "0" },
 
   searchContainer: { background: "#f4f4f4", padding: "16px clamp(12px, 4vw, 24px) 32px", position: "relative", zIndex: 10 },
