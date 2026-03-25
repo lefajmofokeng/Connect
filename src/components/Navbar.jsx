@@ -30,8 +30,7 @@ export default function Navbar() {
 
           {/* Logo */}
           <div style={s.navLogo} onClick={() => navigate("/")}>
-            <div style={s.logoMark}>V</div>
-            <span style={s.logoText}>Vetted</span>
+            <img src="Public/logo.png" alt="Vetted Logo" style={s.logoImg} />
           </div>
 
           {/* Desktop links */}
@@ -116,15 +115,14 @@ const s = {
   },
 
   // Logo
-  navLogo:  { cursor: "pointer", display: "flex", alignItems: "center", gap: "10px", flexShrink: 0 },
-  logoMark: { width: "28px", height: "28px", borderRadius: "5px", background: "#ffca28", color: "#d84315", fontWeight: "700", fontSize: "15px", display: "flex", alignItems: "center", justifyContent: "center", fontFamily: FONT },
-  logoText: { color: "#202124", fontWeight: "600", fontSize: "15px", fontFamily: FONT },
+  navLogo: { cursor: "pointer", display: "flex", alignItems: "center", flexShrink: 0 },
+  logoImg: { height: "32px", width: "auto", objectFit: "contain" },
 
   // Desktop nav
   navLinks:     { display: "flex", alignItems: "center", gap: "12px" },
   navLink:      { color: "#f4f4f4", fontSize: "14px", fontWeight: "500", textDecoration: "none", padding: "8px 12px", borderRadius: "50px", fontFamily: FONT },
   navLinkActive:{ color: "#1a73e8" },
-  navSignIn:    { color: "#92d1ff", background: "#1199fa33", padding: "7px 16px", borderRadius: "50px", fontSize: "14px", fontWeight: "500", textDecoration: "none", fontFamily: FONT, border: "none", textDecoration: "none" },
+  navSignIn:    { color: "#92d1ff", background: "#1199fa33", padding: "7px 16px", borderRadius: "50px", fontSize: "14px", fontWeight: "500", textDecoration: "none", fontFamily: FONT, border: "none" },
   navBtn:       { background: "#1199fa", color: "#f7f9fa", border: "none", padding: "8px 18px", borderRadius: "50px", fontSize: "14px", fontWeight: "500", textDecoration: "none", fontFamily: FONT },
 
   // Avatar

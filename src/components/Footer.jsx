@@ -33,8 +33,7 @@ export default function Footer() {
           <div className="footer-top-mobile" style={s.footerTop}>
             <div style={{ maxWidth: "250px" }}>
               <div style={s.footerBrand}>
-                <div style={s.footerLogoMark}>V</div>
-                <span style={s.footerBrandName}>Vetted</span>
+                <img src="Public/logo.png" alt="Vetted Logo" style={s.logoImg} />
               </div>
               <p style={s.footerTagline}>Verified Professional Network.</p>
             </div>
@@ -60,8 +59,8 @@ export default function Footer() {
 
           {/* Bottom bar */}
           <div className="footer-bottom-mobile" style={s.footerBottom}>
-            <span>© {new Date().getFullYear()} Vetted (Pty) Ltd. All rights reserved.</span>
-            <span>Developed for South Africa 🇿🇦</span>
+            <span>Copyright © {new Date().getFullYear()} Vetted (Pty) Ltd. All rights reserved.</span>
+            <span>Developed for South Africa</span>
           </div>
 
         </div>
@@ -85,6 +84,10 @@ export default function Footer() {
 const s = {
   footer:      { background: "#fff", padding: "0", fontFamily: FONT },
   footerInner: { maxWidth: "1200px", margin: "0 auto", padding: "0 24px" },
+
+  // Logo
+  navLogo: { cursor: "pointer", display: "flex", alignItems: "center", flexShrink: 0 },
+  logoImg: { height: "32px", width: "auto", objectFit: "contain" },
 
   // Disclaimer
   disclaimerSection: { padding: "40px 0", borderTop: "1px solid #dadce0" },
