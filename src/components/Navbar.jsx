@@ -105,9 +105,9 @@ const s = {
     fontFamily: FONT,
   },
   navInner: {
-    maxWidth: "1200px",
+    maxWidth: "1400px",
     margin: "0 auto",
-    padding: "0 24px",
+    padding: "0 20px",
     height: "55px",
     display: "flex",
     alignItems: "center",

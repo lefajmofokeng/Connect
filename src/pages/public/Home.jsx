@@ -96,11 +96,11 @@ export default function Home() {
   const closeDropdown = () => setOpenDropdown(null);
   const clearFilters = () => {
     setSearch(""); setFilterProvince(""); setFilterType("");
-    setFilterIndustry(""); setFilterSalary(""); setOpenDropdown(null);
+    setFilterIndustry(""); setOpenDropdown(null);
     setMobileFilterOpen(false);
   };
-  const hasFilters = search || filterProvince || filterType || filterIndustry || filterSalary;
-  const activeFilterCount = [filterProvince, filterType, filterIndustry, filterSalary].filter(Boolean).length;
+  const hasFilters = search || filterProvince || filterType || filterIndustry;
+  const activeFilterCount = [filterProvince, filterType, filterIndustry].filter(Boolean).length;
 
   return (
     <div className="page-wrapper" style={s.page}>
@@ -111,47 +111,41 @@ export default function Home() {
       {/* ── Hero Section ── */}
       <div style={s.heroSection}>
         <div style={s.heroInner}>
-          <h1 className="hero-title" style={s.heroTitle}>Discover High-End Professional Opportunities.</h1>
+          <h1 className="hero-title" style={s.heroTitle}>Join your<br />dream team.</h1>
           <p className="hero-subtitle" style={s.heroSubtitle}>Connect with verified enterprises across South Africa in a streamlined, premium ecosystem built for your career advancement.</p>
+          <p style={s.heroJobCount}><strong style={{ color: "#fff" }}>{allJobs.length > 0 ? allJobs.length : "—"}</strong> verified positions available right now</p>
         </div>
       </div>
 
-      {/* ── Search Bar ── */}
-      <div style={s.searchContainer}>
-        <div className="search-bar-inner" style={s.searchBarInner}>
-          <div style={s.searchLeft}>
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#9aa0a6" strokeWidth="2" style={{ flexShrink: 0 }}>
-              <circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/>
-            </svg>
-            <input
-              style={s.searchInput}
-              value={search}
-              onChange={e => setSearch(e.target.value)}
-              placeholder="Search by job title, keyword, or company..."
-            />
-            {search && (
-              <button style={s.searchClear} onClick={() => setSearch("")}>
-                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#5f6368" strokeWidth="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
-              </button>
-            )}
-          </div>
-          <div className="search-divider" style={s.searchDivider} />
-          <div style={s.searchRight}>
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#1a73e8" strokeWidth="2" style={{ flexShrink: 0 }}>
-              <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/>
-            </svg>
-            <select style={s.provinceSelect} value={filterProvince} onChange={e => setFilterProvince(e.target.value)}>
-              <option value="">All Regions</option>
-              {PROVINCES.map(p => <option key={p}>{p}</option>)}
-            </select>
-          </div>
-          <button style={s.searchBtn} onClick={() => {}}>Search</button>
-        </div>
-      </div>
 
-      {/* ── Filter Bar (desktop) ── */}
+
+      {/* ── Filter Bar ── */}
       <div style={s.filterRow} onClick={closeDropdown}>
         <div className="filter-scroll-container desktop-filters" style={s.filterRowInner}>
+
+          {/* Search by title — text input tab */}
+          <div style={ft.searchTabWrap}>
+            <div style={{ ...ft.tab, ...(search ? ft.tabActive : {}), padding: "0" }}>
+              <span style={{ ...ft.tabLabel, ...(search ? ft.tabLabelActive : {}) }}>Search</span>
+              <div style={{ display: "flex", alignItems: "center", width: "100%" }}>
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke={search ? "#1967d2" : "#9aa0a6"} strokeWidth="2" style={{ flexShrink: 0, marginLeft: "14px" }}>
+                  <circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/>
+                </svg>
+                <input
+                  style={ft.searchInput}
+                  value={search}
+                  onChange={e => setSearch(e.target.value)}
+                  placeholder="Job title or keyword…"
+                  onClick={e => e.stopPropagation()}
+                />
+                {search && (
+                  <button style={ft.searchClear} onClick={e => { e.stopPropagation(); setSearch(""); }}>
+                    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#9aa0a6" strokeWidth="2.5"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+                  </button>
+                )}
+              </div>
+            </div>
+          </div>
 
           <FilterTab
             label="Job Type" value={filterType} options={JOB_TYPES}
@@ -174,23 +168,7 @@ export default function Home() {
             onSelect={v => { setFilterIndustry(v); setOpenDropdown(null); }}
             onClear={() => { setFilterIndustry(""); setOpenDropdown(null); }}
           />
-          <FilterTab
-            label="Salary" value={filterSalary}
-            options={["R0 – R10k", "R10k – R20k", "R20k – R35k", "R35k – R50k", "R50k – R75k", "R75k+", "Market Related"]}
-            open={openDropdown === "salary"}
-            onToggle={e => { e.stopPropagation(); setOpenDropdown(openDropdown === "salary" ? null : "salary"); }}
-            onSelect={v => { setFilterSalary(v); setOpenDropdown(null); }}
-            onClear={() => { setFilterSalary(""); setOpenDropdown(null); }}
-          />
-          <FilterTab
-            label="Sort"
-            value={sortBy === "oldest" ? "Oldest First" : "Newest First"}
-            options={["Newest First", "Oldest First"]}
-            open={openDropdown === "sort"}
-            onToggle={e => { e.stopPropagation(); setOpenDropdown(openDropdown === "sort" ? null : "sort"); }}
-            onSelect={v => { setSortBy(v === "Oldest First" ? "oldest" : "newest"); setOpenDropdown(null); }}
-            isSort
-          />
+
           {hasFilters && (
             <div className="clear-btn-wrap">
               <button style={s.clearBtn} onClick={clearFilters}>✕ Clear</button>
@@ -260,12 +238,15 @@ export default function Home() {
                           </div>
                         </div>
 
-                        <div style={s.jobListArrow}>
-                          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                        {/* Hover 'Apply now' Container */}
+                        <div className="job-list-arrow-container">
+                          <span className="apply-now-text">Apply now</span>
+                          <svg className="job-list-arrow-icon" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                             <line x1="7" y1="17" x2="17" y2="7"></line>
                             <polyline points="7 7 17 7 17 17"></polyline>
                           </svg>
                         </div>
+
                       </div>
                     </div>
                   ))}
@@ -286,7 +267,6 @@ export default function Home() {
                 </div>
               )}
             </div>
-            {/* The detail panel has been completely removed as requested */}
           </div>
         </div>
       </div>
@@ -385,22 +365,25 @@ export default function Home() {
               </select>
             </div>
 
-            {/* Salary */}
+            {/* Search by title */}
             <div style={s.mobileDrawerGroup}>
-              <div style={s.mobileDrawerLabel}>Salary Range</div>
-              <select style={s.mobileDrawerSelect} value={filterSalary} onChange={e => setFilterSalary(e.target.value)}>
-                <option value="">Any Salary</option>
-                {["R0 – R10k","R10k – R20k","R20k – R35k","R35k – R50k","R50k – R75k","R75k+","Market Related"].map(o => <option key={o}>{o}</option>)}
-              </select>
-            </div>
-
-            {/* Sort */}
-            <div style={s.mobileDrawerGroup}>
-              <div style={s.mobileDrawerLabel}>Sort By</div>
-              <select style={s.mobileDrawerSelect} value={sortBy} onChange={e => setSortBy(e.target.value)}>
-                <option value="newest">Newest First</option>
-                <option value="oldest">Oldest First</option>
-              </select>
+              <div style={s.mobileDrawerLabel}>Search by Title</div>
+              <div style={{ position: "relative", display: "flex", alignItems: "center", background: "#f8f9fa", border: "2px solid #e0e0e0", borderRadius: "4px" }}>
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#9aa0a6" strokeWidth="2" style={{ flexShrink: 0, marginLeft: "12px" }}>
+                  <circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/>
+                </svg>
+                <input
+                  style={{ flex: 1, border: "none", outline: "none", background: "transparent", padding: "11px 12px", fontSize: "15px", color: "#202124", fontFamily: "inherit" }}
+                  value={search}
+                  onChange={e => setSearch(e.target.value)}
+                  placeholder="e.g. Software Engineer"
+                />
+                {search && (
+                  <button style={{ background: "none", border: "none", cursor: "pointer", padding: "8px", display: "flex", alignItems: "center" }} onClick={() => setSearch("")}>
+                    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#9aa0a6" strokeWidth="2.5"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+                  </button>
+                )}
+              </div>
             </div>
 
             <div style={s.mobileDrawerFooter}>
@@ -429,11 +412,41 @@ export default function Home() {
         ::-webkit-scrollbar-thumb { background: #dadce0; border-radius: 4px; }
 
         .job-list-item-hover { will-change: auto !important; transform: none !important; backface-visibility: visible !important; outline: none !important; }
-        .job-list-item-hover:hover { background-color: #f8f9fa !important; }
+        
 
         .filter-tab-wrap { will-change: auto !important; }
         .filter-tab-wrap button { will-change: auto !important; transform: none !important; -webkit-font-smoothing: antialiased !important; }
         .filter-tab-wrap button:hover { background: #f8f9fa !important; }
+
+        /* ── Apply Now Hover Effect ── */
+        .job-list-arrow-container {
+          display: flex;
+          align-items: center;
+          justify-content: flex-end;
+          padding-left: 16px;
+          flex-shrink: 0;
+          color: #3d3d3d;
+        }
+        .apply-now-text {
+          opacity: 0;
+          color: #004599;
+          font-weight: 500;
+          font-size: 24px;
+          transition: opacity 0.2s ease, transform 0.2s ease;
+          transform: translateX(10px);
+          margin-right: 6px;
+        }
+        .job-list-item-hover:hover .apply-now-text {
+          opacity: 1;
+          transform: translateX(0);
+        }
+        .job-list-arrow-icon {
+          transition: transform 0.2s ease, color 0.2s ease;
+        }
+        .job-list-item-hover:hover .job-list-arrow-icon {
+          color: #004599;
+          transform: translate(2px, -2px);
+        }
 
         @keyframes shimmer { 0%{background-position:200% 0} 100%{background-position:-200% 0} }
 
@@ -459,7 +472,7 @@ export default function Home() {
         @media (max-width: 768px) {
           .desktop-filters { display: none !important; }
           .mobile-filter-btn { display: flex !important; }
-          .results-header-mobile { display: flex; align-items: center; justify-content: space-between; width: 100%; }
+          .results-header-mobile { display: flex; align-items: center; justify-content: space-between; width: 100%; margin-left: 0; margin-right: 0; }
 
           .hero-title { font-size: 26px !important; line-height: 1.25 !important; }
           .hero-subtitle { font-size: 14px !important; }
@@ -476,21 +489,19 @@ export default function Home() {
           .search-bar-inner > div:last-of-type { padding: 4px 0 !important; }
           .search-bar-inner button { width: 100% !important; border-radius: 10px !important; margin-top: 10px !important; padding: 14px !important; font-size: 15px !important; }
 
-          .main-inner { padding: 0 20px 48px !important; }
           .job-list-item-hover { padding: 16px 0 !important; }
         }
 
         /* ── Small phones ── */
         @media (max-width: 480px) {
           .hero-title { font-size: 22px !important; }
-          .main-inner { padding: 0 12px 40px !important; }
         }
 
         /* ── Employer Pricing Section ── */
         .vt-pricing-wrapper {
           font-family: "Circular Std", "Circular", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
           position: relative; overflow: hidden;
-          background-color: #f4f5f7; padding: 80px 20px 120px;
+          background-color: #f4f5f7; padding: 80px 0 120px;
         }
         .vt-pricing-bg-graphic {
           position: absolute; top: 0; left: 0; right: 0; bottom: 0; z-index: 1;
@@ -502,7 +513,7 @@ export default function Home() {
           background: linear-gradient(135deg, #ffca28 0%, #ff8f00 30%, #d84315 65%, #b71c1c 100%);
           transform: skewY(-8deg); opacity: 0.85; z-index: -1; pointer-events: none;
         }
-        .vt-pricing-container { position: relative; z-index: 2; max-width: 1200px; margin: 0 auto; padding: 50px 25px 0; }
+        .vt-pricing-container { position: relative; z-index: 2; max-width: 1200px; width: 100%; box-sizing: border-box; margin: 0 auto; padding: 50px 20px 0; }
         .vt-pricing-headline { font-size: 48px; font-weight: 500; line-height: 1.15; color: #202124; margin-bottom: 56px; font-family: inherit; }
         .vt-pricing-grid { display: flex; flex-wrap: wrap; gap: 28px; }
         .vt-pricing-card { display: flex; border-radius: 8px; overflow: hidden; min-height: 280px; flex: 1 1 400px; }
@@ -537,7 +548,7 @@ export default function Home() {
           .vt-card-price-right { padding: 32px; }
         }
         @media (max-width: 600px) {
-          .vt-pricing-wrapper { padding: 60px 16px 80px; }
+          .vt-pricing-wrapper { padding: 60px 0 80px; }
           .vt-pricing-headline { font-size: 26px; margin-bottom: 32px; line-height: 1.2; }
           .vt-pricing-card { flex-direction: column; }
           .vt-card-left { padding: 28px 24px; }
@@ -605,11 +616,11 @@ function FilterTab({ label, value, options, open, onToggle, onSelect, onClear, i
 }
 
 const ft = {
-  tabWrap: { position: "relative", marginTop: "10px" },
+  tabWrap: { position: "relative", marginTop: "10px", flex: "1 1 0", minWidth: 0 },
   tab: {
     position: "relative", display: "flex", alignItems: "center", justifyContent: "space-between",
     background: "#fefefe", border: "2px solid #939393", borderRadius: "4px", outline: "none",
-    padding: "10px 14px", cursor: "pointer", minWidth: "160px", gap: "12px",
+    padding: "10px 14px", cursor: "pointer", width: "100%", gap: "12px",
     fontFamily: '"Circular Std", "Circular", -apple-system, sans-serif',
     transition: "border-color 0.15s",
     WebkitFontSmoothing: "antialiased",
@@ -648,6 +659,13 @@ const ft = {
     fontFamily: '"Circular Std", "Circular", -apple-system, sans-serif',
     marginBottom: "4px",
   },
+  searchTabWrap: { position: "relative", marginTop: "10px", flex: "1 1 0", minWidth: 0 },
+  searchInput: {
+    flex: 1, border: "none", outline: "none", background: "transparent",
+    fontSize: "15px", fontWeight: "400", color: "#202124", fontFamily: '"Circular Std", "Circular", -apple-system, sans-serif',
+    padding: "10px 10px 10px 8px", WebkitFontSmoothing: "antialiased", width: "100%",
+  },
+  searchClear: { background: "none", border: "none", outline: "none", cursor: "pointer", padding: "6px", display: "flex", alignItems: "center", flexShrink: 0, marginRight: "8px" },
 };
 
 const s = {
@@ -655,12 +673,13 @@ const s = {
 
   heroSection: { 
     background: "linear-gradient(rgba(244, 244, 244, 0.14), rgba(244, 244, 244, 0)), url('https://images.unsplash.com/photo-1579548122080-c35fd6820ecb?q=80&w=1170&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D') center/cover no-repeat", 
-    padding: "clamp(90px, 15vw, 128px) clamp(16px, 4vw, 24px) 40px", 
-    textAlign: "center" 
+    padding: "clamp(90px, 15vw, 128px) 0 56px", 
+    textAlign: "left" 
   },
-  heroInner: { maxWidth: "800px", margin: "0 auto" },
-  heroTitle: { color: "#ffffff", fontSize: "clamp(22px, 5vw, 55px)", fontWeight: "400", margin: "0 0 16px", lineHeight: "1.2" },
-  heroSubtitle: { color: "#9f9f9f", fontSize: "clamp(23px, 2.5vw, 18px)", lineHeight: "1.6", margin: "0" },
+  heroInner: { maxWidth: "1200px", margin: "0 auto", padding: "0 20px", width: "100%", boxSizing: "border-box" },
+  heroTitle: { color: "#ffffff", fontSize: "clamp(32px, 6vw, 72px)", fontWeight: "400", margin: "0 0 16px", lineHeight: "1.1", letterSpacing: "-0.02em" },
+  heroSubtitle: { color: "#5f6368", fontSize: "clamp(14px, 2vw, 17px)", lineHeight: "1.6", margin: "0 0 14px", maxWidth: "720px" },
+  heroJobCount: { fontSize: "14px", color: "#9aa0a6", margin: 0 },
 
   searchContainer: { background: "#fefefe", padding: "16px clamp(12px, 4vw, 24px) 32px", position: "relative", zIndex: 10 },
   searchBarInner: { maxWidth: "900px", margin: "0 auto", display: "flex", alignItems: "center", background: "#fff", borderRadius: "32px", boxShadow: "0 1px 6px rgba(32,33,36,0.28)", padding: "8px 8px 8px 20px" },
@@ -672,26 +691,26 @@ const s = {
   provinceSelect: { flex: 1, border: "none", outline: "none", fontSize: "16px", color: "#3c4043", background: "transparent", cursor: "pointer", fontFamily: "inherit", padding: "12px 0", appearance: "none" },
   searchBtn: { background: "#1a73e8", color: "#fff", border: "none", outline: "none", padding: "14px 32px", fontSize: "15px", fontWeight: "500", cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0, borderRadius: "24px" },
 
-  filterRow: { background: "#fefefe", padding: "0 24px" },
-  filterRowInner: { maxWidth: "1200px", margin: "0 auto", display: "flex", alignItems: "center", justifyContent: "center", gap: "16px", flexWrap: "wrap", paddingBottom: "16px" },
+  filterRow: { background: "#fefefe", padding: "0" },
+  filterRowInner: { maxWidth: "1200px", margin: "0 auto", display: "flex", alignItems: "flex-start", justifyContent: "flex-start", gap: "12px", flexWrap: "wrap", padding: "20px 20px 16px", width: "100%", boxSizing: "border-box" },
   clearBtn: { color: "#c5221f", background: "none", outline: "none", fontSize: "14px", fontWeight: "500", cursor: "pointer", padding: "10px 16px", fontFamily: "inherit", alignSelf: "center", marginTop: "10px" },
 
   mainSection: { flex: 1, background: "#fefefe", paddingTop: "24px" },
-  mainInner: { maxWidth: "1200px", margin: "0 auto", padding: "0 clamp(12px, 3vw, 24px) 64px" },
+  mainInner: { maxWidth: "1200px", margin: "0 auto", padding: "0 20px 64px", width: "100%", boxSizing: "border-box" },
 
-  resultsRow: { maxWidth: "800px", margin: "0 auto 20px", display: "flex", alignItems: "center", justifyContent: "space-between" },
+  resultsRow: { width: "100%", margin: "0 0 20px", display: "flex", alignItems: "center", justifyContent: "space-between" },
   resultsCount: { color: "#5f6368", fontSize: "14px" },
   resultsLocation: { color: "#202124", fontWeight: "500" },
 
   mobileFilterBtn: { display: "none", alignItems: "center", gap: "7px", background: "#fff", border: "1px solid #dadce0", borderRadius: "20px", padding: "8px 16px", fontSize: "14px", color: "#202124", cursor: "pointer", fontFamily: "inherit", fontWeight: "500" },
   mobileFilterBadge: { background: "#1a73e8", color: "#fff", borderRadius: "50%", width: "18px", height: "18px", fontSize: "11px", fontWeight: "700", display: "flex", alignItems: "center", justifyContent: "center" },
 
-  splitLayout: { maxWidth: "800px", margin: "0 auto", display: "flex", flexDirection: "column" },
+  splitLayout: { width: "100%", display: "flex", flexDirection: "column" },
   leftPanel: { display: "flex", flexDirection: "column", gap: "12px", width: "100%" },
   skeleton: { background: "linear-gradient(90deg,#f1f3f4 25%,#e8eaed 50%,#f1f3f4 75%)", backgroundSize: "200%", animation: "shimmer 1.5s infinite", height: "140px", border: "1px solid #dadce0", borderRadius: "8px" },
   emptyState: { display: "flex", flexDirection: "column", alignItems: "center", padding: "64px 24px", textAlign: "center" },
-  emptyTitle: { color: "#202124", fontSize: "20px", fontWeight: "400", marginBottom: "8px" },
-  emptySub: { color: "#5f6368", fontSize: "15px", marginBottom: "24px" },
+  emptyTitle: { color: "#202124", fontSize: "20px", fontWeight: "400", margin: "0 0 8px" },
+  emptySub: { color: "#5f6368", fontSize: "15px", margin: "0 0 24px" },
   outlineBtn: { background: "#fff", color: "#1a73e8", border: "1px solid #dadce0", outline: "none", borderRadius: "24px", padding: "12px 28px", fontSize: "15px", fontWeight: "500", cursor: "pointer", textDecoration: "none", display: "inline-block" },
 
   jobListWrapper: { display: "flex", flexDirection: "column", background: "transparent", borderBottom: "none", borderRadius: "8px", overflow: "hidden" },
@@ -704,12 +723,10 @@ const s = {
 
   jobListCenter: { flex: 1, minWidth: 0 },
   jobListItemTitle: { color: "#000000", fontSize: "clamp(17px, 2.5vw, 24px)", fontWeight: "500", margin: "0 0 6px", letterSpacing: "0.2px", lineHeight: "1.3", WebkitFontSmoothing: "antialiased", MozOsxFontSmoothing: "grayscale" },
-  jobListItemSub: { display: "flex", alignItems: "center", gap: "6px", color: "#5f6368", fontSize: "clamp(18px, 2vw, 16px)", fontWeight: "400", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis", WebkitFontSmoothing: "antialiased" },
+  jobListItemSub: { display: "flex", alignItems: "center", gap: "6px", color: "#5f6368", fontSize: "clamp(22px, 2vw, 16px)", fontWeight: "400", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis", WebkitFontSmoothing: "antialiased" },
   jobListItemDept: { color: "#004599", fontWeight: "500" }, 
   jobListItemSeparator: { color: "#9aa0a6" },
   jobListItemLocation: { color: "#004599", fontWeight: "500" },
-
-  jobListArrow: { color: "#3d3d3d", display: "flex", alignItems: "center", justifyContent: "center", paddingLeft: "16px", flexShrink: 0 },
 
   pagination: { display: "flex", alignItems: "center", justifyContent: "center", gap: "8px", marginTop: "20px", padding: "16px", border: "1px solid #dadce0", borderRadius: "8px", background: "#fff" },
   paginationBtn: { border: "none", background: "#f1f3f4", color: "#5f6368", fontWeight: "500", fontSize: "14px", padding: "8px 14px", borderRadius: "20px", cursor: "pointer" },
@@ -722,7 +739,7 @@ const s = {
   mobileDrawerTitle: { color: "#000", fontSize: "17px", fontWeight: "600", fontFamily: "inherit" },
   mobileDrawerClose: { background: "none", border: "none", cursor: "pointer", padding: "4px", display: "flex", alignItems: "center" },
   mobileDrawerGroup: { padding: "16px 20px 0" },
-  mobileDrawerLabel: { color: "#004598", fontSize: "14px", fontWeight: "500", marginBottom: "8px" },
+  mobileDrawerLabel: { color: "#004598", fontSize: "14px", fontWeight: "500", margin: "0 0 8px" },
   mobileDrawerSelect: { width: "100%", background: "#f8f9fa", border: "2px solid #e0e0e0", borderRadius: "4px", padding: "11px 14px", fontSize: "15px", color: "#202124", outline: "none", cursor: "pointer", fontFamily: "inherit" },
   mobileDrawerFooter: { padding: "20px", marginTop: "auto", display: "flex", flexDirection: "column", gap: "10px", borderTop: "1px solid #f1f3f4" },
   mobileDrawerApply: { background: "#1a73e8", color: "#fff", border: "none", borderRadius: "50px", padding: "13px", fontSize: "15px", fontWeight: "500", cursor: "pointer", fontFamily: "inherit" },
