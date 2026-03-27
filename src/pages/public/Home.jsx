@@ -654,13 +654,13 @@ const s = {
   page: { background: "#fefefe", minHeight: "100vh", fontFamily: '"Circular Std", "Circular", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif', color: "#202124" },
 
   heroSection: { 
-    background: "linear-gradient(rgba(244, 244, 244, 0.14), rgba(244, 244, 244, 0)), url('https://images.unsplash.com/photo-1717913521932-358a54d4d1d4?q=80&w=1332&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D') center/cover no-repeat", 
+    background: "linear-gradient(rgba(244, 244, 244, 0.14), rgba(244, 244, 244, 0)), url('https://images.unsplash.com/photo-1579548122080-c35fd6820ecb?q=80&w=1170&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D') center/cover no-repeat", 
     padding: "clamp(90px, 15vw, 128px) clamp(16px, 4vw, 24px) 40px", 
     textAlign: "center" 
   },
   heroInner: { maxWidth: "800px", margin: "0 auto" },
-  heroTitle: { color: "#000000", fontSize: "clamp(22px, 5vw, 55px)", fontWeight: "400", margin: "0 0 16px", lineHeight: "1.2" },
-  heroSubtitle: { color: "#252525", fontSize: "clamp(23px, 2.5vw, 18px)", lineHeight: "1.6", margin: "0" },
+  heroTitle: { color: "#ffffff", fontSize: "clamp(22px, 5vw, 55px)", fontWeight: "400", margin: "0 0 16px", lineHeight: "1.2" },
+  heroSubtitle: { color: "#9f9f9f", fontSize: "clamp(23px, 2.5vw, 18px)", lineHeight: "1.6", margin: "0" },
 
   searchContainer: { background: "#fefefe", padding: "16px clamp(12px, 4vw, 24px) 32px", position: "relative", zIndex: 10 },
   searchBarInner: { maxWidth: "900px", margin: "0 auto", display: "flex", alignItems: "center", background: "#fff", borderRadius: "32px", boxShadow: "0 1px 6px rgba(32,33,36,0.28)", padding: "8px 8px 8px 20px" },

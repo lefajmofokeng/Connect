@@ -43,6 +43,7 @@ export default function Footer() {
                 <Link to="/jobs"               style={s.footerLink}>Browse Jobs</Link>
                 <Link to="/jobseeker/login"    style={s.footerLink}>Sign In</Link>
                 <Link to="/jobseeker/register" style={s.footerLink}>Register</Link>
+                <Link to="/verification"             style={s.footerLink}>Verify</Link>
               </div>
               <div style={s.footerCol}>
                 <div style={s.footerColTitle}>Employers</div>
@@ -82,7 +83,7 @@ export default function Footer() {
 }
 
 const s = {
-  footer:      { background: "#fff", padding: "0", fontFamily: FONT },
+  footer:      { background: "#080d1b", padding: "0", fontFamily: FONT },
   footerInner: { maxWidth: "1200px", margin: "0 auto", padding: "0 24px" },
 
   // Logo
@@ -90,15 +91,15 @@ const s = {
   logoImg: { height: "32px", width: "auto", objectFit: "contain" },
 
   // Disclaimer
-  disclaimerSection: { padding: "40px 0", borderTop: "1px solid #dadce0" },
-  disclaimerTitle:   { color: "#5f6368", fontSize: "12px", fontWeight: "500", textTransform: "uppercase", letterSpacing: "1px", marginBottom: "20px", fontFamily: FONT },
+  disclaimerSection: { padding: "40px 0", },
+  disclaimerTitle:   { color: "#5f6368", fontSize: "12px", fontWeight: "500", textTransform: "uppercase", marginBottom: "20px", fontFamily: FONT },
   disclaimerList:    { display: "flex", flexDirection: "column", gap: "16px" },
   disclaimerRow:     { display: "flex", alignItems: "flex-start", gap: "12px" },
-  disclaimerNum:     { color: "#9aa0a6", fontSize: "13px", fontWeight: "600", flexShrink: 0, minWidth: "18px", paddingTop: "1px", fontFamily: FONT },
-  disclaimerText:    { color: "#80868b", fontSize: "13px", lineHeight: "1.7", margin: 0, fontFamily: FONT },
+  disclaimerNum:     { color: "#7b849b", fontSize: "15px", fontWeight: "300", flexShrink: 0, minWidth: "18px", fontFamily: FONT },
+  disclaimerText:    { color: "#7b849b", fontSize: "15px", lineHeight: "1.7", margin: 0, fontFamily: FONT },
 
   // Footer top
-  footerTop:       { display: "flex", justifyContent: "space-between", gap: "48px", padding: "48px 0", borderTop: "1px solid #dadce0", borderBottom: "1px solid #dadce0" },
+  footerTop:       { display: "flex", justifyContent: "space-between", gap: "48px", padding: "48px 0", borderTop: "1px solid #6d7487", borderBottom: "1px solid #dadce0" },
   footerBrand:     { display: "flex", alignItems: "center", gap: "8px", marginBottom: "10px" },
   footerLogoMark:  { width: "24px", height: "24px", borderRadius: "4px", background: "#ffca28", color: "#d84315", fontWeight: "700", fontSize: "13px", display: "flex", alignItems: "center", justifyContent: "center", fontFamily: FONT },
   footerBrandName: { color: "#202124", fontWeight: "600", fontSize: "14px", fontFamily: FONT },
@@ -107,8 +108,8 @@ const s = {
   // Links grid
   footerLinksGrid: { display: "flex", gap: "64px" },
   footerCol:       { display: "flex", flexDirection: "column", gap: "14px" },
-  footerColTitle:  { color: "#202124", fontSize: "13px", fontWeight: "600", fontFamily: FONT },
-  footerLink:      { color: "#5f6368", fontSize: "13px", textDecoration: "none", fontFamily: FONT },
+  footerColTitle:  { color: "#565a66", fontSize: "13px", fontWeight: "500", fontFamily: FONT },
+  footerLink:      { color: "#9e9e9e", fontSize: "16px", textDecoration: "none", fontFamily: FONT },
 
   // Bottom bar
   footerBottom: { padding: "24px 0 48px", display: "flex", justifyContent: "space-between", color: "#9aa0a6", fontSize: "12px", fontFamily: FONT },

@@ -24,6 +24,8 @@ import JobSeekerDashboard from "./pages/jobseeker/Dashboard";
 import Analytics from "./pages/employer/Analytics";
 import Billing   from "./pages/employer/Billing";
 import Notifications from "./pages/employer/Notifications";
+import Verification from "./pages/public/Verification";
+
 
 function ProtectedRoute({ children }) {
   const { user, loading } = useAuth();
@@ -51,6 +53,7 @@ export default function App() {
         <Route path="/company/:slug" element={<CompanyPage />} />
         <Route path="/terms" element={<Terms />} />
         <Route path="/privacy" element={<Privacy />} />
+        <Route path="/verification" element={<Verification />} />
 
         {/* Employer auth */}
         <Route path="/employer/login" element={<Login />} />
