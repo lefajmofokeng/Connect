@@ -125,25 +125,24 @@ export default function Home() {
 
           {/* Search by title — text input tab */}
           <div style={ft.searchTabWrap}>
-            <div style={{ ...ft.tab, ...(search ? ft.tabActive : {}), padding: "0" }}>
+            <div style={{ ...ft.tab, ...(search ? ft.tabActive : {}), padding: "13px 14px", cursor: "text" }} onClick={() => document.getElementById("home-search-input")?.focus()}>
               <span style={{ ...ft.tabLabel, ...(search ? ft.tabLabelActive : {}) }}>Search</span>
-              <div style={{ display: "flex", alignItems: "center", width: "100%" }}>
-                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke={search ? "#1967d2" : "#9aa0a6"} strokeWidth="2" style={{ flexShrink: 0, marginLeft: "14px" }}>
-                  <circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/>
-                </svg>
-                <input
-                  style={ft.searchInput}
-                  value={search}
-                  onChange={e => setSearch(e.target.value)}
-                  placeholder="Job title or keyword…"
-                  onClick={e => e.stopPropagation()}
-                />
-                {search && (
-                  <button style={ft.searchClear} onClick={e => { e.stopPropagation(); setSearch(""); }}>
-                    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#9aa0a6" strokeWidth="2.5"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
-                  </button>
-                )}
-              </div>
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke={search ? "#1967d2" : "#9aa0a6"} strokeWidth="2" style={{ flexShrink: 0 }}>
+                <circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/>
+              </svg>
+              <input
+                id="home-search-input"
+                style={{ ...ft.searchInput, padding: "0" }}
+                value={search}
+                onChange={e => setSearch(e.target.value)}
+                placeholder="Job title or keyword…"
+                onClick={e => e.stopPropagation()}
+              />
+              {search && (
+                <button style={ft.searchClear} onClick={e => { e.stopPropagation(); setSearch(""); }}>
+                  <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#9aa0a6" strokeWidth="2.5"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+                </button>
+              )}
             </div>
           </div>
 
@@ -271,55 +270,49 @@ export default function Home() {
         </div>
       </div>
 
-      {/* ── For Employers ── */}
-      <div className="vt-pricing-wrapper">
-        <div className="vt-pricing-bg-graphic" />
-        <div className="vt-pricing-container">
-          <h2 className="vt-pricing-headline">
-            Hiring infrastructure built<br />for South African enterprises
-          </h2>
-          <div className="vt-pricing-grid">
-            <div className="vt-pricing-card vt-card-standard">
-              <div className="vt-card-left">
-                <h3 className="vt-card-title">Spark Plan</h3>
-                <p className="vt-card-desc">
-                  Access verified job seekers across South Africa with simple, transparent pricing. No setup fees, no contracts. Pay only for active listings.
-                </p>
-                <Link to="/employer/join" className="vt-btn vt-btn-blue">
-                  Apply for Access
-                  <svg className="vt-btn-icon" width="14" height="14" viewBox="0 0 14 14" fill="none">
-                    <path d="M5.25 10.5L8.75 7L5.25 3.5" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
-                  </svg>
-                </Link>
-              </div>
-              <div className="vt-card-price-right">
-                <div className="vt-price-large">R450 / mo</div>
-                <div className="vt-price-sub">per live job listing, billed monthly</div>
-              </div>
+      {/* ── Employer CTA Section ── */}
+      <div className="vt-employer-wrapper">
+        <div className="vt-employer-inner">
+
+          <h2 className="vt-employer-heading">List your jobs on<br />Vetted</h2>
+          <p className="vt-employer-sub">
+            We are now accepting applications from verified South African enterprises. If your business is registered with CIPC and you are ready to access a pool of serious, qualified candidates — apply now to get listed.
+          </p>
+
+          <span className="vt-platform-group-title">Learn more about our plans:</span>
+          <div className="vt-platform-btn-group">
+            <Link to="/employer/join" className="vt-platform-btn">
+              Spark Plan — R450 / listing / mo
+              <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M1 8h11.5m0 0L8.5 4m4 4-4 4" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/></svg>
+            </Link>
+            <Link to="/employer/join" className="vt-platform-btn">
+              Enterprise — Custom pricing
+              <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M1 8h11.5m0 0L8.5 4m4 4-4 4" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/></svg>
+            </Link>
+          </div>
+
+          <div className="vt-info-card">
+            <div className="vt-alert-note">
+              <strong>Note:</strong> Your business must be registered with the Companies and Intellectual Property Commission (CIPC) and pass our verification process before listings go live. Due to the volume of applications, our team will only contact shortlisted businesses within 1–2 business days.
             </div>
-            <div className="vt-pricing-card vt-card-enterprise">
-              <div className="vt-card-left vt-card-left-dark">
-                <h3 className="vt-card-title vt-text-white">Enterprise Access</h3>
-                <p className="vt-card-desc vt-text-muted">
-                  A tailored recruitment strategy for enterprises with high-volume hiring needs, dedicated account management, and bespoke onboarding.
-                </p>
-                <Link to="/employer/join" className="vt-btn vt-btn-yellow">
-                  Contact Us
-                  <svg className="vt-btn-icon" width="14" height="14" viewBox="0 0 14 14" fill="none">
-                    <path d="M5.25 10.5L8.75 7L5.25 3.5" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
-                  </svg>
-                </Link>
-              </div>
-              <div className="vt-card-features-right">
-                <ul className="vt-feature-list">
-                  <li className="vt-feature-item">Dedicated Account Manager</li>
-                  <li className="vt-feature-item">CIPC Verified Employer Badge</li>
-                  <li className="vt-feature-item">Priority Candidate Matching</li>
-                  <li className="vt-feature-item vt-item-last">National Multi-Province Reach</li>
-                </ul>
-              </div>
+
+            <p className="vt-disclaimer">
+              By submitting your application you acknowledge having read the Vetted Privacy Policy and agree that the information provided will be used solely for the purpose of employer verification and account setup. You guarantee that any third-party information submitted has been authorised for use in this process.
+            </p>
+
+            <ol className="vt-list">
+              <li>Vetted operates as a closed, invite-only platform. Every employer is independently verified against CIPC records before being granted access to post job listings. This ensures candidates trust every listing on the platform.</li>
+              <li>Pricing is R450 per live listing per month — no setup fees, no agency commissions, no long-term contracts. You pay only for active listings. Enterprise pricing is available for businesses with high-volume or multi-province hiring needs.</li>
+            </ol>
+
+            <div className="vt-cta-btn-wrap">
+              <Link to="/employer/join" className="vt-listing-cta">
+                Apply for employer access
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none"><path d="M10 4H6C4.89543 4 4 4.89543 4 6V18C4 19.1046 4.89543 20 6 20H18C19.1046 20 20 19.1046 20 18V14M14 4H20M20 4V10M20 4L12 12" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/></svg>
+              </Link>
             </div>
           </div>
+
         </div>
       </div>
 
@@ -497,69 +490,132 @@ export default function Home() {
           .hero-title { font-size: 22px !important; }
         }
 
-        /* ── Employer Pricing Section ── */
-        .vt-pricing-wrapper {
-          font-family: "Circular Std", "Circular", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-          position: relative; overflow: hidden;
-          background-color: #f4f5f7; padding: 80px 0 120px;
+        /* ── Employer CTA Section ── */
+        .vt-employer-wrapper {
+          font-family: 'Circular Std', 'Circular', -apple-system, BlinkMacSystemFont, sans-serif;
+          background-color: #0a1422;
+          color: #ffffff;
+          padding: 150px 20px;
+          display: flex;
+          justify-content: center;
+          align-items: center;
         }
-        .vt-pricing-bg-graphic {
-          position: absolute; top: 0; left: 0; right: 0; bottom: 0; z-index: 1;
-          background-image: linear-gradient(to right, rgba(0,0,0,0.025) 1px, transparent 1px);
-          background-size: 150px 100%;
+        .vt-employer-inner {
+          max-width: 650px;
+          width: 100%;
+          text-align: center;
         }
-        .vt-pricing-bg-graphic::after {
-          content: ''; position: absolute; left: -10%; right: -10%; bottom: 10%; height: 400px;
-          background: linear-gradient(135deg, #ffca28 0%, #ff8f00 30%, #d84315 65%, #b71c1c 100%);
-          transform: skewY(-8deg); opacity: 0.85; z-index: -1; pointer-events: none;
+        .vt-employer-heading {
+          font-size: clamp(36px, 6vw, 56px);
+          font-weight: 400;
+          letter-spacing: -0.02em;
+          margin: 0 0 28px;
+          line-height: 1.1;
+          color: #ffffff;
+          font-family: inherit;
         }
-        .vt-pricing-container { position: relative; z-index: 2; max-width: 1200px; width: 100%; box-sizing: border-box; margin: 0 auto; padding: 50px 20px 0; }
-        .vt-pricing-headline { font-size: 48px; font-weight: 500; line-height: 1.15; color: #202124; margin-bottom: 56px; font-family: inherit; }
-        .vt-pricing-grid { display: flex; flex-wrap: wrap; gap: 28px; }
-        .vt-pricing-card { display: flex; border-radius: 8px; overflow: hidden; min-height: 280px; flex: 1 1 400px; }
-        .vt-card-standard { background: #ffffff; }
-        .vt-card-enterprise { background: #202124; }
-        .vt-card-left { padding: 40px; flex: 1.4; display: flex; flex-direction: column; justify-content: space-between; }
-        .vt-card-left-dark { padding-right: 56px; }
-        .vt-card-price-right { background: #f4f5f7; padding: 40px; margin: 6px; flex: 1; display: flex; flex-direction: column; justify-content: center; align-items: flex-start; border-radius: 4px; }
-        .vt-price-large { font-size: 30px; font-weight: 700; color: #202124; margin-bottom: 8px; font-family: inherit; }
-        .vt-price-sub { font-size: 15px; line-height: 1.5; color: #5f6368; font-family: inherit; }
-        .vt-card-features-right { flex: 1; background: rgba(255,255,255,0.08); display: flex; flex-direction: column; margin: 6px; border-radius: 4px; }
-        .vt-feature-list { list-style: none; height: 100%; display: flex; flex-direction: column; margin: 0; padding: 0; }
-        .vt-feature-item { flex: 1; display: flex; align-items: center; padding: 0 28px; font-size: 15px; font-weight: 400; color: #ffffff; border-bottom: 1px solid rgba(255,255,255,0.12); font-family: inherit; }
-        .vt-item-last { border-bottom: none; }
-        .vt-card-title { font-size: 22px; font-weight: 700; margin-bottom: 14px; color: #202124; font-family: inherit; }
-        .vt-text-white { color: #ffffff !important; }
-        .vt-card-desc { font-size: 15px; line-height: 1.65; color: #5f6368; margin-bottom: 28px; font-family: inherit; }
-        .vt-text-muted { color: #9aa0a6 !important; }
-        .vt-btn { display: inline-flex; align-items: center; padding: 11px 22px; border-radius: 24px; font-weight: 600; font-size: 14px; text-decoration: none; width: fit-content; transition: transform 0.15s ease, box-shadow 0.15s ease; font-family: inherit; }
-        .vt-btn:hover { transform: translateY(-2px); box-shadow: 0 4px 12px rgba(0,0,0,0.15); }
-        .vt-btn-blue { background: #1a73e8; color: #ffffff; }
-        .vt-btn-yellow { background: #ffca28; color: #202124; }
-        .vt-btn-icon { margin-left: 8px; transition: transform 0.15s ease; }
-        .vt-btn:hover .vt-btn-icon { transform: translateX(3px); }
+        .vt-employer-sub {
+          font-size: clamp(14px, 2vw, 16px);
+          line-height: 1.65;
+          margin: 0 auto 48px;
+          max-width: 560px;
+          color: #ffffff;
+          font-family: inherit;
+        }
+        .vt-platform-group-title {
+          font-size: 14px;
+          margin-bottom: 14px;
+          display: block;
+          color: #c2c9d9;
+          font-family: inherit;
+        }
+        .vt-platform-btn-group {
+          display: flex;
+          gap: 16px;
+          justify-content: center;
+          margin-bottom: 56px;
+          flex-wrap: wrap;
+        }
+        .vt-platform-btn {
+          background-color: transparent;
+          border: 2px solid rgb(255, 255, 255);
+          color: #ffffff;
+          padding: 9px 28px;
+          border-radius: 50px;
+          text-decoration: none;
+          font-weight: 400;
+          font-size: clamp(13px, 2vw, 15px);
+          display: inline-flex;
+          align-items: center;
+          gap: 10px;
+          transition: background 0.2s ease, border-color 0.2s ease;
+          font-family: inherit;
+        }
+        .vt-platform-btn:hover {
+          background-color: rgba(255,255,255,0.1);
+          border-color: rgba(255,255,255,0.85);
+        }
+        .vt-info-card {
+          background-color: #ffffff;
+          color: #111827;
+          border-radius: 20px;
+          padding: 40px;
+          text-align: left;
+          box-shadow: 0 10px 40px rgba(0,0,0,0.25);
+        }
+        .vt-alert-note {
+          color: #034481;
+          font-size: clamp(12px, 2vw, 14px);
+          margin-bottom: 28px;
+          line-height: 1.6;
+          font-family: inherit;
+        }
+        .vt-disclaimer {
+          font-size: clamp(12px, 1.8vw, 13px);
+          line-height: 1.75;
+          color: #151d32;
+          margin-bottom: 22px;
+          font-family: inherit;
+        }
+        .vt-list {
+          font-size: clamp(12px, 1.8vw, 13px);
+          line-height: 1.75;
+          color: #151d32;
+          padding-left: 20px;
+          margin-bottom: 36px;
+          font-family: inherit;
+        }
+        .vt-list li { margin-bottom: 14px; }
+        .vt-cta-btn-wrap {
+          display: flex;
+          justify-content: center;
+        }
+        .vt-listing-cta {
+          background-color: #0d1e3a;
+          color: #ffffff;
+          padding: 11px 36px;
+          border-radius: 50px;
+          text-decoration: none;
+          font-weight: 400;
+          font-size: clamp(14px, 2vw, 16px);
+          display: inline-flex;
+          align-items: center;
+          gap: 10px;
+          transition: background 0.2s ease;
+          font-family: inherit;
+        }
+        .vt-listing-cta:hover { background-color: #1a2c4e; }
 
-        @media (max-width: 900px) {
-          .vt-pricing-headline { font-size: 38px; margin-bottom: 44px; }
-          .vt-pricing-grid { flex-direction: column; gap: 20px; }
-          .vt-pricing-card { min-height: auto; }
-          .vt-card-left { padding: 32px; }
-          .vt-card-left-dark { padding-right: 32px; }
-          .vt-card-price-right { padding: 32px; }
+        @media (max-width: 768px) {
+          .vt-employer-wrapper { padding: 60px 16px; }
+          .vt-employer-heading { margin-bottom: 20px; }
+          .vt-employer-sub { margin-bottom: 36px; }
+          .vt-platform-btn-group { flex-direction: column; gap: 12px; margin-bottom: 40px; }
+          .vt-platform-btn { width: 100%; justify-content: center; }
+          .vt-info-card { padding: 24px 20px; border-radius: 14px; }
+          .vt-listing-cta { width: 100%; justify-content: center; }
         }
-        @media (max-width: 600px) {
-          .vt-pricing-wrapper { padding: 60px 0 80px; }
-          .vt-pricing-headline { font-size: 26px; margin-bottom: 32px; line-height: 1.2; }
-          .vt-pricing-card { flex-direction: column; }
-          .vt-card-left { padding: 28px 24px; }
-          .vt-card-left-dark { padding-right: 24px; }
-          .vt-card-price-right { margin: 0; border-top: 1px solid rgba(0,0,0,0.07); padding: 24px; border-radius: 0; }
-          .vt-card-features-right { margin: 0; border-radius: 0; border-top: 1px solid rgba(255,255,255,0.12); }
-          .vt-price-large { font-size: 26px; }
-          .vt-feature-item { padding: 16px 20px; font-size: 14px; }
-          .vt-btn { width: 100%; justify-content: center; }
-        }
-      `}</style>
+            `}</style>
     </div>
   );
 }
@@ -717,7 +773,7 @@ const s = {
   jobListItem: { padding: "20px 0", cursor: "pointer", position: "relative", borderBottom: "1px solid #dadce0" },
   jobListItemInner: { display: "flex", alignItems: "center", gap: "16px", width: "100%" },
   
-  jobListLogo: { width: "72px", height: "72px", borderRadius: "8px", overflow: "hidden", border: "1px solid #dadce0", flexShrink: 0, background: "#fff" },
+  jobListLogo: { width: "72px", height: "72px", borderRadius: "50px", overflow: "hidden", flexShrink: 0, background: "#fff" },
   jobListLogoImg: { width: "100%", height: "100%", objectFit: "contain" },
   jobListLogoPlaceholder: { width: "100%", height: "100%", display: "flex", alignItems: "center", justifyContent: "center", fontWeight: "600", fontSize: "18px" },
 
