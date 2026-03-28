@@ -619,16 +619,16 @@ const ft = {
   tabWrap: { position: "relative", marginTop: "10px", flex: "1 1 0", minWidth: 0 },
   tab: {
     position: "relative", display: "flex", alignItems: "center", justifyContent: "space-between",
-    background: "#fefefe", border: "2px solid #939393", borderRadius: "4px", outline: "none",
-    padding: "10px 14px", cursor: "pointer", width: "100%", gap: "12px",
+    background: "#f4f4f4", border: "2px solid #939393", borderRadius: "4px", outline: "none",
+    padding: "13px 14px", cursor: "pointer", width: "100%", gap: "12px",
     fontFamily: '"Circular Std", "Circular", -apple-system, sans-serif',
     transition: "border-color 0.15s",
     WebkitFontSmoothing: "antialiased",
   },
   tabActive: { borderColor: "#1967d2" },
   tabLabel: {
-    position: "absolute", top: "-10px", left: "10px", background: "#fefefe",
-    padding: "0 4px", fontSize: "17px", fontWeight: "400", color: "#0058aa",
+    position: "absolute", top: "-10px", left: "10px", background: "#f4f4f4",
+    padding: "0 4px", fontSize: "20px", fontWeight: "500", color: "#0058aa",
     lineHeight: 1, zIndex: 1,
     WebkitFontSmoothing: "antialiased",
   },
@@ -637,7 +637,7 @@ const ft = {
   tabValueActive: { color: "#202124" },
   dropdown: {
     position: "absolute", top: "calc(100% + 8px)", left: 0, zIndex: 100,
-    background: "#fefefe", border: "2px solid #939393", borderRadius: "4px", outline: "none",
+    background: "#f4f4f4", border: "2px solid #939393", borderRadius: "4px", outline: "none",
     boxShadow: "0 4px 16px rgba(60,64,67,0.18)", minWidth: "200px",
     maxHeight: "280px", overflowY: "auto", padding: "4px",
     display: "flex", flexDirection: "column",
@@ -669,7 +669,7 @@ const ft = {
 };
 
 const s = {
-  page: { background: "#fefefe", minHeight: "100vh", fontFamily: '"Circular Std", "Circular", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif', color: "#202124" },
+  page: { background: "#f4f4f4", minHeight: "100vh", fontFamily: '"Circular Std", "Circular", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif', color: "#202124" },
 
   heroSection: { 
     background: "linear-gradient(rgba(244, 244, 244, 0.14), rgba(244, 244, 244, 0)), url('https://images.unsplash.com/photo-1579548122080-c35fd6820ecb?q=80&w=1170&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D') center/cover no-repeat", 
@@ -678,10 +678,10 @@ const s = {
   },
   heroInner: { maxWidth: "1200px", margin: "0 auto", padding: "0 20px", width: "100%", boxSizing: "border-box" },
   heroTitle: { color: "#ffffff", fontSize: "clamp(32px, 6vw, 72px)", fontWeight: "400", margin: "0 0 16px", lineHeight: "1.1", letterSpacing: "-0.02em" },
-  heroSubtitle: { color: "#5f6368", fontSize: "clamp(14px, 2vw, 17px)", lineHeight: "1.6", margin: "0 0 14px", maxWidth: "720px" },
+  heroSubtitle: { color: "#a9b1ba", fontSize: "clamp(14px, 2vw, 17px)", lineHeight: "1.6", margin: "0 0 14px", maxWidth: "720px" },
   heroJobCount: { fontSize: "14px", color: "#9aa0a6", margin: 0 },
 
-  searchContainer: { background: "#fefefe", padding: "16px clamp(12px, 4vw, 24px) 32px", position: "relative", zIndex: 10 },
+  searchContainer: { background: "#f4f4f4", padding: "16px clamp(12px, 4vw, 24px) 32px", position: "relative", zIndex: 10 },
   searchBarInner: { maxWidth: "900px", margin: "0 auto", display: "flex", alignItems: "center", background: "#fff", borderRadius: "32px", boxShadow: "0 1px 6px rgba(32,33,36,0.28)", padding: "8px 8px 8px 20px" },
   searchLeft: { flex: 2, display: "flex", alignItems: "center", gap: "12px", minWidth: 0 },
   searchInput: { flex: 1, border: "none", outline: "none", fontSize: "16px", color: "#202124", background: "transparent", fontFamily: "inherit", padding: "12px 0" },
@@ -691,11 +691,11 @@ const s = {
   provinceSelect: { flex: 1, border: "none", outline: "none", fontSize: "16px", color: "#3c4043", background: "transparent", cursor: "pointer", fontFamily: "inherit", padding: "12px 0", appearance: "none" },
   searchBtn: { background: "#1a73e8", color: "#fff", border: "none", outline: "none", padding: "14px 32px", fontSize: "15px", fontWeight: "500", cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0, borderRadius: "24px" },
 
-  filterRow: { background: "#fefefe", padding: "0" },
+  filterRow: { background: "#f4f4f4", paddingTop: "1rem" },
   filterRowInner: { maxWidth: "1200px", margin: "0 auto", display: "flex", alignItems: "flex-start", justifyContent: "flex-start", gap: "12px", flexWrap: "wrap", padding: "20px 20px 16px", width: "100%", boxSizing: "border-box" },
   clearBtn: { color: "#c5221f", background: "none", outline: "none", fontSize: "14px", fontWeight: "500", cursor: "pointer", padding: "10px 16px", fontFamily: "inherit", alignSelf: "center", marginTop: "10px" },
 
-  mainSection: { flex: 1, background: "#fefefe", paddingTop: "24px" },
+  mainSection: { flex: 1, background: "#f4f4f4", paddingTop: "24px" },
   mainInner: { maxWidth: "1200px", margin: "0 auto", padding: "0 20px 64px", width: "100%", boxSizing: "border-box" },
 
   resultsRow: { width: "100%", margin: "0 0 20px", display: "flex", alignItems: "center", justifyContent: "space-between" },
