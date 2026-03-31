@@ -15,33 +15,30 @@ The answer is an invite-only employer model. You apply for access, you get verif
 ## What it does
 
 **For job seekers**
-- Browse and filter live jobs by province, type, industry, salary range
+- Browse and filter live jobs by province, type, industry and salary range
 - Real-time search across titles, companies, skills and requirements
-- Save jobs to a personal dashboard
-- Apply with documents — CV, ID, supporting certificates — all uploaded directly
-- Track application status from a profile dashboard
+- Save jobs and track applications from a personal dashboard
+- Apply directly with supporting documents uploaded securely
 - Google Sign-In or email registration
 
 **For employers**
-- Apply for platform access, submit CIPC and identity documents
-- Post and manage job listings with full requirements, responsibilities, closing dates
-- Review applications with an inline document viewer — PDFs render inside the dashboard, no browser tab switching
-- Update applicant status, write internal notes, delete applications
-- Monthly invoice tracking with bank details and payment reference
+- Apply for platform access and submit verification documents
+- Post and manage job listings with full requirements and closing dates
+- Review applications with an inline document viewer
+- Update applicant status, write internal notes, manage your pipeline
+- Monthly invoice tracking with payment reference
 
 **For the admin**
 - Full control over every job and employer on the platform
-- Approve, reject, disable or delete employer accounts
-- Cancel, edit or remove any job listing
-- Mark employers as paid or unpaid, suspend accounts on non-payment
-- Manage expressions of interest and pending verifications
+- Approve, reject, suspend or remove employer accounts
+- Manage expressions of interest and verification submissions
 
 ---
 
 ## Stack
 
 - React 18 + Vite
-- Firebase — Firestore, Auth, Storage, Hosting
+- Firebase — Auth, Firestore, Storage, Hosting
 - React Router v6
 - Plain CSS with CSS variables
 - Circular Std typeface
@@ -50,70 +47,20 @@ No component library. No UI kit. Everything is hand-built.
 
 ---
 
-## Project structure
-
-```
-src/
-  pages/
-    public/          # Home, Jobs, JobDetail, Apply, CompanyPage
-    employer/        # Dashboard, Applications, PostJob, Profile
-    jobseeker/       # Register, Login, Dashboard
-    admin/           # Admin panel, AdminLogin
-  context/           # AuthContext — single auth instance for all roles
-  lib/               # Firebase init, savedJobs helper
-  components/        # Shared Navbar, Footer
-public/
-  fonts/             # Circular Std woff2 files
-```
-
----
-
 ## Running locally
 
-```bash
-git clone https://github.com/yourusername/vettd.git
-cd vettd
-npm install
-npm run dev
-```
+This is a private project. It requires environment configuration that is not included in this repository. If you have been granted access, reach out directly for setup instructions.
 
-You will need your own Firebase project. Create a `.env` file at the root:
-
-```
-VITE_FIREBASE_API_KEY=
-VITE_FIREBASE_AUTH_DOMAIN=
-VITE_FIREBASE_PROJECT_ID=
-VITE_FIREBASE_STORAGE_BUCKET=
-VITE_FIREBASE_MESSAGING_SENDER_ID=
-VITE_FIREBASE_APP_ID=
-```
-
----
-
-## Deploying
-
-```bash
-npm run build
-firebase deploy --only hosting
-```
-
----
-
-## Live
-
-[vettd.co.za](https://vettd.co.za) — or currently at [jobs-42a5d.web.app](https://jobs-42a5d.web.app) while the domain is being connected.
-
----
 
 ## Status
 
-Active development. Employer portal redesign in progress. Email notifications and a job/employer verification page are next on the list.
+Active development. Employer portal redesign, email notifications, and a job verification page are next on the list.
 
 ---
 
 ## License
 
-Private. Not open for contribution or redistribution at this time.
+Private. All rights reserved. Not open for contribution, redistribution, or reuse in any form.
 
 ---
 
