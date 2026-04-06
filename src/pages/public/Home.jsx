@@ -467,7 +467,7 @@ export default function Home() {
           .mobile-filter-btn { display: flex !important; }
           .results-header-mobile { display: flex; align-items: center; justify-content: space-between; width: 100%; margin-left: 0; margin-right: 0; }
 
-          .hero-title { font-size: 26px !important; line-height: 1.25 !important; }
+          .hero-title { font-size: 36px !important; line-height: 1.25 !important; }
           .hero-subtitle { font-size: 14px !important; }
 
           .search-bar-inner {
@@ -559,6 +559,7 @@ export default function Home() {
           background-color: #ffffff;
           color: #111827;
           border-radius: 20px;
+          margin-top: 3rem;
           padding: 40px;
           text-align: left;
           box-shadow: 0 10px 40px rgba(0,0,0,0.25);
@@ -755,7 +756,7 @@ const s = {
   mainInner: { maxWidth: "1200px", margin: "0 auto", padding: "0 20px 64px", width: "100%", boxSizing: "border-box" },
 
   resultsRow: { width: "100%", margin: "0 0 20px", display: "flex", alignItems: "center", justifyContent: "space-between" },
-  resultsCount: { color: "#5f6368", fontSize: "14px" },
+  resultsCount: { color: "#5f6368", fontSize: "14px", fontWeight400 },
   resultsLocation: { color: "#202124", fontWeight: "500" },
 
   mobileFilterBtn: { display: "none", alignItems: "center", gap: "7px", background: "#fff", border: "1px solid #dadce0", borderRadius: "20px", padding: "8px 16px", fontSize: "14px", color: "#202124", cursor: "pointer", fontFamily: "inherit", fontWeight: "500" },
