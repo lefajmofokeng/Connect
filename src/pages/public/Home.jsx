@@ -42,6 +42,16 @@ export default function Home() {
 
   useEffect(() => { fetchJobs(); }, [sortBy]);
 
+  // Proactive UI fix: Prevent background scrolling when mobile drawer is open
+  useEffect(() => {
+    if (mobileFilterOpen) {
+      document.body.style.overflow = 'hidden';
+    } else {
+      document.body.style.overflow = '';
+    }
+    return () => { document.body.style.overflow = ''; };
+  }, [mobileFilterOpen]);
+
   const fetchJobs = async () => {
     setLoading(true);
     try {
@@ -117,15 +127,13 @@ export default function Home() {
         </div>
       </div>
 
-
-
-      {/* ── Filter Bar ── */}
+      {/* ── Desktop Filter Bar ── */}
       <div style={s.filterRow} onClick={closeDropdown}>
         <div className="filter-scroll-container desktop-filters" style={s.filterRowInner}>
 
           {/* Search by title — text input tab */}
-          <div style={ft.searchTabWrap}>
-            <div style={{ ...ft.tab, ...(search ? ft.tabActive : {}), padding: "13px 14px", cursor: "text" }} onClick={() => document.getElementById("home-search-input")?.focus()}>
+          <div style={ft.tabWrap}>
+            <div style={{ ...ft.tab, ...(search ? ft.tabActive : {}), cursor: "text" }} onClick={() => document.getElementById("home-search-input")?.focus()}>
               <span style={{ ...ft.tabLabel, ...(search ? ft.tabLabelActive : {}) }}>Search</span>
               <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke={search ? "#1967d2" : "#9aa0a6"} strokeWidth="2" style={{ flexShrink: 0 }}>
                 <circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/>
@@ -151,25 +159,22 @@ export default function Home() {
             open={openDropdown === "type"}
             onToggle={e => { e.stopPropagation(); setOpenDropdown(openDropdown === "type" ? null : "type"); }}
             onSelect={v => { setFilterType(v); setOpenDropdown(null); }}
-            onClear={() => { setFilterType(""); setOpenDropdown(null); }}
           />
           <FilterTab
             label="Province" value={filterProvince} options={PROVINCES}
             open={openDropdown === "province"}
             onToggle={e => { e.stopPropagation(); setOpenDropdown(openDropdown === "province" ? null : "province"); }}
             onSelect={v => { setFilterProvince(v); setOpenDropdown(null); }}
-            onClear={() => { setFilterProvince(""); setOpenDropdown(null); }}
           />
           <FilterTab
             label="Industry" value={filterIndustry} options={INDUSTRIES}
             open={openDropdown === "industry"}
             onToggle={e => { e.stopPropagation(); setOpenDropdown(openDropdown === "industry" ? null : "industry"); }}
             onSelect={v => { setFilterIndustry(v); setOpenDropdown(null); }}
-            onClear={() => { setFilterIndustry(""); setOpenDropdown(null); }}
           />
 
           {hasFilters && (
-            <div className="clear-btn-wrap">
+            <div className="clear-btn-wrap" style={{ display: 'flex', alignItems: 'center', height: '60px' }}>
               <button style={s.clearBtn} onClick={clearFilters}>✕ Clear</button>
             </div>
           )}
@@ -180,22 +185,30 @@ export default function Home() {
       <div style={s.mainSection}>
         <div className="main-inner" style={s.mainInner}>
 
-          <div className="results-header-mobile" style={s.resultsRow}>
-            <span style={s.resultsCount}>
-              <strong>{filtered.length}</strong> {filtered.length === 1 ? "job" : "jobs"} available
-              {filterProvince && <span style={s.resultsLocation}> in {filterProvince}</span>}
+          {/* ── Mobile Sticky Filter Row (Proactive UI addition) ── */}
+          <div className="mobile-sticky-filter-bar">
+            <span style={s.mobileHeroCount}>
+              <strong style={{ color: "#202124" }}>{filtered.length}</strong>
+              <span style={{ color: "#5f6368" }}> {filtered.length === 1 ? "job" : "jobs"}</span>
             </span>
             <button
-              className="mobile-filter-btn"
               style={s.mobileFilterBtn}
               onClick={() => setMobileFilterOpen(true)}
             >
-              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3"/></svg>
-              Filters
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3"/></svg>
+              Filter
               {activeFilterCount > 0 && (
                 <span style={s.mobileFilterBadge}>{activeFilterCount}</span>
               )}
             </button>
+          </div>
+
+          {/* Desktop results count only */}
+          <div className="desktop-results-row" style={s.resultsRow}>
+            <span style={s.resultsCount}>
+              <strong>{filtered.length}</strong> {filtered.length === 1 ? "job" : "jobs"} available
+              {filterProvince && <span style={s.resultsLocation}> in {filterProvince}</span>}
+            </span>
           </div>
 
           <div className="split-layout" style={s.splitLayout}>
@@ -216,7 +229,7 @@ export default function Home() {
                   {currentJobs.map(job => (
                     <div
                       key={job.id}
-                      className="job-list-item-hover"
+                      className="job-list-item-hover mobile-tap-highlight"
                       style={s.jobListItem}
                       onClick={() => navigate(`/jobs/${job.id}`)}
                     >
@@ -232,15 +245,15 @@ export default function Home() {
                           <h3 style={s.jobListItemTitle}>{job.title}</h3>
                           <div style={s.jobListItemSub}>
                             <span style={s.jobListItemDept}>{job.employerName}</span>
-                            <span style={s.jobListItemSeparator}> | </span>
+                            <span style={s.jobListItemSeparator}> · </span>
                             <span style={s.jobListItemLocation}>{job.city}, {job.province}</span>
                           </div>
                         </div>
 
-                        {/* Hover 'Apply now' Container */}
-                        <div className="job-list-arrow-container">
-                          <span className="apply-now-text">Apply now</span>
-                          <svg className="job-list-arrow-icon" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                        {/* Arrow with conditionally hidden Apply Now text */}
+                        <div style={s.jobListArrow}>
+                          <span className="job-list-apply-text">Apply now</span>
+                          <svg className="job-list-arrow-icon" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                             <line x1="7" y1="17" x2="17" y2="7"></line>
                             <polyline points="7 7 17 7 17 17"></polyline>
                           </svg>
@@ -300,10 +313,10 @@ export default function Home() {
               By submitting your application you acknowledge having read the Vetted Privacy Policy and agree that the information provided will be used solely for the purpose of employer verification and account setup. You guarantee that any third-party information submitted has been authorised for use in this process.
             </p>
 
-            <ol className="vt-list">
-              <li>Vetted operates as a closed, invite-only platform. Every employer is independently verified against CIPC records before being granted access to post job listings. This ensures candidates trust every listing on the platform.</li>
-              <li>Pricing is R450 per live listing per month — no setup fees, no agency commissions, no long-term contracts. You pay only for active listings. Enterprise pricing is available for businesses with high-volume or multi-province hiring needs.</li>
-            </ol>
+            <div className="vt-list">
+              <div>Vetted operates as a closed, invite-only platform. Every employer is independently verified against CIPC records before being granted access to post job listings. This ensures candidates trust every listing on the platform.</div>
+              <div style={{marginTop: "14px"}}>Pricing is R450 per live listing per month — no setup fees, no agency commissions, no long-term contracts. You pay only for active listings. Enterprise pricing is available for businesses with high-volume or multi-province hiring needs.</div>
+            </div>
 
             <div className="vt-cta-btn-wrap">
               <Link to="/employer/join" className="vt-listing-cta">
@@ -319,63 +332,74 @@ export default function Home() {
       {/* ── Footer ── */}
       <Footer />
 
-      {/* ── Mobile Filter Drawer ── */}
+      {/* ── Mobile Filter Drawer (Animated) ── */}
       {mobileFilterOpen && (
         <>
-          <div style={s.drawerOverlay} onClick={() => setMobileFilterOpen(false)} />
-          <div style={s.mobileDrawer}>
+          <div className="drawer-overlay-anim" style={s.drawerOverlay} onClick={() => setMobileFilterOpen(false)} />
+          <div className="mobile-drawer-anim" style={s.mobileDrawer}>
             <div style={s.mobileDrawerHeader}>
-              <span style={s.mobileDrawerTitle}>Filters</span>
+              <span style={s.mobileDrawerTitle}>Refine Search</span>
               <button style={s.mobileDrawerClose} onClick={() => setMobileFilterOpen(false)}>
-                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#202124" strokeWidth="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#202124" strokeWidth="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
               </button>
             </div>
 
-            {/* Job Type */}
-            <div style={s.mobileDrawerGroup}>
-              <div style={s.mobileDrawerLabel}>Job Type</div>
-              <select style={s.mobileDrawerSelect} value={filterType} onChange={e => setFilterType(e.target.value)}>
-                <option value="">All Types</option>
-                {JOB_TYPES.map(t => <option key={t}>{t}</option>)}
-              </select>
-            </div>
+            <div style={s.mobileDrawerBody}>
+              {/* Search by title */}
+              <div style={s.mobileDrawerGroup}>
+                <div style={s.mobileDrawerLabel}>Keyword or Title</div>
+                <div style={{ position: "relative", display: "flex", alignItems: "center", background: "#f8f9fa", border: "2px solid #e0e0e0", borderRadius: "8px" }}>
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#9aa0a6" strokeWidth="2" style={{ flexShrink: 0, marginLeft: "14px" }}>
+                    <circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/>
+                  </svg>
+                  <input
+                    style={{ flex: 1, border: "none", outline: "none", background: "transparent", padding: "14px 12px", fontSize: "16px", color: "#202124", fontFamily: "inherit" }}
+                    value={search}
+                    onChange={e => setSearch(e.target.value)}
+                    placeholder="e.g. Software Engineer"
+                  />
+                  {search && (
+                    <button style={{ background: "none", border: "none", cursor: "pointer", padding: "12px", display: "flex", alignItems: "center" }} onClick={() => setSearch("")}>
+                      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#9aa0a6" strokeWidth="2.5"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+                    </button>
+                  )}
+                </div>
+              </div>
 
-            {/* Province */}
-            <div style={s.mobileDrawerGroup}>
-              <div style={s.mobileDrawerLabel}>Province</div>
-              <select style={s.mobileDrawerSelect} value={filterProvince} onChange={e => setFilterProvince(e.target.value)}>
-                <option value="">All Provinces</option>
-                {PROVINCES.map(p => <option key={p}>{p}</option>)}
-              </select>
-            </div>
+              {/* Job Type */}
+              <div style={s.mobileDrawerGroup}>
+                <div style={s.mobileDrawerLabel}>Job Type</div>
+                <div style={{position: "relative"}}>
+                  <select style={s.mobileDrawerSelect} value={filterType} onChange={e => setFilterType(e.target.value)}>
+                    <option value="">All Types</option>
+                    {JOB_TYPES.map(t => <option key={t}>{t}</option>)}
+                  </select>
+                  <div style={s.selectArrow}><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#5f6368" strokeWidth="2.5"><polyline points="6 9 12 15 18 9"/></svg></div>
+                </div>
+              </div>
 
-            {/* Industry */}
-            <div style={s.mobileDrawerGroup}>
-              <div style={s.mobileDrawerLabel}>Industry</div>
-              <select style={s.mobileDrawerSelect} value={filterIndustry} onChange={e => setFilterIndustry(e.target.value)}>
-                <option value="">All Industries</option>
-                {INDUSTRIES.map(i => <option key={i}>{i}</option>)}
-              </select>
-            </div>
+              {/* Province */}
+              <div style={s.mobileDrawerGroup}>
+                <div style={s.mobileDrawerLabel}>Province</div>
+                <div style={{position: "relative"}}>
+                  <select style={s.mobileDrawerSelect} value={filterProvince} onChange={e => setFilterProvince(e.target.value)}>
+                    <option value="">All Provinces</option>
+                    {PROVINCES.map(p => <option key={p}>{p}</option>)}
+                  </select>
+                  <div style={s.selectArrow}><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#5f6368" strokeWidth="2.5"><polyline points="6 9 12 15 18 9"/></svg></div>
+                </div>
+              </div>
 
-            {/* Search by title */}
-            <div style={s.mobileDrawerGroup}>
-              <div style={s.mobileDrawerLabel}>Search by Title</div>
-              <div style={{ position: "relative", display: "flex", alignItems: "center", background: "#f8f9fa", border: "2px solid #e0e0e0", borderRadius: "4px" }}>
-                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#9aa0a6" strokeWidth="2" style={{ flexShrink: 0, marginLeft: "12px" }}>
-                  <circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/>
-                </svg>
-                <input
-                  style={{ flex: 1, border: "none", outline: "none", background: "transparent", padding: "11px 12px", fontSize: "15px", color: "#202124", fontFamily: "inherit" }}
-                  value={search}
-                  onChange={e => setSearch(e.target.value)}
-                  placeholder="e.g. Software Engineer"
-                />
-                {search && (
-                  <button style={{ background: "none", border: "none", cursor: "pointer", padding: "8px", display: "flex", alignItems: "center" }} onClick={() => setSearch("")}>
-                    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#9aa0a6" strokeWidth="2.5"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
-                  </button>
-                )}
+              {/* Industry */}
+              <div style={s.mobileDrawerGroup}>
+                <div style={s.mobileDrawerLabel}>Industry</div>
+                <div style={{position: "relative"}}>
+                  <select style={s.mobileDrawerSelect} value={filterIndustry} onChange={e => setFilterIndustry(e.target.value)}>
+                    <option value="">All Industries</option>
+                    {INDUSTRIES.map(i => <option key={i}>{i}</option>)}
+                  </select>
+                  <div style={s.selectArrow}><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#5f6368" strokeWidth="2.5"><polyline points="6 9 12 15 18 9"/></svg></div>
+                </div>
               </div>
             </div>
 
@@ -396,7 +420,7 @@ export default function Home() {
       {/* ── Page CSS ── */}
       <style>{`
         *:focus { outline: none !important; box-shadow: none !important; }
-        button, div, a { -webkit-tap-highlight-color: transparent !important; }
+        button, div, a, select, input { -webkit-tap-highlight-color: transparent !important; }
 
         .page-wrapper { -webkit-font-smoothing: antialiased; -moz-osx-font-smoothing: grayscale; text-rendering: optimizeLegibility; }
 
@@ -405,89 +429,100 @@ export default function Home() {
         ::-webkit-scrollbar-thumb { background: #dadce0; border-radius: 4px; }
 
         .job-list-item-hover { will-change: auto !important; transform: none !important; backface-visibility: visible !important; outline: none !important; }
-        
 
         .filter-tab-wrap { will-change: auto !important; }
         .filter-tab-wrap button { will-change: auto !important; transform: none !important; -webkit-font-smoothing: antialiased !important; }
         .filter-tab-wrap button:hover { background: #f8f9fa !important; }
 
-        /* ── Apply Now Hover Effect ── */
-        .job-list-arrow-container {
-          display: flex;
-          align-items: center;
-          justify-content: flex-end;
-          padding-left: 16px;
-          flex-shrink: 0;
-          color: #3d3d3d;
-        }
-        .apply-now-text {
+        /* Desktop Apply now hover accent */
+        .job-list-apply-text {
           opacity: 0;
-          color: #004599;
-          font-weight: 500;
-          font-size: 24px;
-          transition: opacity 0.2s ease, transform 0.2s ease;
+          visibility: hidden;
           transform: translateX(10px);
-          margin-right: 6px;
-        }
-        .job-list-item-hover:hover .apply-now-text {
-          opacity: 1;
-          transform: translateX(0);
-        }
-        .job-list-arrow-icon {
-          transition: transform 0.2s ease, color 0.2s ease;
-        }
-        .job-list-item-hover:hover .job-list-arrow-icon {
+          transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+          font-weight: 500;
+          font-size: 22px;
           color: #004599;
-          transform: translate(2px, -2px);
+          margin-right: 8px;
+        }
+
+
+        .job-list-arrow-icon { transition: transform 0.2s ease, color 0.2s ease; }
+
+        @media (min-width: 769px) {
+          .job-list-item-hover:hover .job-list-apply-text {
+            opacity: 1;
+            visibility: visible;
+            transform: translateX(0);
+          }
+          .job-list-item-hover:hover .job-list-arrow-icon {
+            color: #004599;
+            transform: translate(2px, -2px);
+          }
         }
 
         @keyframes shimmer { 0%{background-position:200% 0} 100%{background-position:-200% 0} }
 
-        .mobile-filter-btn { display: none !important; }
+        /* Mobile animations */
+        @keyframes slideInRight {
+          from { transform: translateX(100%); }
+          to { transform: translateX(0); }
+        }
+        @keyframes fadeIn {
+          from { opacity: 0; backdrop-filter: blur(0px); }
+          to { opacity: 1; backdrop-filter: blur(4px); }
+        }
+        .mobile-drawer-anim {
+          animation: slideInRight 0.35s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+        }
+        .drawer-overlay-anim {
+          animation: fadeIn 0.3s ease forwards;
+        }
+
+        /* Mobile specific hiding */
+        .mobile-sticky-filter-bar { display: none !important; }
+        .desktop-results-row { display: flex !important; }
 
         /* ── Tablet / Mobile ── */
         @media (max-width: 900px) {
           .hide-on-mobile { display: none !important; }
-          .results-header-mobile {
-            background: #fff;
-            padding: 12px 16px;
-            margin-bottom: 0 !important;
-            position: sticky;
-            top: 56px;
-            z-index: 10;
-            border-bottom: 1px solid #f1f3f4;
-            margin-left: -16px;
-            margin-right: -16px;
-          }
         }
 
         /* ── Mobile ── */
         @media (max-width: 768px) {
           .desktop-filters { display: none !important; }
-          .mobile-filter-btn { display: flex !important; }
-          .results-header-mobile { display: flex; align-items: center; justify-content: space-between; width: 100%; margin-left: 0; margin-right: 0; }
+          .desktop-results-row { display: none !important; }
+          
+          /* Hide Apply text on mobile so tap is clean */
+          .job-list-apply-text { display: none !important; }
+
+          /* Dedicated Sticky Filter Row */
+          .mobile-sticky-filter-bar { 
+            display: flex !important; 
+            align-items: center;
+            justify-content: space-between;
+            background: rgba(244, 244, 244, 0.95);
+            backdrop-filter: blur(12px);
+            padding: 12px 0 16px;
+            margin-bottom: 8px;
+            position: sticky;
+            top: 0; /* Adjust this value if you have a sticky navbar */
+            z-index: 90;
+            border-bottom: 1px solid #dadce0;
+          }
+          
+          /* Touch feedback for mobile */
+          .mobile-tap-highlight:active { background-color: #e8eaed !important; border-radius: 8px; }
 
           .hero-title { font-size: 36px !important; line-height: 1.25 !important; }
           .hero-subtitle { font-size: 14px !important; }
 
-          .search-bar-inner {
-            flex-direction: column !important;
-            padding: 12px !important;
-            border-radius: 16px !important;
-            gap: 0 !important;
-            align-items: stretch !important;
-          }
-          .search-bar-inner > div:first-child { padding: 4px 0 !important; }
-          .search-divider { width: 100% !important; height: 1px !important; margin: 8px 0 !important; }
-          .search-bar-inner > div:last-of-type { padding: 4px 0 !important; }
-          .search-bar-inner button { width: 100% !important; border-radius: 10px !important; margin-top: 10px !important; padding: 14px !important; font-size: 15px !important; }
-
-          .job-list-item-hover { padding: 16px 0 !important; }
+          .job-list-item-hover { padding: 18px 12px !important; margin: 0 -12px !important; }
         }
 
         /* ── Small phones ── */
         @media (max-width: 480px) {
-          .hero-title { font-size: 22px !important; }
+          .hero-title { font-size: 26px !important; }
         }
 
         /* ── Employer CTA Section ── */
@@ -495,7 +530,7 @@ export default function Home() {
           font-family: 'Circular Std', 'Circular', -apple-system, BlinkMacSystemFont, sans-serif;
           background-color: #0a1422;
           color: #ffffff;
-          padding: 150px 20px;
+          padding: 100px 20px;
           display: flex;
           justify-content: center;
           align-items: center;
@@ -582,11 +617,9 @@ export default function Home() {
           font-size: clamp(12px, 1.8vw, 13px);
           line-height: 1.75;
           color: #151d32;
-          padding-left: 20px;
           margin-bottom: 36px;
           font-family: inherit;
         }
-        .vt-list li { margin-bottom: 14px; }
         .vt-cta-btn-wrap {
           display: flex;
           justify-content: center;
@@ -622,7 +655,7 @@ export default function Home() {
 }
 
 // ── FilterTab — desktop dropdown ──────────────────────────
-function FilterTab({ label, value, options, open, onToggle, onSelect, onClear, isSort }) {
+function FilterTab({ label, value, options, open, onToggle, onSelect, isSort }) {
   const isActive = isSort ? false : !!value;
   const displayValue = isSort ? value : (value || "- Select -");
 
@@ -646,12 +679,6 @@ function FilterTab({ label, value, options, open, onToggle, onSelect, onClear, i
 
       {open && (
         <div style={ft.dropdown} onClick={e => e.stopPropagation()}>
-          {!isSort && (
-            <button style={ft.optionClear} onClick={onClear}>
-              <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
-              Clear
-            </button>
-          )}
           {options.map(opt => (
             <button
               key={opt}
@@ -673,11 +700,11 @@ function FilterTab({ label, value, options, open, onToggle, onSelect, onClear, i
 }
 
 const ft = {
-  tabWrap: { position: "relative", marginTop: "10px", flex: "1 1 0", minWidth: 0 },
+  tabWrap: { position: "relative", marginTop: "10px", flex: "1 1 0", minWidth: "160px" },
   tab: {
     position: "relative", display: "flex", alignItems: "center", justifyContent: "space-between",
     background: "#f4f4f4", border: "2px solid #939393", borderRadius: "4px", outline: "none",
-    padding: "13px 14px", cursor: "pointer", width: "100%", gap: "12px",
+    padding: "0 14px", cursor: "pointer", width: "100%", height: "60px", gap: "12px", boxSizing: "border-box",
     fontFamily: '"Circular Std", "Circular", -apple-system, sans-serif',
     transition: "border-color 0.15s",
     WebkitFontSmoothing: "antialiased",
@@ -708,21 +735,12 @@ const ft = {
     WebkitFontSmoothing: "antialiased",
   },
   optionActive: { color: "#1967d2", fontWeight: "600", background: "#f0f4ff" },
-  optionClear: {
-    display: "flex", alignItems: "center", gap: "6px", outline: "none",
-    background: "none", border: "none", borderBottom: "1px solid #f1f3f4",
-    width: "100%", textAlign: "left", padding: "8px 14px 10px",
-    fontSize: "13px", fontWeight: "500", color: "#9aa0a6", cursor: "pointer",
-    fontFamily: '"Circular Std", "Circular", -apple-system, sans-serif',
-    marginBottom: "4px",
-  },
-  searchTabWrap: { position: "relative", marginTop: "10px", flex: "1 1 0", minWidth: 0 },
   searchInput: {
-    flex: 1, border: "none", outline: "none", background: "transparent",
+    flex: 1, border: "none", outline: "none", background: "transparent", height: "100%",
     fontSize: "15px", fontWeight: "400", color: "#202124", fontFamily: '"Circular Std", "Circular", -apple-system, sans-serif',
-    padding: "10px 10px 10px 8px", WebkitFontSmoothing: "antialiased", width: "100%",
+    padding: "0 10px 0 8px", WebkitFontSmoothing: "antialiased", width: "100%", boxSizing: "border-box"
   },
-  searchClear: { background: "none", border: "none", outline: "none", cursor: "pointer", padding: "6px", display: "flex", alignItems: "center", flexShrink: 0, marginRight: "8px" },
+  searchClear: { background: "none", border: "none", outline: "none", cursor: "pointer", padding: "6px", display: "flex", alignItems: "center", flexShrink: 0 },
 };
 
 const s = {
@@ -730,37 +748,29 @@ const s = {
 
   heroSection: { 
     background: "linear-gradient(rgba(244, 244, 244, 0.14), rgba(244, 244, 244, 0)), url('https://images.unsplash.com/photo-1579548122080-c35fd6820ecb?q=80&w=1170&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D') center/cover no-repeat", 
-    padding: "clamp(90px, 15vw, 128px) 0 56px", 
+    padding: "80px 0 40px", 
     textAlign: "left" 
   },
+
   heroInner: { maxWidth: "1200px", margin: "0 auto", padding: "0 20px", width: "100%", boxSizing: "border-box" },
   heroTitle: { color: "#ffffff", fontSize: "clamp(32px, 6vw, 72px)", fontWeight: "400", margin: "0 0 16px", lineHeight: "1.1", letterSpacing: "-0.02em" },
   heroSubtitle: { color: "#a9b1ba", fontSize: "clamp(14px, 2vw, 17px)", lineHeight: "1.6", margin: "0 0 14px", maxWidth: "720px" },
   heroJobCount: { fontSize: "14px", color: "#9aa0a6", margin: 0 },
 
-  searchContainer: { background: "#f4f4f4", padding: "16px clamp(12px, 4vw, 24px) 32px", position: "relative", zIndex: 10 },
-  searchBarInner: { maxWidth: "900px", margin: "0 auto", display: "flex", alignItems: "center", background: "#fff", borderRadius: "32px", boxShadow: "0 1px 6px rgba(32,33,36,0.28)", padding: "8px 8px 8px 20px" },
-  searchLeft: { flex: 2, display: "flex", alignItems: "center", gap: "12px", minWidth: 0 },
-  searchInput: { flex: 1, border: "none", outline: "none", fontSize: "16px", color: "#202124", background: "transparent", fontFamily: "inherit", padding: "12px 0" },
-  searchClear: { background: "none", border: "none", outline: "none", cursor: "pointer", padding: "4px", display: "flex", alignItems: "center" },
-  searchDivider: { width: "1px", height: "32px", background: "#dadce0", flexShrink: 0, margin: "0 16px" },
-  searchRight: { flex: 1, display: "flex", alignItems: "center", gap: "12px", minWidth: 0 },
-  provinceSelect: { flex: 1, border: "none", outline: "none", fontSize: "16px", color: "#3c4043", background: "transparent", cursor: "pointer", fontFamily: "inherit", padding: "12px 0", appearance: "none" },
-  searchBtn: { background: "#1a73e8", color: "#fff", border: "none", outline: "none", padding: "14px 32px", fontSize: "15px", fontWeight: "500", cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0, borderRadius: "24px" },
-
   filterRow: { background: "#f4f4f4", paddingTop: "1rem" },
-  filterRowInner: { maxWidth: "1200px", margin: "0 auto", display: "flex", alignItems: "flex-start", justifyContent: "flex-start", gap: "12px", flexWrap: "wrap", padding: "20px 20px 16px", width: "100%", boxSizing: "border-box" },
-  clearBtn: { color: "#c5221f", background: "none", outline: "none", fontSize: "14px", fontWeight: "500", cursor: "pointer", padding: "10px 16px", fontFamily: "inherit", alignSelf: "center", marginTop: "10px" },
+  filterRowInner: { maxWidth: "1200px", margin: "0 auto", display: "flex", alignItems: "center", justifyContent: "flex-start", gap: "12px", flexWrap: "wrap", padding: "20px 20px 16px", width: "100%", boxSizing: "border-box" },
+  clearBtn: { color: "#c5221f", background: "none", outline: "none", fontSize: "14px", fontWeight: "500", cursor: "pointer", padding: "10px 16px", fontFamily: "inherit" },
 
-  mainSection: { flex: 1, background: "#f4f4f4", paddingTop: "24px" },
+  mainSection: { flex: 1, background: "#f4f4f4", paddingTop: "16px" },
   mainInner: { maxWidth: "1200px", margin: "0 auto", padding: "0 20px 64px", width: "100%", boxSizing: "border-box" },
 
   resultsRow: { width: "100%", margin: "0 0 20px", display: "flex", alignItems: "center", justifyContent: "space-between" },
-  resultsCount: { color: "#5f6368", fontSize: "14px", fontWeight400 },
+  resultsCount: { color: "#5f6368", fontSize: "14px", fontWeight: "400" },
   resultsLocation: { color: "#202124", fontWeight: "500" },
 
-  mobileFilterBtn: { display: "none", alignItems: "center", gap: "7px", background: "#fff", border: "1px solid #dadce0", borderRadius: "20px", padding: "8px 16px", fontSize: "14px", color: "#202124", cursor: "pointer", fontFamily: "inherit", fontWeight: "500" },
-  mobileFilterBadge: { background: "#1a73e8", color: "#fff", borderRadius: "50%", width: "18px", height: "18px", fontSize: "11px", fontWeight: "700", display: "flex", alignItems: "center", justifyContent: "center" },
+  mobileFilterBtn: { background: "#1a73e8", border: "none", borderRadius: "50px", padding: "10px 20px", fontSize: "14px", color: "#ffffff", cursor: "pointer", fontFamily: "inherit", fontWeight: "500", display: "flex", alignItems: "center", gap: "8px", boxShadow: "0 2px 8px rgba(26,115,232,0.3)" },
+  mobileFilterBadge: { background: "#fff", color: "#1a73e8", borderRadius: "50%", width: "18px", height: "18px", fontSize: "11px", fontWeight: "700", display: "flex", alignItems: "center", justifyContent: "center" },
+  mobileHeroCount: { fontSize: "15px", fontFamily: "inherit" },
 
   splitLayout: { width: "100%", display: "flex", flexDirection: "column" },
   leftPanel: { display: "flex", flexDirection: "column", gap: "12px", width: "100%" },
@@ -774,31 +784,35 @@ const s = {
   jobListItem: { padding: "20px 0", cursor: "pointer", position: "relative", borderBottom: "1px solid #dadce0" },
   jobListItemInner: { display: "flex", alignItems: "center", gap: "16px", width: "100%" },
   
-  jobListLogo: { width: "72px", height: "72px", borderRadius: "50px", overflow: "hidden", flexShrink: 0, background: "#fff" },
+  jobListLogo: { width: "75px", height: "75px", borderRadius: "50px", overflow: "hidden", flexShrink: 0, background: "#fff" },
   jobListLogoImg: { width: "100%", height: "100%", objectFit: "contain" },
-  jobListLogoPlaceholder: { width: "100%", height: "100%", display: "flex", alignItems: "center", justifyContent: "center", fontWeight: "600", fontSize: "18px" },
+  jobListLogoPlaceholder: { width: "100%", height: "100%", display: "flex", alignItems: "center", justifyContent: "center", fontWeight: "600", fontSize: "16px" },
 
   jobListCenter: { flex: 1, minWidth: 0 },
-  jobListItemTitle: { color: "#000000", fontSize: "clamp(17px, 2.5vw, 24px)", fontWeight: "500", margin: "0 0 6px", letterSpacing: "0.2px", lineHeight: "1.3", WebkitFontSmoothing: "antialiased", MozOsxFontSmoothing: "grayscale" },
-  jobListItemSub: { display: "flex", alignItems: "center", gap: "6px", color: "#5f6368", fontSize: "clamp(22px, 2vw, 16px)", fontWeight: "400", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis", WebkitFontSmoothing: "antialiased" },
+  jobListItemTitle: { color: "#000000", fontSize: "clamp(16px, 2.5vw, 24px)", fontWeight: "500", margin: "0 0 5px", lineHeight: "1.3", WebkitFontSmoothing: "antialiased", MozOsxFontSmoothing: "grayscale" },
+  jobListItemSub: { display: "flex", alignItems: "center", flexWrap: "wrap", gap: "6px", color: "#5f6368", fontSize: "21px", fontWeight: "400", WebkitFontSmoothing: "antialiased" },
   jobListItemDept: { color: "#004599", fontWeight: "500" }, 
-  jobListItemSeparator: { color: "#9aa0a6" },
+  jobListItemSeparator: { color: "#dadce0" },
   jobListItemLocation: { color: "#004599", fontWeight: "500" },
+
+  jobListArrow: { display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0, paddingLeft: "12px", color: "#9aa0a6" },
 
   pagination: { display: "flex", alignItems: "center", justifyContent: "center", gap: "8px", marginTop: "20px", padding: "16px", border: "1px solid #dadce0", borderRadius: "8px", background: "#fff" },
   paginationBtn: { border: "none", background: "#f1f3f4", color: "#5f6368", fontWeight: "500", fontSize: "14px", padding: "8px 14px", borderRadius: "20px", cursor: "pointer" },
   paginationBtnActive: { background: "#1a73e8", color: "#fff" },
 
-  // Mobile filter drawer
-  drawerOverlay: { position: "fixed", inset: 0, background: "rgba(0,0,0,0.4)", zIndex: 299 },
-  mobileDrawer: { position: "fixed", top: 0, left: 0, bottom: 0, width: "300px", background: "#fff", zIndex: 300, display: "flex", flexDirection: "column", boxShadow: "4px 0 24px rgba(0,0,0,0.15)", overflowY: "auto" },
-  mobileDrawerHeader: { display: "flex", alignItems: "center", justifyContent: "space-between", padding: "20px 20px 16px", borderBottom: "1px solid #f1f3f4" },
-  mobileDrawerTitle: { color: "#000", fontSize: "17px", fontWeight: "600", fontFamily: "inherit" },
-  mobileDrawerClose: { background: "none", border: "none", cursor: "pointer", padding: "4px", display: "flex", alignItems: "center" },
-  mobileDrawerGroup: { padding: "16px 20px 0" },
-  mobileDrawerLabel: { color: "#004598", fontSize: "14px", fontWeight: "500", margin: "0 0 8px" },
-  mobileDrawerSelect: { width: "100%", background: "#f8f9fa", border: "2px solid #e0e0e0", borderRadius: "4px", padding: "11px 14px", fontSize: "15px", color: "#202124", outline: "none", cursor: "pointer", fontFamily: "inherit" },
-  mobileDrawerFooter: { padding: "20px", marginTop: "auto", display: "flex", flexDirection: "column", gap: "10px", borderTop: "1px solid #f1f3f4" },
-  mobileDrawerApply: { background: "#1a73e8", color: "#fff", border: "none", borderRadius: "50px", padding: "13px", fontSize: "15px", fontWeight: "500", cursor: "pointer", fontFamily: "inherit" },
-  mobileDrawerClear: { background: "none", border: "none", color: "#c5221f", fontSize: "14px", fontWeight: "500", cursor: "pointer", fontFamily: "inherit", textAlign: "center" },
+  // Mobile filter drawer (Animated version)
+  drawerOverlay: { position: "fixed", inset: 0, background: "rgba(0,0,0,0.5)", zIndex: 299 },
+  mobileDrawer: { position: "fixed", top: 0, right: 0, bottom: 0, width: "100%", maxWidth: "340px", background: "#fff", zIndex: 300, display: "flex", flexDirection: "column", boxShadow: "-4px 0 24px rgba(0,0,0,0.15)", overflowY: "auto" },
+  mobileDrawerHeader: { display: "flex", alignItems: "center", justifyContent: "space-between", padding: "24px 24px 20px", borderBottom: "1px solid #f1f3f4" },
+  mobileDrawerTitle: { color: "#000", fontSize: "20px", fontWeight: "600", fontFamily: "inherit" },
+  mobileDrawerClose: { background: "#f1f3f4", border: "none", borderRadius: "50%", cursor: "pointer", padding: "8px", display: "flex", alignItems: "center", justifyContent: "center" },
+  mobileDrawerBody: { flex: 1, overflowY: "auto", paddingBottom: "24px" },
+  mobileDrawerGroup: { padding: "24px 24px 0" },
+  mobileDrawerLabel: { color: "#004598", fontSize: "14px", fontWeight: "600", margin: "0 0 10px" },
+  mobileDrawerSelect: { width: "100%", background: "#f8f9fa", border: "2px solid #e0e0e0", borderRadius: "8px", padding: "14px 40px 14px 16px", fontSize: "16px", color: "#202124", outline: "none", cursor: "pointer", fontFamily: "inherit", appearance: "none" },
+  selectArrow: { position: "absolute", right: "16px", top: "50%", transform: "translateY(-50%)", pointerEvents: "none", display: "flex" },
+  mobileDrawerFooter: { padding: "24px", display: "flex", flexDirection: "column", gap: "12px", borderTop: "1px solid #f1f3f4", background: "#fff" },
+  mobileDrawerApply: { background: "#1a73e8", color: "#fff", border: "none", borderRadius: "50px", padding: "16px", fontSize: "16px", fontWeight: "600", cursor: "pointer", fontFamily: "inherit" },
+  mobileDrawerClear: { background: "none", border: "none", color: "#c5221f", fontSize: "15px", fontWeight: "600", cursor: "pointer", fontFamily: "inherit", textAlign: "center", padding: "8px" },
 };
