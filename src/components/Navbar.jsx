@@ -30,7 +30,7 @@ export default function Navbar() {
 
           {/* Logo */}
           <div style={s.navLogo} onClick={() => navigate("/")}>
-            <img src="Public/logo.png" alt="Vetted Logo" style={s.logoImg} />
+            <img src="/logo.png" alt="Vetted Logo" style={s.logoImg} />
           </div>
 
           {/* Desktop links */}
