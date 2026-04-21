@@ -61,116 +61,99 @@ export default function JobDetail() {
     <div className="jd-page" style={s.page}>
       <Navbar />
 
-      <div className="jd-body" style={s.body}>
-        <div style={s.inner}>
+      {/* ── Premium Dark Hero Banner ── */}
+      <div style={s.heroBanner}>
+        <div style={s.heroBannerInner}>
 
           {/* Back */}
-          <button onClick={() => navigate("/")} style={s.backBtn}>
-            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" style={{ marginRight: 7 }}>
-              <line x1="19" y1="12" x2="5" y2="12"/><polyline points="12 19 5 12 12 5"/>
-            </svg>
-            Back
-          </button>
-
-          {/* ── Hero Header ── */}
-          <div className="jd-hero" style={s.hero}>
-            <div style={s.heroInner}>
-
-              {/* Logo */}
-              <div style={s.heroLogo}>
-                {job.logoUrl
-                  ? <img src={job.logoUrl} alt={job.employerName} style={s.logoImg} />
-                  : <div style={{ ...s.logoPlaceholder, background: job.brandColour || "#1a73e8" }}>{job.employerName?.[0]}</div>
-                }
-              </div>
-
-              {/* Title block */}
-              <div style={s.heroText}>
-                <div style={s.heroCompany}>{job.employerName}</div>
-                <h1 className="jd-title" style={s.jobTitle}>{job.title}</h1>
-
-                {/* Meta row */}
-                <div className="jd-meta-row" style={s.metaRow}>
-                  <MetaPill icon={
-                    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
-                  } value={`${job.city}, ${job.province}`} />
-                  <span style={s.metaDot}>·</span>
-                  <MetaPill icon={
-                    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"/></svg>
-                  } value={job.type} />
-                  {job.department && <><span style={s.metaDot}>·</span><MetaPill icon={
-                    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/></svg>
-                  } value={job.department} /></>}
-                  {job.remote && <><span style={s.metaDot}>·</span><span style={s.remoteTag}>Remote / Hybrid</span></>}
-                </div>
-
-                {/* Salary + Closing */}
-                <div style={s.heroSubMeta}>
-                  {job.salary && <span style={s.salaryBadge}>{job.salary}</span>}
-                  <span style={s.closingText}>
-                    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" style={{ marginRight: 5 }}>
-                      <rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/>
-                    </svg>
-                    Closes {job.closes}
-                  </span>
-                </div>
-              </div>
-
-              {/* Save button — desktop */}
-              <button onClick={handleToggleSave} style={{ ...s.saveBtn, ...(isSaved ? s.saveBtnActive : {}) }}>
-                {isSaved
-                  ? <><svg width="14" height="14" viewBox="0 0 24 24" fill="#ea8600" stroke="#ea8600" strokeWidth="1.5"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>Saved</>
-                  : <><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>Save</>
-                }
-              </button>
-
-            </div>
-
-            {/* Mobile Apply */}
-            <div className="jd-mobile-apply" style={s.mobileApplyWrap}>
-              <button style={s.applyBtnMobile} onClick={() => navigate(`/apply/${job.id}`)}>Apply Now</button>
-            </div>
+          <div style={s.backRow}>
+            <button onClick={() => navigate("/")} style={s.backBtn}>
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" style={{ marginRight: 6 }}>
+                <line x1="19" y1="12" x2="5" y2="12"/><polyline points="12 19 5 12 12 5"/>
+              </svg>
+              Back to positions
+            </button>
           </div>
 
-          {/* ── Body Layout ── */}
+          <div className="jd-hero-inner" style={s.heroRow}>
+
+            {/* Tight, refined Logo */}
+            <div style={s.heroLogo}>
+              {job.logoUrl
+                ? <img src={job.logoUrl} alt={job.employerName} style={s.logoImg} />
+                : <div style={{ ...s.logoPlaceholder, background: job.brandColour || "#1a73e8" }}>{job.employerName?.[0]}</div>
+              }
+            </div>
+
+            {/* Title + meta */}
+            <div style={s.heroText}>
+              <div style={s.heroCompany}>{job.employerName}</div>
+              <h1 className="jd-title" style={s.jobTitle}>{job.title}</h1>
+
+              {/* Tag chips row */}
+              <div className="jd-tag-row" style={s.tagRow}>
+                <Chip icon={<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path><circle cx="12" cy="10" r="3"></circle></svg>} value={`${job.city}, ${job.province}`} />
+                <Chip icon={<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><rect x="2" y="7" width="20" height="14" rx="2" ry="2"></rect><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"></path></svg>} value={job.type} />
+                {job.department && <Chip icon={<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><rect x="4" y="4" width="16" height="16" rx="2" ry="2"></rect><rect x="9" y="9" width="6" height="6"></rect><line x1="9" y1="1" x2="9" y2="4"></line><line x1="15" y1="1" x2="15" y2="4"></line><line x1="9" y1="20" x2="9" y2="23"></line><line x1="15" y1="20" x2="15" y2="23"></line><line x1="20" y1="9" x2="23" y2="9"></line><line x1="20" y1="14" x2="23" y2="14"></line><line x1="1" y1="9" x2="4" y2="9"></line><line x1="1" y1="14" x2="4" y2="14"></line></svg>} value={job.department} />}
+                {job.remote && <Chip value="Remote / Hybrid" green />}
+                {job.salary && <Chip value={job.salary} highlight />}
+                <Chip icon={<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>} value={`Closes ${job.closes}`} muted />
+              </div>
+            </div>
+
+            {/* Save — desktop */}
+            <button onClick={handleToggleSave} className="jd-save-desktop" style={{ ...s.saveBtn, ...(isSaved ? s.saveBtnActive : {}) }}>
+              {isSaved
+                ? <><svg width="14" height="14" viewBox="0 0 24 24" fill="#0058aa" stroke="#0058aa" strokeWidth="1.5"><path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"></path></svg>Saved</>
+                : <><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"></path></svg>Save</>
+              }
+            </button>
+
+          </div>
+        </div>
+      </div>
+
+      {/* ── Body ── */}
+      <div className="jd-body" style={s.body}>
+        <div style={s.inner}>
           <div className="jd-layout" style={s.layout}>
 
             {/* ── Main Column ── */}
             <div style={s.mainCol}>
 
               {job.description && (
-                <Section title="About the Role">
+                <DetailBlock title="About the Role">
                   <p style={s.bodyText}>{job.description}</p>
-                </Section>
+                </DetailBlock>
               )}
 
               {job.responsibilities?.length > 0 && (
-                <Section title="Responsibilities">
+                <DetailBlock title="Responsibilities">
                   {job.responsibilities.map((r, i) => <BulletItem key={i} text={r} dot />)}
-                </Section>
+                </DetailBlock>
               )}
 
               {job.requirements?.length > 0 && (
-                <Section title="Requirements">
+                <DetailBlock title="Requirements">
                   {job.requirements.map((r, i) => <BulletItem key={i} text={r} check />)}
-                </Section>
+                </DetailBlock>
               )}
 
               {job.niceToHaves?.length > 0 && (
-                <Section title="Nice to Have">
+                <DetailBlock title="Nice to Have">
                   {job.niceToHaves.map((r, i) => <BulletItem key={i} text={r} dot />)}
-                </Section>
+                </DetailBlock>
               )}
 
               {job.specialNotes && (
-                <Section title="Special Notes">
+                <DetailBlock title="Special Notes">
                   <div style={s.specialNote}>
-                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#ea8600" strokeWidth="2" style={{ flexShrink: 0, marginTop: 2 }}>
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#ea8600" strokeWidth="2" style={{ flexShrink: 0, marginTop: 2 }}>
                       <circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/>
                     </svg>
-                    <p style={s.bodyText}>{job.specialNotes}</p>
+                    <p style={s.specialNoteText}>{job.specialNotes}</p>
                   </div>
-                </Section>
+                </DetailBlock>
               )}
             </div>
 
@@ -183,43 +166,46 @@ export default function JobDetail() {
                   Apply Now
                 </button>
                 <div style={s.applyNote}>
-                  <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><polyline points="20 6 9 17 4 12"/></svg>
-                  Free to apply · No account required
+                  <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+                  Free to apply · Verified Listing
                 </div>
+                <div style={s.applyDivider} />
                 <button onClick={handleToggleSave} style={{ ...s.saveBtnLarge, ...(isSaved ? s.saveBtnLargeActive : {}) }}>
                   {isSaved
-                    ? <><svg width="14" height="14" viewBox="0 0 24 24" fill="#ea8600" stroke="#ea8600" strokeWidth="1.5"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>Saved</>
-                    : <><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>Save Job</>
+                    ? <><svg width="14" height="14" viewBox="0 0 24 24" fill="#0058aa" stroke="#0058aa" strokeWidth="1.5"><path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"></path></svg>Saved to Dashboard</>
+                    : <><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"></path></svg>Save for Later</>
                   }
                 </button>
               </div>
 
-              {/* Job details — transparent, no card */}
-              <div style={s.sideDetails}>
-                <div style={s.sideDetailsTitle}>Position Details</div>
-                <InfoRow label="Location"     value={`${job.city}, ${job.province}`} />
-                <InfoRow label="Job Type"     value={job.type} />
-                {job.department && <InfoRow label="Department"  value={job.department} />}
-                <InfoRow label="Remote"       value={job.remote ? "Yes — Remote / Hybrid" : "On-site"} />
-                {job.salary && <InfoRow label="Salary"      value={job.salary} highlight />}
-                <InfoRow label="Closes"       value={job.closes} />
+              {/* Position Details */}
+              <div style={s.sideBlock}>
+                <div style={s.sideBlockTitle}>Position Meta</div>
+                <InfoRow label="Location"   value={`${job.city}, ${job.province}`} />
+                <InfoRow label="Job Type"   value={job.type} />
+                {job.department && <InfoRow label="Department" value={job.department} />}
+                <InfoRow label="Work Mode"  value={job.remote ? "Remote / Hybrid" : "On-site"} />
+                {job.salary && <InfoRow label="Salary Range" value={job.salary} highlight />}
+                <InfoRow label="Closing Date" value={job.closes} />
               </div>
 
-              {/* Company — transparent, no card */}
-              <div style={s.sideCompany}>
-                <div style={s.sideDetailsTitle}>About the Employer</div>
+              {/* Employer */}
+              <div style={s.sideBlock}>
+                <div style={s.sideBlockTitle}>Enterprise</div>
                 <div style={s.companyRow}>
                   <div style={s.companyLogo}>
                     {job.logoUrl
                       ? <img src={job.logoUrl} alt={job.employerName} style={{ width: "100%", height: "100%", objectFit: "contain" }} />
-                      : <div style={{ ...s.logoPlaceholder, background: job.brandColour || "#1a73e8", width: "100%", height: "100%" }}>{job.employerName?.[0]}</div>
+                      : <div style={{ ...s.logoPlaceholder, background: job.brandColour || "#1a73e8", width: "100%", height: "100%", fontSize: "16px" }}>{job.employerName?.[0]}</div>
                     }
                   </div>
-                  <div style={s.companyName}>{job.employerName}</div>
+                  <div style={{ flex: 1, minWidth: 0 }}>
+                    <div style={s.companyName}>{job.employerName}</div>
+                    <Link to={`/company/${job.employerSlug || job.employerId}`} style={s.viewCompanyBtn}>
+                      View enterprise profile <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" style={{marginLeft: 2}}><line x1="5" y1="12" x2="19" y2="12"></line><polyline points="12 5 19 12 12 19"></polyline></svg>
+                    </Link>
+                  </div>
                 </div>
-                <Link to={`/company/${job.employerSlug || job.employerId}`} style={s.viewCompanyBtn}>
-                  View Company Profile →
-                </Link>
               </div>
 
             </div>
@@ -229,28 +215,40 @@ export default function JobDetail() {
 
       <Footer />
 
+      {/* Mobile Sticky Apply Bar */}
+      <div className="jd-mobile-sticky-bar" style={s.mobileStickyBar}>
+        <button style={s.applyBtnMobile} onClick={() => navigate(`/apply/${job.id}`)}>Apply Now</button>
+        <button onClick={handleToggleSave} style={{ ...s.mobileStickySave, ...(isSaved ? s.mobileStickySaveActive : {}) }}>
+          {isSaved 
+            ? <svg width="20" height="20" viewBox="0 0 24 24" fill="#0058aa" stroke="#0058aa" strokeWidth="1.5"><path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"></path></svg>
+            : <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"></path></svg>
+          }
+        </button>
+      </div>
+
       <style>{`
         * { box-sizing: border-box; }
-        .jd-page * { font-family: ${FONT} !important; }
+        .jd-page * { font-family: ${FONT} !important; -webkit-font-smoothing: antialiased !important; -moz-osx-font-smoothing: grayscale !important; }
         @keyframes shimmer { 0%{background-position:200% 0} 100%{background-position:-200% 0} }
 
+        .jd-mobile-sticky-bar { display: none !important; }
+
         @media (max-width: 900px) {
-          .jd-layout  { grid-template-columns: 1fr !important; }
-          .jd-side    { display: none !important; }
-          .jd-mobile-apply { display: block !important; }
-          .jd-hero    { border-radius: 0 !important; margin: 0 -16px !important; }
+          .jd-layout      { grid-template-columns: 1fr !important; }
+          .jd-side        { display: none !important; }
+          .jd-mobile-sticky-bar { display: flex !important; }
         }
 
         @media (max-width: 768px) {
-          .jd-body    { padding: 72px 16px 40px !important; }
-          .jd-title   { font-size: 22px !important; }
-          .jd-meta-row { flex-wrap: wrap !important; gap: 6px !important; }
-          .jd-hero-inner { flex-direction: column !important; align-items: flex-start !important; gap: 16px !important; }
+          .jd-body        { padding: 0 16px 80px !important; } /* Extra padding for sticky bar */
+          .jd-title       { font-size: 26px !important; letter-spacing: -0.5px !important; }
+          .jd-hero-inner  { flex-direction: column !important; align-items: flex-start !important; gap: 16px !important; }
           .jd-save-desktop { display: none !important; }
+          .jd-tag-row     { gap: 8px !important; }
         }
 
         @media (max-width: 480px) {
-          .jd-title { font-size: 20px !important; }
+          .jd-title { font-size: 24px !important; }
         }
       `}</style>
     </div>
@@ -258,7 +256,7 @@ export default function JobDetail() {
 }
 
 // ── Sub-components ────────────────────────────────────────────────────
-function Section({ title, children }) {
+function DetailBlock({ title, children }) {
   return (
     <div style={s.sectionCard}>
       <div style={s.sectionTitle}>{title}</div>
@@ -271,7 +269,7 @@ function BulletItem({ text, check, dot }) {
   return (
     <div style={s.bulletItem}>
       {check
-        ? <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#1a73e8" strokeWidth="2.5" style={{ flexShrink: 0, marginTop: 3 }}><polyline points="20 6 9 17 4 12"/></svg>
+        ? <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#000000" strokeWidth="2" style={{ flexShrink: 0, marginTop: 4 }}><polyline points="20 6 9 17 4 12"/></svg>
         : <div style={s.bulletDot} />
       }
       <span style={s.bulletText}>{text}</span>
@@ -279,10 +277,15 @@ function BulletItem({ text, check, dot }) {
   );
 }
 
-function MetaPill({ icon, value }) {
+function Chip({ icon, value, highlight, green, muted }) {
   return (
-    <span style={s.metaPill}>
-      <span style={{ display: "flex", alignItems: "center", opacity: 0.6 }}>{icon}</span>
+    <span style={{
+      ...s.chip,
+      ...(highlight ? s.chipHighlight : {}),
+      ...(green     ? s.chipGreen    : {}),
+      ...(muted     ? s.chipMuted    : {}),
+    }}>
+      {icon && <span style={{ display: "flex", alignItems: "center", opacity: 0.7 }}>{icon}</span>}
       {value}
     </span>
   );
@@ -293,7 +296,7 @@ function InfoRow({ label, value, highlight }) {
   return (
     <div style={s.infoRow}>
       <span style={s.infoLabel}>{label}</span>
-      <span style={{ ...s.infoValue, ...(highlight ? { color: "#0d652d", fontWeight: "600" } : {}) }}>{value}</span>
+      <span style={{ ...s.infoValue, ...(highlight ? { color: "#000000", fontWeight: "600" } : {}) }}>{value}</span>
     </div>
   );
 }
@@ -302,89 +305,222 @@ const FONT = '"Circular Std", "Circular", -apple-system, BlinkMacSystemFont, "Se
 
 const s = {
   page: {
-    background: "#ffffff",
+    background: "#f7f8f9",
     minHeight: "100vh",
     fontFamily: FONT,
-    color: "#202124",
+    color: "#111827",
     display: "flex",
     flexDirection: "column",
   },
 
-  // ── Body ──
-  body: { flex: 1, padding: "80px 32px 80px" },
-  inner: { maxWidth: "1160px", margin: "0 auto" },
-  backBtn: { display: "inline-flex", alignItems: "center", background: "none", border: "none", color: "#9aa0a6", fontSize: "13px", fontWeight: "500", cursor: "pointer", padding: "0 0 28px", fontFamily: FONT, letterSpacing: "0.1px" },
-
-  // ── Hero Header ── full-width, no card border
-  hero: { borderBottom: "1px solid #a2a2a2", color: "#323444", padding: "0 20px 20px 20px", marginBottom: "0" },
-  heroInner: { display: "flex", alignItems: "flex-start", gap: "20px" },
-  heroLogo: { width: "72px", height: "72px", borderRadius: "50px", overflow: "hidden", border: "1px solid #f1f3f4", flexShrink: 0, background: "#f8f9fa" },
+  // ── Sleek Dark Hero Banner ──
+  heroBanner: {
+    background: "#050a14",
+    borderBottom: "1px solid #1f2937",
+    paddingTop: "60px",
+    paddingBottom: "0",
+  },
+  heroBannerInner: {
+    maxWidth: "1160px",
+    margin: "0 auto",
+    padding: "24px 32px 0",
+  },
+  backRow: {
+    marginBottom: "24px",
+  },
+  backBtn: {
+    display: "inline-flex", alignItems: "center",
+    background: "transparent", border: "none",
+    color: "#9ca3af", fontSize: "14px", fontWeight: "500",
+    cursor: "pointer", padding: "0",
+    fontFamily: FONT, transition: "color 0.2s ease",
+  },
+  heroRow: {
+    display: "flex", alignItems: "flex-start", gap: "20px",
+    paddingBottom: "32px",
+  },
+  heroLogo: {
+    width: "64px", height: "64px", borderRadius: "12px",
+    overflow: "hidden", flexShrink: 0,
+    background: "#ffffff", border: "1px solid rgba(255,255,255,0.1)",
+  },
   logoImg: { width: "100%", height: "100%", objectFit: "contain" },
-  logoPlaceholder: { width: "72px", height: "72px", display: "flex", alignItems: "center", justifyContent: "center", color: "#fff", fontWeight: "700", fontSize: "26px", borderRadius: "12px" },
+  logoPlaceholder: {
+    width: "100%", height: "100%", display: "flex", alignItems: "center",
+    justifyContent: "center", color: "#fff", fontWeight: "700",
+    fontSize: "24px",
+  },
   heroText: { flex: 1, minWidth: 0 },
-  heroCompany: { color: "#1a73e8", fontSize: "17px", fontWeight: "500", marginBottom: "6px", letterSpacing: "0.1px" },
-  jobTitle: { color: "#202124", fontSize: "28px", fontWeight: "500", margin: "0 0 12px", letterSpacing: "-0.5px", lineHeight: "1.25" },
+  heroCompany: {
+    color: "#9ca3af", fontSize: "15px",
+    fontWeight: "500", marginBottom: "6px",
+  },
+  jobTitle: {
+    color: "#ffffff", fontSize: "34px", fontWeight: "500",
+    margin: "0 0 16px", letterSpacing: "-0.02em", lineHeight: "1.15",
+  },
 
-  // Meta row — inline, dot-separated
-  metaRow: { display: "flex", alignItems: "center", gap: "8px", flexWrap: "wrap", marginBottom: "12px" },
-  metaPill: { display: "inline-flex", alignItems: "center", gap: "5px", color: "#5f6368", fontSize: "13px", fontWeight: "400" },
-  metaDot: { color: "#dadce0", fontSize: "14px", lineHeight: 1 },
-  remoteTag: { display: "inline-flex", alignItems: "center", background: "#e6f4ea", color: "#0d652d", borderRadius: "100px", padding: "3px 10px", fontSize: "12px", fontWeight: "600" },
-
-  // Sub-meta: salary + closing
-  heroSubMeta: { display: "flex", alignItems: "center", gap: "16px", flexWrap: "wrap" },
-  salaryBadge: { display: "inline-flex", alignItems: "center", background: "#f0f6ff", color: "#1557b0", borderRadius: "50px", padding: "4px 10px", fontSize: "13px", fontWeight: "600" },
-  closingText: { display: "inline-flex", alignItems: "center", color: "#9aa0a6", fontSize: "13px" },
+  // Premium Pill Tags
+  tagRow: { display: "flex", flexWrap: "wrap", gap: "10px" },
+  chip: {
+    display: "inline-flex", alignItems: "center", gap: "6px",
+    background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.1)",
+    color: "#d1d5db", borderRadius: "50px",
+    padding: "6px 14px", fontSize: "13px", fontWeight: "500",
+    fontFamily: FONT,
+  },
+  chipHighlight: {
+    background: "rgba(255,255,255,0.1)", border: "1px solid rgba(255,255,255,0.3)",
+    color: "#ffffff",
+  },
+  chipGreen: {
+    background: "rgba(52,168,83,0.1)", border: "1px solid rgba(52,168,83,0.2)",
+    color: "#86efac",
+  },
+  chipMuted: {
+    background: "transparent", border: "1px solid rgba(255,255,255,0.05)",
+    color: "#6b7280",
+  },
 
   // Save button
-  saveBtn: { display: "inline-flex", alignItems: "center", gap: "6px", background: "#ffffff", border: "1px solid #e3e3e3", color: "#5f6368", borderRadius: "100px", padding: "8px 16px", fontSize: "13px", fontWeight: "500", cursor: "pointer", whiteSpace: "nowrap", flexShrink: 0, fontFamily: FONT, transition: "all 0.15s" },
-  saveBtnActive: { border: "1px solid #fde68a", color: "#ea8600", background: "#fef7e0" },
+  saveBtn: {
+    display: "inline-flex", alignItems: "center", gap: "8px",
+    background: "transparent", border: "1px solid #374151",
+    color: "#d1d5db", borderRadius: "8px",
+    padding: "10px 16px", fontSize: "14px", fontWeight: "500",
+    cursor: "pointer", whiteSpace: "nowrap", flexShrink: 0,
+    fontFamily: FONT, transition: "all 0.2s",
+  },
+  saveBtnActive: {
+    background: "rgba(0,88,170,0.1)", border: "1px solid rgba(0,88,170,0.3)",
+    color: "#60a5fa",
+  },
 
-  // Mobile apply
-  mobileApplyWrap: { display: "none", paddingTop: "20px" },
-  applyBtnMobile: { width: "100%", background: "#1a73e8", color: "#ffffff", border: "none", borderRadius: "8px", padding: "13px", fontSize: "15px", fontWeight: "600", cursor: "pointer", fontFamily: FONT },
+  // ── Body ──
+  body: { flex: 1, padding: "0 32px 80px" },
+  inner: { maxWidth: "1160px", margin: "0 auto" },
 
   // ── Layout ──
-  layout: { display: "grid", gridTemplateColumns: "1fr 280px", gap: "64px", alignItems: "start", paddingTop: "40px" },
-  mainCol: { display: "flex", flexDirection: "column", gap: "0" },
-  sideCol: { position: "sticky", top: "80px", display: "flex", flexDirection: "column", gap: "28px" },
+  layout: { display: "grid", gridTemplateColumns: "1fr 320px", gap: "40px", alignItems: "start", paddingTop: "40px" },
+  mainCol: { display: "flex", flexDirection: "column", gap: "24px" },
+  sideCol: { position: "sticky", top: "80px", display: "flex", flexDirection: "column", gap: "24px" },
 
-  // ── Section — transparent, separated by line only ──
-  sectionCard: { background: "transparent", borderBottom: "1px solid #f1f3f4", padding: "32px 0" },
-  sectionTitle: { color: "#202124", fontSize: "23px", fontWeight: "500", marginBottom: "20px", color: "#000000" },
-  sectionBody: { display: "flex", flexDirection: "column", gap: "10px" },
-  bodyText: { color: "#3c4043", fontSize: "17px", lineHeight: "1.85", margin: 0, whiteSpace: "pre-wrap" },
-  bulletItem: { display: "flex", alignItems: "flex-start", gap: "12px" },
-  bulletDot: { width: "5px", height: "5px", borderRadius: "50%", background: "#dadce0", flexShrink: 0, marginTop: "9px" },
-  bulletText: { color: "#3c4043", fontSize: "17px", lineHeight: "1.7" },
-  specialNote: { display: "flex", gap: "12px", background: "#fffbf0", border: "1px solid #fde68a", borderRadius: "8px", padding: "14px 16px" },
+  // ── Blocks — Flat, bordered, clean ──
+  sectionCard: {
+   padding: "32px",
+  },
+  sectionTitle: {
+    color: "#111827", fontSize: "18px", fontWeight: "600",
+    marginBottom: "20px", letterSpacing: "-0.01em",
+  },
+  sectionBody: { display: "flex", flexDirection: "column", gap: "12px" },
+  bodyText: { color: "#374151", fontSize: "18px", lineHeight: "1.7", margin: 0, whiteSpace: "pre-wrap" },
+  bulletItem: { display: "flex", alignItems: "flex-start", gap: "14px" },
+  bulletDot: {
+    width: "6px", height: "6px", borderRadius: "50%",
+    background: "#9ca3af", flexShrink: 0, marginTop: "10px",
+  },
+  bulletText: { color: "#374151", fontSize: "18px", lineHeight: "1.6" },
+  specialNote: {
+    display: "flex", gap: "14px",
+    background: "#fffbeb", border: "1px solid #fef3c7",
+    borderRadius: "8px", padding: "16px 20px",
+  },
+  specialNoteText: { color: "#92400e", fontSize: "18px", lineHeight: "1.6", margin: 0 },
 
-  // ── Apply card — minimal white ──
-  applyCard: { background: "#ffffff", border: "1px solid #e8eaed", borderRadius: "12px", padding: "20px" },
-  applyBtn: { width: "100%", background: "#1a73e8", color: "#ffffff", border: "none", borderRadius: "8px", padding: "12px", fontSize: "14px", fontWeight: "600", cursor: "pointer", marginBottom: "10px", fontFamily: FONT, letterSpacing: "0.1px" },
-  applyNote: { display: "flex", alignItems: "center", justifyContent: "center", gap: "5px", color: "#9aa0a6", fontSize: "12px", marginBottom: "14px" },
-  saveBtnLarge: { display: "flex", alignItems: "center", justifyContent: "center", gap: "6px", width: "100%", background: "#f8f9fa", border: "1px solid #e8eaed", color: "#5f6368", borderRadius: "8px", padding: "10px", fontSize: "13px", fontWeight: "500", cursor: "pointer", fontFamily: FONT, transition: "all 0.15s" },
-  saveBtnLargeActive: { background: "#fef7e0", border: "1px solid #fde68a", color: "#ea8600" },
+  // ── Sidebar Cards ──
+  applyCard: {
+    background: "#ffffff", border: "1px solid #e5e7eb", borderRadius: "12px",
+    padding: "24px",
+  },
+  applyBtn: {
+    width: "100%", background: "#000000", color: "#ffffff",
+    border: "none", borderRadius: "8px", padding: "14px",
+    fontSize: "15px", fontWeight: "500", cursor: "pointer",
+    marginBottom: "12px", fontFamily: FONT, transition: "background 0.2s",
+  },
+  applyNote: {
+    display: "flex", alignItems: "center", justifyContent: "center",
+    gap: "6px", color: "#6b7280", fontSize: "13px", marginBottom: "16px",
+  },
+  applyDivider: { height: "1px", background: "#f3f4f6", margin: "0 0 16px" },
+  saveBtnLarge: {
+    display: "flex", alignItems: "center", justifyContent: "center",
+    gap: "8px", width: "100%", background: "#f9fafb",
+    border: "1px solid #e5e7eb", color: "#374151",
+    borderRadius: "8px", padding: "12px", fontSize: "14px",
+    fontWeight: "500", cursor: "pointer", fontFamily: FONT,
+  },
+  saveBtnLargeActive: { background: "#eff6ff", border: "1px solid #bfdbfe", color: "#1d4ed8" },
 
-  // ── Sidebar details — transparent, no card ──
-  sideDetails: { paddingTop: "4px" },
-  sideDetailsTitle: { color: "#9aa0a6", fontSize: "11px", fontWeight: "700", textTransform: "uppercase", letterSpacing: "0.8px", marginBottom: "14px" },
-  infoRow: { display: "flex", justifyContent: "space-between", alignItems: "center", gap: "12px", padding: "10px 0", borderBottom: "1px solid #f1f3f4", fontSize: "13px" },
-  infoLabel: { color: "#9aa0a6", fontWeight: "400" },
-  infoValue: { color: "#202124", fontWeight: "500", textAlign: "right", maxWidth: "55%" },
+  // ── Sidebar Info Blocks ──
+  sideBlock: {
+    background: "#ffffff", borderRadius: "12px", border: "1px solid #e5e7eb", padding: "24px",
+  },
+  sideBlockTitle: {
+    color: "#6b7280", fontSize: "12px", fontWeight: "600",
+    textTransform: "uppercase", letterSpacing: "0.05em",
+    marginBottom: "16px",
+  },
+  infoRow: {
+    display: "flex", justifyContent: "space-between",
+    alignItems: "flex-start", gap: "12px",
+    padding: "10px 0", borderBottom: "1px solid #f3f4f6", fontSize: "14px",
+  },
+  infoLabel: { color: "#6b7280", fontWeight: "400", flexShrink: 0 },
+  infoValue: { color: "#111827", fontWeight: "500", textAlign: "right" },
 
-  // ── Sidebar company — transparent ──
-  sideCompany: { paddingTop: "4px" },
-  companyRow: { display: "flex", alignItems: "center", gap: "10px", marginBottom: "12px" },
-  companyLogo: { width: "36px", height: "36px", borderRadius: "6px", overflow: "hidden", flexShrink: 0, border: "1px solid #f1f3f4" },
-  companyName: { color: "#202124", fontSize: "13px", fontWeight: "600" },
-  viewCompanyBtn: { display: "inline-flex", alignItems: "center", color: "#1a73e8", fontSize: "13px", fontWeight: "500", textDecoration: "none" },
+  companyRow: { display: "flex", alignItems: "center", gap: "14px" },
+  companyLogo: {
+    width: "48px", height: "48px", borderRadius: "10px",
+    overflow: "hidden", flexShrink: 0, border: "1px solid #e5e7eb",
+    background: "#ffffff", padding: "4px",
+  },
+  companyName: { color: "#111827", fontSize: "15px", fontWeight: "600", marginBottom: "4px", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" },
+  viewCompanyBtn: { display: "inline-flex", alignItems: "center", color: "#4b5563", fontSize: "13px", fontWeight: "500", textDecoration: "none" },
+
+  // ── Mobile Sticky Bottom Bar ──
+  mobileStickyBar: {
+    position: "fixed", bottom: 0, left: 0, right: 0,
+    background: "#ffffff", borderTop: "1px solid #e5e7eb",
+    padding: "16px", display: "flex", gap: "12px", zIndex: 100,
+    boxShadow: "0 -4px 12px rgba(0,0,0,0.05)",
+  },
+  applyBtnMobile: {
+    flex: 1, background: "#000000", color: "#ffffff",
+    border: "none", borderRadius: "8px", padding: "14px",
+    fontSize: "15px", fontWeight: "500", cursor: "pointer", fontFamily: FONT,
+  },
+  mobileStickySave: {
+    display: "flex", alignItems: "center", justifyContent: "center",
+    width: "52px", flexShrink: 0, background: "#f9fafb",
+    border: "1px solid #e5e7eb", color: "#374151",
+    borderRadius: "8px", cursor: "pointer",
+  },
+  mobileStickySaveActive: {
+    background: "#eff6ff", border: "1px solid #bfdbfe", color: "#1d4ed8"
+  },
 
   // ── Loading / empty ──
-  loadingWrap: { maxWidth: "1160px", margin: "92px auto 28px", padding: "0 32px", display: "flex", flexDirection: "column", gap: "14px" },
-  skeleton: { background: "linear-gradient(90deg,#f1f3f4 25%,#e8eaed 50%,#f1f3f4 75%)", backgroundSize: "200%", animation: "shimmer 1.5s infinite", borderRadius: "8px", height: "120px" },
-  emptyWrap: { flex: 1, display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", padding: "80px 24px", textAlign: "center" },
-  emptyTitle: { color: "#202124", fontSize: "20px", fontWeight: "600", marginBottom: "8px", letterSpacing: "-0.3px", fontFamily: FONT },
-  emptySub: { color: "#9aa0a6", fontSize: "14px", marginBottom: "24px", fontFamily: FONT },
-  emptyBtn: { background: "#1a73e8", color: "#ffffff", border: "none", borderRadius: "8px", padding: "10px 24px", fontSize: "13px", fontWeight: "600", cursor: "pointer", fontFamily: FONT },
+  loadingWrap: {
+    maxWidth: "1160px", margin: "92px auto 28px",
+    padding: "0 32px", display: "flex", flexDirection: "column", gap: "16px",
+  },
+  skeleton: {
+    background: "linear-gradient(90deg,#f3f4f6 25%,#e5e7eb 50%,#f3f4f6 75%)",
+    backgroundSize: "200%", animation: "shimmer 1.5s infinite",
+    borderRadius: "12px", height: "120px", border: "1px solid #e5e7eb",
+  },
+  emptyWrap: {
+    flex: 1, display: "flex", flexDirection: "column",
+    alignItems: "center", justifyContent: "center",
+    padding: "80px 24px", textAlign: "center",
+  },
+  emptyTitle: { color: "#111827", fontSize: "22px", fontWeight: "600", marginBottom: "8px", fontFamily: FONT },
+  emptySub: { color: "#6b7280", fontSize: "15px", marginBottom: "24px", fontFamily: FONT },
+  emptyBtn: {
+    background: "#000000", color: "#ffffff", border: "none",
+    borderRadius: "8px", padding: "12px 28px",
+    fontSize: "14px", fontWeight: "500", cursor: "pointer", fontFamily: FONT,
+  },
 };

@@ -120,10 +120,10 @@ const s = {
 
   // Desktop nav
   navLinks:     { display: "flex", alignItems: "center", gap: "12px" },
-  navLink:      { color: "#f4f4f4", fontSize: "14px", fontWeight: "500", textDecoration: "none", padding: "8px 12px", borderRadius: "50px", fontFamily: FONT },
+  navLink:      { color: "#f4f4f4", fontSize: "14px", fontWeight: "400", textDecoration: "none", padding: "8px 12px", borderRadius: "50px", fontFamily: FONT },
   navLinkActive:{ color: "#1a73e8" },
-  navSignIn:    { color: "#92d1ff", background: "#1199fa33", padding: "7px 16px", borderRadius: "50px", fontSize: "14px", fontWeight: "500", textDecoration: "none", fontFamily: FONT, border: "none" },
-  navBtn:       { background: "#1199fa", color: "#f7f9fa", border: "none", padding: "8px 18px", borderRadius: "50px", fontSize: "14px", fontWeight: "500", textDecoration: "none", fontFamily: FONT },
+  navSignIn:    { color: "#92d1ff", background: "#1199fa33", padding: "7px 16px", borderRadius: "50px", fontSize: "14px", fontWeight: "400", textDecoration: "none", fontFamily: FONT, border: "none" },
+  navBtn:       { background: "#1199fa", color: "#f7f9fa", border: "none", padding: "8px 18px", borderRadius: "50px", fontSize: "14px", fontWeight: "400", textDecoration: "none", fontFamily: FONT },
 
   // Avatar
   navAvatar:        { width: "36px", height: "36px", borderRadius: "50%", overflow: "hidden", cursor: "pointer", border: "1px solid #dadce0", flexShrink: 0 },

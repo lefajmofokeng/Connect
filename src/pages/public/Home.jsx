@@ -123,7 +123,6 @@ export default function Home() {
         <div style={s.heroInner}>
           <h1 className="hero-title" style={s.heroTitle}>Join your<br />dream team.</h1>
           <p className="hero-subtitle" style={s.heroSubtitle}>Connect with verified enterprises across South Africa in a streamlined, premium ecosystem built for your career advancement.</p>
-          <p style={s.heroJobCount}><strong style={{ color: "#fff" }}>{allJobs.length > 0 ? allJobs.length : "—"}</strong> verified positions available right now</p>
         </div>
       </div>
 
@@ -720,16 +719,16 @@ const ft = {
   tabValue: { fontSize: "15px", fontWeight: "400", color: "#5f6368", lineHeight: 1.4, whiteSpace: "nowrap", WebkitFontSmoothing: "antialiased" },
   tabValueActive: { color: "#202124" },
   dropdown: {
-    position: "absolute", top: "calc(100% + 8px)", left: 0, zIndex: 100,
+    position: "absolute", top: "calc(100% + 8px)", left: 0, zIndex: 80,
     background: "#f4f4f4", border: "2px solid #939393", borderRadius: "4px", outline: "none",
-    boxShadow: "0 4px 16px rgba(60,64,67,0.18)", minWidth: "200px",
+    boxShadow: "0 4px 16px rgba(60,64,67,0.18)", minWidth: "280px",
     maxHeight: "280px", overflowY: "auto", padding: "4px",
     display: "flex", flexDirection: "column",
   },
   option: {
     display: "flex", alignItems: "center", gap: "8px", outline: "none",
     background: "none", border: "none", width: "100%", textAlign: "left",
-    padding: "9px 14px", fontSize: "16px", fontWeight: "400", color: "#000000",
+    padding: "9px 14px", fontSize: "19px", fontWeight: "400", color: "#000000",
     cursor: "pointer", borderRadius: "4px",
     fontFamily: '"Circular Std", "Circular", -apple-system, sans-serif',
     WebkitFontSmoothing: "antialiased",
@@ -748,12 +747,12 @@ const s = {
 
   heroSection: { 
     background: "linear-gradient(rgba(244, 244, 244, 0.14), rgba(244, 244, 244, 0)), url('https://images.unsplash.com/photo-1579548122080-c35fd6820ecb?q=80&w=1170&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D') center/cover no-repeat", 
-    padding: "80px 0 40px", 
+    padding: "100px 0 40px", 
     textAlign: "left" 
   },
 
   heroInner: { maxWidth: "1200px", margin: "0 auto", padding: "0 20px", width: "100%", boxSizing: "border-box" },
-  heroTitle: { color: "#ffffff", fontSize: "clamp(32px, 6vw, 72px)", fontWeight: "400", margin: "0 0 16px", lineHeight: "1.1", letterSpacing: "-0.02em" },
+  heroTitle: { color: "#ffffff", fontSize: "clamp(32px, 6vw, 72px)", fontWeight: "400", margin: "0 0 16px", lineHeight: "1", letterSpacing: "-0.02em" },
   heroSubtitle: { color: "#a9b1ba", fontSize: "clamp(14px, 2vw, 17px)", lineHeight: "1.6", margin: "0 0 14px", maxWidth: "720px" },
   heroJobCount: { fontSize: "14px", color: "#9aa0a6", margin: 0 },
 
@@ -810,7 +809,7 @@ const s = {
   mobileDrawerBody: { flex: 1, overflowY: "auto", paddingBottom: "24px" },
   mobileDrawerGroup: { padding: "24px 24px 0" },
   mobileDrawerLabel: { color: "#004598", fontSize: "14px", fontWeight: "600", margin: "0 0 10px" },
-  mobileDrawerSelect: { width: "100%", background: "#f8f9fa", border: "2px solid #e0e0e0", borderRadius: "8px", padding: "14px 40px 14px 16px", fontSize: "16px", color: "#202124", outline: "none", cursor: "pointer", fontFamily: "inherit", appearance: "none" },
+  mobileDrawerSelect: { width: "100%", background: "#f8f9fa", border: "2px solid #e0e0e0", borderRadius: "4px", padding: "14px 40px 14px 16px", fontSize: "16px", color: "#202124", outline: "none", cursor: "pointer", fontFamily: "inherit", appearance: "none" },
   selectArrow: { position: "absolute", right: "16px", top: "50%", transform: "translateY(-50%)", pointerEvents: "none", display: "flex" },
   mobileDrawerFooter: { padding: "24px", display: "flex", flexDirection: "column", gap: "12px", borderTop: "1px solid #f1f3f4", background: "#fff" },
   mobileDrawerApply: { background: "#1a73e8", color: "#fff", border: "none", borderRadius: "50px", padding: "16px", fontSize: "16px", fontWeight: "600", cursor: "pointer", fontFamily: "inherit" },
