@@ -77,14 +77,14 @@ export default function Terms() {
 
         .toc-btn { 
           transition: background 0.2s ease, color 0.2s ease;
-          border-radius: 0 16px 16px 0;
+          border-radius: 50px;
           margin-bottom: 2px;
         }
         .toc-btn:hover { background: #f1f3f4; color: #202124 !important; }
         .toc-btn.active { 
-          background: #e8f0fe !important; 
-          color: #1a73e8 !important; 
-          font-weight: 600 !important; 
+          background: #d7e5ff !important; 
+          color: #151515 !important; 
+          font-weight: 500 !important; 
         }
         
         /* Mobile Horizontal Nav */
@@ -100,10 +100,6 @@ export default function Terms() {
           border-color: #d2e3fc !important;
           font-weight: 600 !important;
         }
-
-        /* Material Design Card Hover Effect */
-        .section-card { transition: box-shadow 0.2s ease, border-color 0.2s ease; }
-        .section-card:hover { box-shadow: 0 1px 3px 0 rgba(60,64,67,0.1), 0 4px 8px 3px rgba(60,64,67,0.05); }
 
         /* Responsive Breakpoints */
         @media (max-width: 900px) {
@@ -138,17 +134,17 @@ export default function Terms() {
         </div>
 
         {/* Page Header */}
-        <div className="legal-header" style={{ background: "#ffffff", borderBottom: "1px solid #dadce0", padding: "104px 40px 48px" }}>
+        <div className="legal-header" style={{ background: "#005cb7", borderBottom: "1px solid #dadce0", padding: "104px 40px 48px" }}>
           <div style={{ maxWidth: "1000px", margin: "0 auto" }}>
             <div style={{ display: "flex", alignItems: "center", gap: "12px", marginBottom: "20px", flexWrap: "wrap" }}>
-              <span style={{ color: "#1a73e8", fontSize: "13px", fontWeight: "600", textTransform: "uppercase", letterSpacing: "0.8px" }}>Legal Policies</span>
+              <span style={{ color: "#ffffff", fontSize: "13px", fontWeight: "600", textTransform: "uppercase", letterSpacing: "0.8px" }}>Legal Policies</span>
               <span style={{ color: "#dadce0" }}>|</span>
-              <span style={{ color: "#5f6368", fontSize: "14px" }}>Last updated: March 2025</span>
+              <span style={{ color: "#bdc1c6", fontSize: "14px" }}>Last updated: March 2025</span>
             </div>
-            <h1 className="legal-page-title" style={{ color: "#202124", fontSize: "44px", fontWeight: "500", letterSpacing: "-1px", lineHeight: 1.2, marginBottom: "16px" }}>
+            <h1 className="legal-page-title" style={{ color: "#ffffff", fontSize: "44px", fontWeight: "500", letterSpacing: "-1px", lineHeight: 1.2, marginBottom: "16px" }}>
               Terms of Service
             </h1>
-            <p style={{ color: "#3c4043", fontSize: "18px", lineHeight: "1.6", maxWidth: "720px", fontWeight: "400" }}>
+            <p style={{ color: "#ffffff", fontSize: "18px", lineHeight: "1.6", maxWidth: "720px", fontWeight: "400" }}>
               Please read these terms carefully before using Vetted. By accessing or using the platform, you agree to be bound by the following terms and conditions.
             </p>
           </div>
@@ -213,7 +209,7 @@ export default function Terms() {
 function Section({ id, number, title, children }) {
   return (
     <div id={id} style={{ marginBottom: "24px", scrollMarginTop: "140px" }}>
-      <div className="section-card" style={{ background: "#ffffff", border: "1px solid #dadce0", borderRadius: "8px", padding: "32px", overflow: "hidden" }}>
+      <div className="section-card" style={{ overflow: "hidden" }}>
         <div style={{ display: "flex", alignItems: "center", gap: "16px", marginBottom: "16px" }}>
           <div style={{ background: "#f1f3f4", color: "#1a73e8", borderRadius: "50%", width: "32px", height: "32px", display: "flex", alignItems: "center", justifyContent: "center", fontSize: "14px", fontWeight: "600", flexShrink: 0 }}>
             {number}

@@ -131,10 +131,10 @@ const s = {
   navAvatarInitials:{ width: "100%", height: "100%", background: "#1a73e8", color: "#fff", display: "flex", alignItems: "center", justifyContent: "center", fontSize: "14px", fontWeight: "600" },
 
   // Hamburger
-  menuToggle: { display: "none", background: "none", border: "none", cursor: "pointer", padding: "4px", alignItems: "center" },
+  menuToggle: { display: "none", background: "none", border: "none", cursor: "pointer", padding: "4px", alignItems: "center", border: "2px solid #38393a", borderRadius: "50px" },
 
   // Mobile menu
-  mobileMenu:   { background: "#fff", borderTop: "1px solid #dadce0", padding: "16px", display: "flex", flexDirection: "column", gap: "8px" },
-  mobileLink:   { color: "#202124", fontSize: "15px", padding: "12px 16px", textDecoration: "none", display: "block", fontFamily: FONT },
-  mobileLinkBtn:{ color: "#1a73e8", background: "#fff", border: "1px solid #dadce0", fontSize: "15px", padding: "12px 16px", borderRadius: "50px", textDecoration: "none", display: "block", textAlign: "center", marginTop: "12px", fontWeight: "500", fontFamily: FONT },
+  mobileMenu:   { background: "#080d1b", padding: "16px", display: "flex", flexDirection: "column", gap: "8px" },
+  mobileLink:   { color: "#ffffff", fontSize: "15px", padding: "12px 16px", textDecoration: "none", display: "block", fontFamily: FONT },
+  mobileLinkBtn:{ color: "#fff", background: "#1199fa", fontSize: "15px", padding: "12px 16px", borderRadius: "50px", textDecoration: "none", display: "block", textAlign: "center", marginTop: "12px", fontWeight: "400", fontFamily: FONT },
 };

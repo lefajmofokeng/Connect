@@ -429,7 +429,7 @@ const s = {
   specialNoteText: { color: "#92400e", fontSize: "18px", lineHeight: "1.6", margin: 0 },
 
   // ── Sidebar Cards ──
-  applyCard: {
+  applyCard: { 
     background: "#ffffff", border: "1px solid #e5e7eb", borderRadius: "12px",
     padding: "24px",
   },

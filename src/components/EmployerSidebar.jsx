@@ -169,7 +169,7 @@ export default function EmployerSidebar() {
 }
 
 const s = {
-  sidebar:          { width: "256px", flexShrink: 0, height: "100%", background: "#ffffff", borderRight: "1px solid #e3e3e3", display: "flex", flexDirection: "column", zIndex: 10, fontFamily: FONT },
+  sidebar:          { width: "256px", flexShrink: 0, height: "100%", background: "#ffffff", display: "flex", flexDirection: "column", zIndex: 10, fontFamily: FONT },
   sidebarHeader:    { padding: "16px 20px", borderBottom: "1px solid #e3e3e3" },
   projectSelector:  { display: "flex", alignItems: "center", gap: "12px", cursor: "pointer", padding: "8px", borderRadius: "8px" },
   logoMark:         { width: "32px", height: "32px", borderRadius: "6px", background: "#ffca28", color: "#d84315", fontWeight: "700", fontSize: "18px", display: "flex", alignItems: "center", justifyContent: "center", fontFamily: FONT },
@@ -178,11 +178,11 @@ const s = {
   logoSub:          { color: "#5f6368", fontSize: "12px", fontWeight: "500", fontFamily: FONT },
   dropdownArrow:    { color: "#5f6368" },
   nav:              { display: "flex", flexDirection: "column", gap: "2px", flex: 1, padding: "16px 12px", overflowY: "auto" },
-  navSectionTitle:  { color: "#5f6368", fontSize: "11px", fontWeight: "700", textTransform: "uppercase", letterSpacing: "0.5px", padding: "0 12px", marginBottom: "8px", marginTop: "8px", fontFamily: FONT },
-  navBtn:           { background: "none", border: "none", color: "#3c4043", fontSize: "13px", fontWeight: "500", padding: "10px 12px", borderRadius: "6px", cursor: "pointer", textAlign: "left", display: "flex", alignItems: "center", gap: "12px", transition: "all 0.15s", fontFamily: FONT, width: "100%" },
-  navBtnActive:     { background: "#e3f2fd", color: "#1967d2", fontWeight: "600" },
-  navIcon:          { color: "#5f6368", display: "flex", alignItems: "center", justifyContent: "center", width: "20px", flexShrink: 0 },
-  navIconActive:    { color: "#1967d2" },
+  navSectionTitle:  { color: "#676767", fontSize: "14px", fontWeight: "400", padding: "0 12px", marginBottom: "8px", marginTop: "8px", fontFamily: FONT },
+  navBtn:           { background: "none", border: "none", color: "#707070", fontSize: "14px", fontWeight: "500", padding: "10px 12px", borderRadius: "50px", cursor: "pointer", textAlign: "left", display: "flex", alignItems: "center", gap: "12px", transition: "all 0.15s", fontFamily: FONT, width: "100%" },
+  navBtnActive:     { background: "#f2f2f2", color: "#000000", fontWeight: "500" },
+  navIcon:          { color: "#707070", display: "flex", alignItems: "center", justifyContent: "center", width: "20px", flexShrink: 0 },
+  navIconActive:    { color: "#000000" },
   navLabel:         { flex: 1, fontFamily: FONT },
   navBadge:         { background: "#1a73e8", color: "#ffffff", borderRadius: "10px", padding: "1px 7px", fontSize: "11px", fontWeight: "600", flexShrink: 0, fontFamily: FONT },
   navSeparator:     { borderTop: "1px solid #e3e3e3", marginTop: "8px", paddingTop: "8px" },

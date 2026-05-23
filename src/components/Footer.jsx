@@ -9,23 +9,23 @@ const DISCLAIMER_TABS = [
     id: "job-seekers",
     label: "Job Seekers",
     content: [
-      "Vetted is an advertising platform, not a recruitment agency. We publish job opportunities on behalf of verified South African employers. We are not involved in any part of the hiring process — including shortlisting, interviewing, or making employment decisions. Any such decisions rest entirely with the employer who posted the listing.",
-      "Vetted will never ask job seekers for any form of payment, fee, or deposit at any stage of the application process. Browsing jobs and applying is completely free. If any employer or individual using this platform requests payment from you — whether for training, uniforms, background checks, or any other reason — do not pay and report it to us immediately at support@vetted.co.za."
+      "1. Vetted is an advertising platform, not a recruitment agency. We publish job opportunities on behalf of verified South African employers. We are not involved in any part of the hiring process — including shortlisting, interviewing, or making employment decisions. Any such decisions rest entirely with the employer who posted the listing.",
+      "2. Vetted will never ask job seekers for any form of payment, fee, or deposit at any stage of the application process. Browsing jobs and applying is completely free. If any employer or individual using this platform requests payment from you — whether for training, uniforms, background checks, or any other reason — do not pay and report it to us immediately at support@vetted.co.za."
     ]
   },
   {
     id: "employers",
     label: "Employers",
     content: [
-      "Vetted verifies employer registrations through CIPC documentation and supporting identity records before granting platform access. While we take reasonable steps to confirm that employers are legitimate registered entities, we cannot guarantee the accuracy of job descriptions, advertised salaries, or employment outcomes. We encourage all applicants to conduct their own due diligence."
+      "1. Vetted verifies employer registrations through CIPC documentation and supporting identity records before granting platform access. While we take reasonable steps to confirm that employers are legitimate registered entities, we cannot guarantee the accuracy of job descriptions, advertised salaries, or employment outcomes. We encourage all applicants to conduct their own due diligence."
     ]
   },
   {
     id: "platform-ai",
     label: "Platform & AI",
     content: [
-      "All job applications submitted through this platform are sent directly to the relevant employer. Vetted does not receive, review, store, forward, or influence any application at any stage. Once you submit your application, your information is shared solely with the employer associated with that specific listing.",
-      "Vetted does not use artificial intelligence, automated scoring systems, or algorithmic ranking to evaluate, filter, or prioritise any candidate's application at any point. Every application you submit reaches the employer exactly as you submitted it — no modifications, no scoring, no filtering by our platform."
+      "1. All job applications submitted through this platform are sent directly to the relevant employer. Vetted does not receive, review, store, forward, or influence any application at any stage. Once you submit your application, your information is shared solely with the employer associated with that specific listing.",
+      "2. Vetted does not use artificial intelligence, automated scoring systems, or algorithmic ranking to evaluate, filter, or prioritise any candidate's application at any point. Every application you submit reaches the employer exactly as you submitted it — no modifications, no scoring, no filtering by our platform."
     ]
   }
 ];

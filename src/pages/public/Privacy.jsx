@@ -70,7 +70,7 @@ export default function Privacy() {
         /* Sidebar Navigation Styling */
         .toc-btn { 
           transition: background 0.2s ease, color 0.2s ease;
-          border-radius: 0 16px 16px 0;
+          border-radius: 50px;
           margin-bottom: 2px;
         }
         .toc-btn:hover { background: #f1f3f4; color: #202124 !important; }
@@ -93,10 +93,6 @@ export default function Privacy() {
           border-color: #d2e3fc !important;
           font-weight: 600 !important;
         }
-
-        /* Material Card Hover Styling */
-        .section-card { transition: box-shadow 0.2s ease, border-color 0.2s ease; }
-        .section-card:hover { box-shadow: 0 1px 3px 0 rgba(60,64,67,0.1), 0 4px 8px 3px rgba(60,64,67,0.05); }
 
         /* Responsive Breakpoints */
         @media (max-width: 900px) {
@@ -131,7 +127,7 @@ export default function Privacy() {
         </div>
 
         {/* Page Header */}
-        <div className="legal-header" style={{ background: "#ffffff", borderBottom: "1px solid #dadce0", padding: "104px 40px 48px" }}>
+        <div className="legal-header" style={{ background: "#ffffff", padding: "104px 40px 48px" }}>
           <div style={{ maxWidth: "1000px", margin: "0 auto" }}>
             <div style={{ display: "flex", alignItems: "center", gap: "12px", marginBottom: "20px", flexWrap: "wrap" }}>
               <span style={{ color: "#1a73e8", fontSize: "13px", fontWeight: "600", textTransform: "uppercase", letterSpacing: "0.8px" }}>Legal Policies</span>
@@ -233,7 +229,7 @@ export default function Privacy() {
 function Section({ id, number, title, children }) {
   return (
     <div id={id} style={{ marginBottom: "24px", scrollMarginTop: "140px" }}>
-      <div className="section-card" style={{ background: "#ffffff", border: "1px solid #dadce0", borderRadius: "8px", padding: "32px", overflow: "hidden" }}>
+      <div className="section-card" style={{ overflow: "hidden" }}>
         <div style={{ display: "flex", alignItems: "center", gap: "16px", marginBottom: "16px" }}>
           <div style={{ background: "#f1f3f4", color: "#1a73e8", borderRadius: "50%", width: "32px", height: "32px", display: "flex", alignItems: "center", justifyContent: "center", fontSize: "14px", fontWeight: "600", flexShrink: 0 }}>
             {number}

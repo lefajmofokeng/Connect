@@ -711,7 +711,7 @@ const ft = {
   tabActive: { borderColor: "#1967d2" },
   tabLabel: {
     position: "absolute", top: "-10px", left: "10px", background: "#f4f4f4",
-    padding: "0 4px", fontSize: "20px", fontWeight: "500", color: "#0058aa",
+    padding: "0 4px", fontSize: "19px", fontWeight: "400", color: "#0058aa",
     lineHeight: 1, zIndex: 1,
     WebkitFontSmoothing: "antialiased",
   },
@@ -767,7 +767,7 @@ const s = {
   resultsCount: { color: "#5f6368", fontSize: "14px", fontWeight: "400" },
   resultsLocation: { color: "#202124", fontWeight: "500" },
 
-  mobileFilterBtn: { background: "#1a73e8", border: "none", borderRadius: "50px", padding: "10px 20px", fontSize: "14px", color: "#ffffff", cursor: "pointer", fontFamily: "inherit", fontWeight: "500", display: "flex", alignItems: "center", gap: "8px", boxShadow: "0 2px 8px rgba(26,115,232,0.3)" },
+  mobileFilterBtn: { background: "#007ed2", border: "none", borderRadius: "50px", padding: "10px 20px", fontSize: "14px", color: "#ffffff", cursor: "pointer", fontFamily: "inherit", fontWeight: "500", display: "flex", alignItems: "center", gap: "8px",},
   mobileFilterBadge: { background: "#fff", color: "#1a73e8", borderRadius: "50%", width: "18px", height: "18px", fontSize: "11px", fontWeight: "700", display: "flex", alignItems: "center", justifyContent: "center" },
   mobileHeroCount: { fontSize: "15px", fontFamily: "inherit" },
 
@@ -777,7 +777,7 @@ const s = {
   emptyState: { display: "flex", flexDirection: "column", alignItems: "center", padding: "64px 24px", textAlign: "center" },
   emptyTitle: { color: "#202124", fontSize: "20px", fontWeight: "400", margin: "0 0 8px" },
   emptySub: { color: "#5f6368", fontSize: "15px", margin: "0 0 24px" },
-  outlineBtn: { background: "#fff", color: "#1a73e8", border: "1px solid #dadce0", outline: "none", borderRadius: "24px", padding: "12px 28px", fontSize: "15px", fontWeight: "500", cursor: "pointer", textDecoration: "none", display: "inline-block" },
+  outlineBtn: { background: "#fff", color: "#1a73e8", outline: "none", borderRadius: "24px", padding: "12px 28px", fontSize: "15px", fontWeight: "500", cursor: "pointer", textDecoration: "none", display: "inline-block" },
 
   jobListWrapper: { display: "flex", flexDirection: "column", background: "transparent", borderBottom: "none", borderRadius: "8px", overflow: "hidden" },
   jobListItem: { padding: "20px 0", cursor: "pointer", position: "relative", borderBottom: "1px solid #dadce0" },

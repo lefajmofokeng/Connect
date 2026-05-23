@@ -5,6 +5,8 @@
    Accent: #1a73e8 (Google Blue)
 ═══════════════════════════════════════════════════════════ */
 
+@import url('https://fonts.googleapis.com/css2?family=Ancizar+Sans:ital,wght@0,100..1000;1,100..1000&family=Google+Sans:ital,opsz,wght@0,17..18,400..700;1,17..18,400..700&family=PT+Sans:ital,wght@0,400;0,700;1,400;1,700&family=Source+Sans+3:ital,wght@0,200..900;1,200..900&display=swap');
+
 @font-face {
   font-family: 'Circular Std';
   src: url('/fonts/CircularStd-Book.woff2') format('woff2');

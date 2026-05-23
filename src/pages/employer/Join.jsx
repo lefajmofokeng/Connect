@@ -57,7 +57,7 @@ export default function Join() {
           --text-muted: #5f6368;
           --bg-main: #f8f9fa;
           --border-color: #e2e8f0;
-          --radius: 15px;
+          --radius: 2px;
           --font-family: "Circular Std", -apple-system, BlinkMacSystemFont, sans-serif;
         }
 
@@ -228,7 +228,7 @@ export default function Join() {
 
         .form-input {
           background: #fafafa;
-          border: 1px solid var(--border-color);
+          border: none;
           border-radius: var(--radius);
           padding: 14px 16px;
           color: var(--text-main);
